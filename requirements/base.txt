@@ -1,0 +1,36 @@
+# Bleeding edge Django
+django==1.7
+
+# Configuration
+django-configurations==0.8
+django-secure==1.0
+django-cache-url==0.8.0
+dj-database-url==0.3.0
+
+# Forms
+django-braces==1.4.0
+django-crispy-forms==1.4.0
+django-floppyforms==1.2.0
+
+# Models
+django-model-utils==2.2
+
+# images
+Pillow==2.5.3
+
+# For user registration, either via email or social
+# Well-built with regular release cycles!
+django-allauth==0.18.0
+
+# For the persistance stores
+MySQL-Python==1.2.5
+
+# Unicode slugification
+unicode-slugify==0.1.1
+django-autoslug==1.7.2
+
+# Useful things
+django-avatar==2.0
+
+
+# Your custom requirements go here

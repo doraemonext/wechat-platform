@@ -1,0 +1,1 @@
+web: gunicorn --pythonpath="$PWD/wechat_platform" wsgi:application
