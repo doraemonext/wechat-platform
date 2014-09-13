@@ -16,6 +16,9 @@ nosetests.xml
 *.mo
 *.pot
 
+# Media
+wechat_platform/media
+
 # Pycharm
 .idea
 

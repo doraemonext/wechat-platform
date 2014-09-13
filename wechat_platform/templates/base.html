@@ -38,14 +38,9 @@
         <a class="navbar-brand" href="/">wechat_platform</a>
         <ul class="nav navbar-nav">
           <li class="active"><a href="{% url 'home' %}">Home</a></li>
-          <li><a href="{% url 'about' %}">About</a></li>
 
           {% if request.user.is_authenticated %}
-            <li><a href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a></li>
-            <li><a href="{% url 'account_logout' %}">{% trans "Logout" %}</a></li>
           {% else %}
-            <li><a href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a></li>
-            <li><a href="{% url 'account_login' %}">{% trans "Log In" %}</a></li>
           {% endif %}
         </ul>
       </div>
