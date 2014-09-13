@@ -46,12 +46,17 @@ class Common(Configuration):
 
     # Apps specific for this project go here.
     LOCAL_APPS = (
-        'users',  # custom users app
+        'system.users',  # custom users app
         # Your stuff: custom apps go here
     )
 
+    # Wechat Plugin App
+    PLUGIN_APPS = (
+
+    )
+
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
-    INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+    INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + PLUGIN_APPS
     # END APP CONFIGURATION
 
     # MIDDLEWARE CONFIGURATION
