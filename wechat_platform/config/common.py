@@ -42,6 +42,7 @@ class Common(Configuration):
 
     # Apps specific for this project go here.
     LOCAL_APPS = (
+        'admin.dashboard',
         'system.official_account',
     )
 
