@@ -4,8 +4,10 @@ from django.core.urlresolvers import reverse
 from django.http.response import HttpResponseRedirect
 from django.views.generic import TemplateView
 
+from lib.tools.mixin import AnonymousRequiredMixin
 
-class LoginView(TemplateView):
+
+class LoginView(AnonymousRequiredMixin, TemplateView):
     template_name = 'login.html'
 
     def get_context_data(self, **kwargs):

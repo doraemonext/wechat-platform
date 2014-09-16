@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse
 
 from rest_framework.views import APIView
@@ -43,3 +43,15 @@ class LoginAPI(APIView):
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutAPI(APIView):
+    authentication_classes = (authentication.SessionAuthentication, )
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get(self, request):
+        logout(request)
+        response = {
+            'redirect_url': reverse('admin:user:login'),
+        }
+        return Response(response, status=status.HTTP_200_OK)
