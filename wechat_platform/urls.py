@@ -10,4 +10,6 @@ from django.views.generic import TemplateView
 urlpatterns = patterns('',
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name="home"),
     url(r'^admin/', include('admin.urls', namespace='admin')),
+    url(r'^api/', include('api.urls', namespace='api')),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

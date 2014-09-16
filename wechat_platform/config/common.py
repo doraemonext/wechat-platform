@@ -38,11 +38,13 @@ class Common(Configuration):
     )
     THIRD_PARTY_APPS = (
         'crispy_forms',  # Form layouts
+        'rest_framework',
     )
 
     # Apps specific for this project go here.
     LOCAL_APPS = (
         'admin.dashboard',
+        'admin.user',
         'system.official_account',
     )
 

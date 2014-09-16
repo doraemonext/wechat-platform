@@ -6,8 +6,9 @@ from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
 
+from .views import LoginView
+
 
 urlpatterns = patterns('',
-    url(r'^dashboard/', include('admin.dashboard.urls', namespace='dashboard')),
-    url(r'^user/', include('admin.user.urls', namespace='user')),
+    url(r'^login/$', LoginView.as_view(), name='login'),
 )
