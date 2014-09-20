@@ -1,0 +1,86 @@
+{% extends 'base/admin.html' %}
+{% load staticfiles i18n %}
+
+{% block content_header %}用户{% endblock %}
+{% block content_header_small %}管理当前系统用户{% endblock %}
+{% block content_header_right %}用户{% endblock %}
+
+{% block content %}
+    <div id="member-list-container"></div>
+
+    <script type="text/template" id="member-list-template">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="content-header">
+                    <div class="pull-right">
+                        <button class="btn btn-primary add"><i class="fa fa-fw fa-plus-circle"></i> 添加用户</button>
+                    </div>
+                    <div class="list-operation">
+                        <select class="form-control">
+                            <option></option>
+                            <option value="delete">删除所选用户</option>
+                        </select>
+                        <button class="btn btn-default">应用</button>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="box-body table-responsive no-padding">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 34px"></th>
+                                    <th style="min-width: 150px">用户名</th>
+                                    <th style="min-width: 150px">昵称</th>
+                                    <th style="min-width: 250px">电子邮件地址</th>
+                                    <th style="min-width: 150px">所属用户组</th>
+                                    <th style="min-width: 150px">注册时间</th>
+                                    <th style="min-width: 120px">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="list"></tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="member-item-template">
+        <td><input type="checkbox"></td>
+        <td><%= username %></td>
+        <td><%= nickname %></td>
+        <td><%= email %></td>
+        <td><%= group %></td>
+        <td><%= date_joined %></td>
+        <td>
+            <button type="button" class="btn btn-xs btn-default edit">编辑</button>
+            <button type="button" class="btn btn-xs btn-danger delete">删除</button>
+        </td>
+    </script>
+
+    <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">关闭</span></button>
+                    <h4 class="modal-title" id="myModalLabel">确认删除</h4>
+                </div>
+                <div class="modal-body">
+                    是否删除？
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger btn-ok">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script src="{% static 'js/admin/member.js' %}"></script>
+{% endblock %}

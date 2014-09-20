@@ -78,7 +78,7 @@
                     <!-- sidebar menu: : style can be found in sidebar.less -->
                     <ul class="sidebar-menu">
                         <li class="active">
-                            <a href="#">
+                            <a href="{% url 'admin:dashboard:dashboard' %}">
                                 <i class="fa fa-dashboard"></i> <span>仪表盘</span>
                             </a>
                         </li>
@@ -112,7 +112,7 @@
                                 <i class="fa fa-angle-left pull-right"></i>
                             </a>
                             <ul class="treeview-menu">
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 用户</a></li>
+                                <li><a href="{% url 'admin:member:list' %}"><i class="fa fa-angle-double-right"></i> 用户</a></li>
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 用户组</a></li>
                             </ul>
                         </li>
@@ -140,11 +140,11 @@
                         <small>{% block content_header_small %}{% endblock %}</small>
                     </h1>
                     <ol class="breadcrumb">
-                        {% url 'admin:dashoard:dashboard' as dashboard_url %}
-                        {% if request.get_full_path == dashboard_url %}
+                        {% url 'admin:dashboard:dashboard' as dashboard_url %}
+                        {% ifnotequal request.get_full_path dashboard_url %}
                             <li><a href="{% url 'admin:dashboard:dashboard' %}"><i class="fa fa-dashboard"></i> 仪表盘</a></li>
                             <li class="active">{% block content_header_right %}{% endblock %}</li>
-                        {% endif %}
+                        {% endifnotequal %}
                     </ol>
                 </section>
 
@@ -161,10 +161,12 @@
 
         {% block javascript %}
             <script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
+            <script src="{% static 'js/underscore-min.js' %}"></script>
+            <script src="{% static 'js/backbone-min.js' %}"></script>
             <script src="{% static 'js/bootstrap.min.js' %}"></script>
             <script src="{% static 'js/AdminLTE/app.js' %}"></script>
-            <script src="{% static 'js/AdminLTE/demo.js' %}"></script>
             <script src="{% static 'js/admin/common.js' %}"></script>
+            <script src="{% static 'js/plugins/noty/jquery.noty.packaged.min.js' %}"></script>
         {% endblock %}
     </body>
 </html>
