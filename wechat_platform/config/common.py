@@ -34,7 +34,7 @@ class Common(Configuration):
         # 'django.contrib.humanize',
 
         # Admin
-        'django.contrib.admin',
+        # 'django.contrib.admin',
     )
     THIRD_PARTY_APPS = (
         'crispy_forms',  # Form layouts
@@ -43,10 +43,11 @@ class Common(Configuration):
 
     # Apps specific for this project go here.
     LOCAL_APPS = (
+        'system.users',
+        'system.official_account',
         'admin.dashboard',
         'admin.user',
         'admin.member',
-        'system.official_account',
     )
 
     # Wechat Plugin App
@@ -245,5 +246,7 @@ class Common(Configuration):
         }
     }
     # END LOGGING CONFIGURATION
+
+    AUTH_USER_MODEL = 'users.User'
 
     # Your common stuff: Below this line define 3rd party libary settings
