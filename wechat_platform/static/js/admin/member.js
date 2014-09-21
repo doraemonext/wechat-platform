@@ -34,7 +34,8 @@ $(document).ready(function() {
     var MemberItemView = Backbone.View.extend({
         tagName: "tr",
         template: _.template($("#member-item-template").html()),
-        initialize: function() {
+        initialize: function(member) {
+            this.model = member;
             this.listenTo(this.model, 'change', this.render);
             this.listenTo(this.model, 'destroy', this.remove);
         },
@@ -87,7 +88,7 @@ $(document).ready(function() {
             return this;
         },
         add: function(member) {
-            var member_view = new MemberItemView({ model: member });
+            var member_view = new MemberItemView(member);
             this.$el.find(".list").append(member_view.render().el);
         }
     });
@@ -95,25 +96,21 @@ $(document).ready(function() {
 
     var AppView = Backbone.View.extend({
         el: $("#container"),
-        template: _.template($("#app-template").html()),
+        template_container: _.template($("#app-template").html()),
         template_header_list: _.template($("#app-header-list-template").html()),
         initialize: function() {
-            this.$el.html(this.template());
-            this.header = this.$el.find("#header");
-            this.content = this.$el.find("#member-list");
-
             this.render();
         },
         events: {
             "click .add": "add_user"
         },
         render: function() {
-            this.header.html(this.template_header_list());
-            this.content.html(member_list_view.render().el);
+            this.$el.html(this.template_container());
+            this.$el.find("#header").html(this.template_header_list());
+            this.$el.find("#content").html(member_list_view.render().el);
         },
         add_user: function() {
-            this.content.html('');
-            this.content.html(member_list_view.render().el);
+            
         }
     });
     var app_view = new AppView;
