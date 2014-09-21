@@ -53,7 +53,21 @@
         <td><%= username %></td>
         <td><%= nickname %></td>
         <td><%= email %></td>
-        <td><%= group %></td>
+        <% if (groups.length > 0) { %>
+        <td>
+        <%     _.each(groups, function(group) { %>
+        <%         if (group['name'] == '超级管理员') { %>
+                       <small class="badge bg-red"><%= group['name'] %></small>
+        <%         } else if (group['name'] == '管理员') { %>
+                       <small class="badge bg-light-blue"><%= group['name'] %></small>
+        <%         } else { %>
+                       <small class="badge"><%= group['name'] %></small>
+        <%         } %>
+        <%     }); %>
+        </td>
+        <% } else { %>
+        <td>无用户组</td>
+        <% } %>
         <td><%= date_joined %></td>
         <td>
             <button type="button" class="btn btn-xs btn-default edit">编辑</button>
