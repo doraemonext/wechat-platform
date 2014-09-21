@@ -6,50 +6,47 @@
 {% block content_header_right %}用户{% endblock %}
 
 {% block content %}
-    <div id="member-list-container"></div>
+    <div id="container"></div>
 
-    <script type="text/template" id="member-list-template">
+    <script type="text/template" id="app-template">
         <div class="row">
             <div class="col-xs-12">
                 <div class="content-header">
-                    <div class="pull-right">
-                        <button class="btn btn-primary add"><i class="fa fa-fw fa-plus-circle"></i> 添加用户</button>
-                    </div>
                     <div class="list-operation">
-                        <select class="form-control">
-                            <option></option>
-                            <option value="delete">删除所选用户</option>
-                        </select>
-                        <button class="btn btn-default">应用</button>
+                        <div class="pull-right">
+                            <button class="btn btn-success add"><i class="fa fa-fw fa-plus-circle"></i> 添加用户</button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="box">
-                    <div class="box-body table-responsive no-padding">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="min-width: 34px"></th>
-                                    <th style="min-width: 150px">用户名</th>
-                                    <th style="min-width: 150px">昵称</th>
-                                    <th style="min-width: 250px">电子邮件地址</th>
-                                    <th style="min-width: 150px">所属用户组</th>
-                                    <th style="min-width: 150px">注册时间</th>
-                                    <th style="min-width: 120px">操作</th>
-                                </tr>
-                            </thead>
-                            <tbody class="list"></tbody>
-                        </table>
-                    </div>
-                    <!-- /.box-body -->
-                </div>
+                <div id="member-list"></div>
                 <!-- /.box -->
             </div>
         </div>
     </script>
 
+    <script type="text/template" id="member-list-template">
+        <div class="box">
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th style="min-width: 150px">用户名</th>
+                            <th style="min-width: 150px">昵称</th>
+                            <th style="min-width: 250px">电子邮件地址</th>
+                            <th style="min-width: 150px">所属用户组</th>
+                            <th style="min-width: 150px">注册时间</th>
+                            <th style="min-width: 120px">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="list"></tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </script>
+
     <script type="text/template" id="member-item-template">
-        <td><input type="checkbox"></td>
         <td><%= username %></td>
         <td><%= nickname %></td>
         <td><%= email %></td>

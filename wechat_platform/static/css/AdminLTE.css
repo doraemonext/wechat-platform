@@ -3541,7 +3541,9 @@ fieldset[disabled] .btn-vk.active {
     height: 34px;
 }
 .content-header .list-operation {
-    margin-bottom: 8px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    zoom: 1;
 }
 .content-header .list-operation select {
     width: 150px;

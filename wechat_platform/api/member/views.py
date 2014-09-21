@@ -12,7 +12,7 @@ from rest_framework import status, parsers
 from .serializer import MemberSerializer
 
 
-class MemberListAPI(mixins.ListModelMixin, GenericAPIView):
+class MemberListAPI(mixins.ListModelMixin, mixins.CreateModelMixin, GenericAPIView):
     authentication_classes = (authentication.SessionAuthentication, )
     permission_classes = (permissions.IsAuthenticated, )
     queryset = get_user_model().objects.all()
@@ -20,6 +20,12 @@ class MemberListAPI(mixins.ListModelMixin, GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         return super(MemberListAPI, self).list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return super(MemberListAPI, self).create(request, *args, **kwargs)
+
+    def post_save(self, obj, created=False):
+        pass
 
 
 class MemberDetailAPI(mixins.DestroyModelMixin, GenericAPIView):

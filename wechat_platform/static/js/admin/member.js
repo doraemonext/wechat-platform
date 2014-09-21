@@ -74,14 +74,11 @@ $(document).ready(function() {
     });
 
     var MemberListView = Backbone.View.extend({
-        el: $("#member-list-container"),
         template: _.template($("#member-list-template").html()),
         initialize: function() {
             this.listenTo(members, 'add', this.add_with_model);
+            this.render();
             members.fetch();
-        },
-        events: {
-            "click .add": "add"
         },
         render: function() {
             this.$el.html(this.template());
@@ -89,13 +86,22 @@ $(document).ready(function() {
         },
         add_with_model: function(member) {
             var member_item_view = new MemberItemView({ model: member });
-            $(this.el).find(".list").append(member_item_view.render().el);
+            this.$el.find(".list").append(member_item_view.render().el);
             return this;
-        },
-        add: function() {
-            this.remove();
         }
     });
     var member_list_view = new MemberListView;
-    member_list_view.render();
+
+    var AppView = Backbone.View.extend({
+        el: $("#container"),
+        template: _.template($("#app-template").html()),
+        initialize: function() {
+            this.render();
+        },
+        render: function() {
+            this.$el.html(this.template());
+            this.$el.find("#member-list").html(member_list_view.render().el);
+        }
+    });
+    var app_view = new AppView;
 });
