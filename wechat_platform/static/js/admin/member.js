@@ -75,32 +75,45 @@ $(document).ready(function() {
 
     var MemberListView = Backbone.View.extend({
         template: _.template($("#member-list-template").html()),
-        initialize: function() {
-            this.listenTo(members, 'add', this.add_with_model);
+        initialize: function(collection) {
+            this.collection = collection;
             this.render();
-            members.fetch();
+            this.listenTo(this.collection, 'add', this.add);
+            this.collection.fetch();
         },
         render: function() {
             this.$el.html(this.template());
+            _(this.collection.models).each(this.add, this);
             return this;
         },
-        add_with_model: function(member) {
-            var member_item_view = new MemberItemView({ model: member });
-            this.$el.find(".list").append(member_item_view.render().el);
-            return this;
+        add: function(member) {
+            var member_view = new MemberItemView({ model: member });
+            this.$el.find(".list").append(member_view.render().el);
         }
     });
-    var member_list_view = new MemberListView;
+    var member_list_view = new MemberListView(members);
 
     var AppView = Backbone.View.extend({
         el: $("#container"),
         template: _.template($("#app-template").html()),
+        template_header_list: _.template($("#app-header-list-template").html()),
         initialize: function() {
+            this.$el.html(this.template());
+            this.header = this.$el.find("#header");
+            this.content = this.$el.find("#member-list");
+
             this.render();
         },
+        events: {
+            "click .add": "add_user"
+        },
         render: function() {
-            this.$el.html(this.template());
-            this.$el.find("#member-list").html(member_list_view.render().el);
+            this.header.html(this.template_header_list());
+            this.content.html(member_list_view.render().el);
+        },
+        add_user: function() {
+            this.content.html('');
+            this.content.html(member_list_view.render().el);
         }
     });
     var app_view = new AppView;
