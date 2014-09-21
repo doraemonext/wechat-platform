@@ -1,21 +1,37 @@
 {% extends 'base/admin.html' %}
 {% load staticfiles i18n %}
 
-{% block content_header %}用户{% endblock %}
-{% block content_header_small %}管理当前系统用户{% endblock %}
-{% block content_header_right %}用户{% endblock %}
-
 {% block content %}
     <div id="container"></div>
 
+    <script type="text/template" id="app-breadcrumb-template">
+        <h1>
+            <span id="breadcrumb-title"><%= title %></span>
+            <small id="breadcrumb-subtitle"><%= subtitle %></small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'admin:dashboard:dashboard' %}"><i class="fa fa-dashboard"></i> 仪表盘</a></li>
+            <% _.each(breadcrumbs, function(breadcrumb, index, list) { %>
+            <%     if (index < _.size(list) - 1) { %>
+                       <li><a href="<%= breadcrumb.url %>"><%= breadcrumb.title %></a></li>
+            <%     } else { %>
+                       <li class="active"><%= breadcrumb.title %></li>
+            <%     } %>
+            <% }); %>
+        </ol>
+    </script>
+
     <script type="text/template" id="app-template">
-        <div class="row">
-            <div class="col-xs-12">
-                <div id="header"></div>
-                <div id="content"></div>
-                <!-- /.box -->
-            </div>
-        </div>
+        <aside class="right-side">
+            <section class="content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div id="header"></div>
+                        <div id="content"></div>
+                    </div>
+                </div>
+            </section>
+        </aside>
     </script>
 
     <script type="text/template" id="app-header-list-template">

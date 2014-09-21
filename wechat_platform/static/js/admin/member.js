@@ -8,6 +8,22 @@ $(document).ready(function() {
     });
     var members = new Members;
 
+    var BreadcrumbView = Backbone.View.extend({
+        tagName: "section",
+        className: "content-header",
+        template: _.template($("#app-breadcrumb-template").html()),
+        initialize: function() {},
+        render: function(args) {
+            this.$el.html(this.template({
+                title: args.title,
+                subtitle: args.subtitle,
+                breadcrumbs: args.breadcrumbs
+            }));
+            return this;
+        }
+    });
+    var breadcrumb_view = new BreadcrumbView;
+
     var ConfirmModelView = Backbone.View.extend({
         el: "#confirm-modal",
         events: {
@@ -112,19 +128,37 @@ $(document).ready(function() {
         template_header_add_user: _.template($("#app-header-add-user-template").html()),
         initialize: function() {
             this.render();
+            this.breadcrumb = this.$el.find(".right-side");
             this.header = this.$el.find("#header");
             this.content = this.$el.find("#content");
         },
         render: function() {
             this.$el.html(this.template_container());
         },
+
+        set_breadcrumb: function(title, subtitle, breadcrumbs) {
+            this.breadcrumb.prepend(breadcrumb_view.render({
+                title: title,
+                subtitle: subtitle,
+                breadcrumbs: breadcrumbs
+            }).el);
+        },
+        set_header: function(html) {
+            this.header.html(html);
+        },
+        set_content: function(html) {
+            this.content.html(html);
+        },
+
         default_interface: function() {
-            this.header.html(this.template_header_list());
-            this.content.html(member_list_view.render().el);
+            this.set_breadcrumb('用户', '管理用户列表', [{title:'用户', url:'#'}]);
+            this.set_header(this.template_header_list());
+            this.set_content(member_list_view.render().el);
         },
         add_user_interface: function() {
-            this.header.html(this.template_header_add_user());
-            this.content.html(member_item_add_view.render().el);
+            this.set_breadcrumb('添加用户', '添加一个新的用户', [{title:'用户', url:'#'},{title:'添加用户', url:'#/add_user'}]);
+            this.set_header(this.template_header_add_user());
+            this.set_content(member_item_add_view.render().el);
         }
     });
     var app_view = new AppView;
