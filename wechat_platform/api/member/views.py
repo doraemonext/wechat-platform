@@ -16,17 +16,24 @@ from .serializer import MemberSerializer, GroupSerializer
 class MemberListAPI(mixins.ListModelMixin, mixins.CreateModelMixin, GenericAPIView):
     authentication_classes = (authentication.SessionAuthentication, )
     permission_classes = (permissions.IsAuthenticated, )
-    queryset = get_user_model().objects.all()
+    model = get_user_model()
     serializer_class = MemberSerializer
 
     def get(self, request, *args, **kwargs):
         return super(MemberListAPI, self).list(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        return super(MemberListAPI, self).create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.DATA, files=request.FILES)
+        groups = request.POST.getlist('groups[]')
 
-    def post_save(self, obj, created=False):
-        pass
+        if serializer.is_valid():
+            object = serializer.save()
+            for group in groups:
+                object.groups.add(Group.objects.get(pk=group))
+            serializer = self.get_serializer(instance=object)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MemberDetailAPI(mixins.DestroyModelMixin, GenericAPIView):

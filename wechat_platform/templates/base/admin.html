@@ -139,12 +139,14 @@
 
         {% block javascript %}
             <script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
+            <script src="{% static 'js/jquery.cookie.js' %}"></script>
             <script src="{% static 'js/underscore-min.js' %}"></script>
             <script src="{% static 'js/backbone-min.js' %}"></script>
             <script src="{% static 'js/bootstrap.min.js' %}"></script>
             <script src="{% static 'js/AdminLTE/app.js' %}"></script>
-            <script src="{% static 'js/admin/common.js' %}"></script>
             <script src="{% static 'js/plugins/noty/jquery.noty.packaged.min.js' %}"></script>
+            <script src="{% static 'js/admin/preload.js' %}"></script>
+            <script src="{% static 'js/admin/common.js' %}"></script>
         {% endblock %}
     </body>
 </html>

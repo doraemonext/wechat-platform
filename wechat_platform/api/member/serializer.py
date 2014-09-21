@@ -25,6 +25,15 @@ class GroupSerializer(serializers.ModelSerializer):
 class MemberSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True, read_only=True)
 
+    def save(self, **kwargs):
+        return get_user_model().objects.create_user(
+            username=self.object.username,
+            email=self.object.email,
+            nickname=self.object.nickname,
+            password=self.object.password
+        )
+
     class Meta:
         model = get_user_model()
         fields = ('id', 'username', 'nickname', 'email', 'groups', 'date_joined')
+        read_only_fields = ('date_joined', )

@@ -25,6 +25,9 @@ class UserManager(BaseUserManager):
     def create_superuser(self, username, email, nickname, password, **extra_fields):
         return self._create_user(username, email, nickname, password, True, True, **extra_fields)
 
+    def save(self):
+        pass
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(u'用户名', max_length=30, unique=True)

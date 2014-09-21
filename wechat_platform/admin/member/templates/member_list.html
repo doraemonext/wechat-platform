@@ -38,7 +38,7 @@
         <div class="content-header">
             <div class="list-operation">
                 <div class="pull-right">
-                    <a href="#/add_user" class="btn btn-success"><i class="fa fa-fw fa-plus-circle"></i> <strong>添加用户</strong></a>
+                    <a href="#/add_user" class="btn btn-primary"><i class="fa fa-fw fa-plus-circle"></i> <strong>添加用户</strong></a>
                 </div>
             </div>
         </div>
@@ -48,7 +48,7 @@
         <div class="content-header">
             <div class="list-operation">
                 <div>
-                    <a href="#" class="btn btn-primary"><i class="fa fa-fw fa-arrow-circle-o-left"></i> <strong>返回用户列表</strong></a>
+                    <a href="#" class="btn btn-default"><i class="fa fa-fw fa-arrow-circle-o-left"></i> <strong>返回用户列表</strong></a>
                 </div>
             </div>
         </div>
@@ -102,51 +102,55 @@
     </script>
 
     <script type="text/template" id="member-add-user-template">
-        <form class="form-horizontal" role="form">
+        <hr>
+        <form class="form-horizontal" role="form" id="add-user-form">
             <div class="form-group">
-                <label for="inputEmail3" class="col-sm-2 control-label">用户名</label>
+                <label for="inputEmail3" class="col-sm-2 control-label">用户名 <span class="text-red">*</span></label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" id="inputEmail3">
+                    <input type="text" class="form-control" name="username" id="username">
+                    <!--<label class="control-label text-red">用户名不能为空</label>-->
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">电子邮件</label>
+                <label for="inputPassword3" class="col-sm-2 control-label">电子邮件 <span class="text-red">*</span></label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" id="inputPassword3">
+                    <input type="text" class="form-control" name="email" id="email">
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">昵称</label>
+                <label for="inputPassword3" class="col-sm-2 control-label">昵称 <span class="text-red">*</span></label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" id="inputPassword3">
+                    <input type="text" class="form-control" name="nickname" id="nickname">
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">密码</label>
+                <label for="inputPassword3" class="col-sm-2 control-label">密码 <span class="text-red">*</span></label>
                 <div class="col-sm-9">
-                    <input type="password" class="form-control" id="inputPassword3">
+                    <input type="password" class="form-control" name="password" id="password">
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">确认密码</label>
+                <label for="inputPassword3" class="col-sm-2 control-label">确认密码 <span class="text-red">*</span></label>
                 <div class="col-sm-9">
-                    <input type="password" class="form-control" id="inputPassword3">
+                    <input type="password" class="form-control" name="password_confirm" id="password_confirm">
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-sm-2 control-label">所属用户组</label>
+                <label class="col-sm-2 control-label">所属用户组 <span class="text-red">*</span></label>
                 <div class="col-sm-9">
                     <label class="checkbox-inline">
-                        <input type="checkbox" id="inlineCheckbox1" value="option1"> 超级管理员
+                        <input type="checkbox" class="groups" name="groups" value="1"> 超级管理员
                     </label>
                     <label class="checkbox-inline">
-                        <input type="checkbox" id="inlineCheckbox2" value="option2"> 管理员
+                        <input type="checkbox" class="groups" name="groups" value="2"> 管理员
                     </label>
                     <label class="checkbox-inline">
-                        <input type="checkbox" id="inlineCheckbox3" value="option3"> 用户
+                        <input type="checkbox" class="groups" name="groups" value="3"> 用户
                     </label>
+                    <span class="help-block">提示：用户组可多选，每次权限检查将取所选所有用户组中的最大值</span>
                 </div>
             </div>
+            <hr>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-2">
                     <button type="submit" class="btn btn-primary btn-block">添加用户</button>
@@ -174,5 +178,6 @@
 
 {% block javascript %}
     {{ block.super }}
+    <script src="{% static 'js/jquery.validate.min.js' %}"></script>
     <script src="{% static 'js/admin/member.js' %}"></script>
 {% endblock %}
