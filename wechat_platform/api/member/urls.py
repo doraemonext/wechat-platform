@@ -5,10 +5,11 @@ from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
 
-from .views import MemberListAPI, MemberDetailAPI
+from .views import MemberListAPI, MemberDetailAPI, GroupListAPI
 
 
 urlpatterns = patterns('',
     url(r'^$', MemberListAPI.as_view(), name='member_list'),
-    url(r'(?P<pk>[0-9]+)', MemberDetailAPI.as_view(), name='member_detail'),
+    url(r'^(?P<pk>[0-9]+)', MemberDetailAPI.as_view(), name='member_detail'),
+    url(r'^group$', GroupListAPI.as_view(), name='group'),
 )

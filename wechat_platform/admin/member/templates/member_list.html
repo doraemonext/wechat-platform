@@ -22,7 +22,17 @@
         <div class="content-header">
             <div class="list-operation">
                 <div class="pull-right">
-                    <button class="btn btn-success add"><i class="fa fa-fw fa-plus-circle"></i> 添加用户</button>
+                    <a href="#/add_user" class="btn btn-success"><i class="fa fa-fw fa-plus-circle"></i> <strong>添加用户</strong></a>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="app-header-add-user-template">
+        <div class="content-header">
+            <div class="list-operation">
+                <div>
+                    <a href="#" class="btn btn-primary"><i class="fa fa-fw fa-arrow-circle-o-left"></i> <strong>返回用户列表</strong></a>
                 </div>
             </div>
         </div>
@@ -75,16 +85,68 @@
         </td>
     </script>
 
+    <script type="text/template" id="member-add-user-template">
+        <form class="form-horizontal" role="form">
+            <div class="form-group">
+                <label for="inputEmail3" class="col-sm-2 control-label">用户名</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="inputEmail3">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">电子邮件</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="inputPassword3">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">昵称</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="inputPassword3">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">密码</label>
+                <div class="col-sm-9">
+                    <input type="password" class="form-control" id="inputPassword3">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">确认密码</label>
+                <div class="col-sm-9">
+                    <input type="password" class="form-control" id="inputPassword3">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">所属用户组</label>
+                <div class="col-sm-9">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox1" value="option1"> 超级管理员
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox2" value="option2"> 管理员
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox3" value="option3"> 用户
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-2">
+                    <button type="submit" class="btn btn-primary btn-block">添加用户</button>
+                </div>
+            </div>
+        </form>
+    </script>
+
     <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">关闭</span></button>
-                    <h4 class="modal-title" id="myModalLabel">确认删除</h4>
+                    <h4 class="modal-title" id="myModalLabel"></h4>
                 </div>
-                <div class="modal-body">
-                    是否删除？
-                </div>
+                <div class="modal-body"></div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                     <button type="button" class="btn btn-danger btn-ok">确认</button>

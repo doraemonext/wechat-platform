@@ -3537,7 +3537,7 @@ fieldset[disabled] .btn-vk.active {
 }
 
 /* Custom CSS */
-.content-header button {
+.content-header a {
     height: 34px;
 }
 .content-header .list-operation {
