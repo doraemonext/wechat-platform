@@ -33,20 +33,20 @@ $(document).ready(function() {
     });
     var breadcrumb_view = new BreadcrumbView;
 
-    var ConfirmModelView = Backbone.View.extend({
+    var ConfirmModalView = Backbone.View.extend({
         el: "#confirm-modal",
         events: {
-            "click .btn-ok": "run_callback"
+            "click .btn-ok": "run_callback",
+            "click .btn-cancel": "hide"
         },
-        build: function(args) {
+        show: function(args) {
             this.$el.find(".modal-title").html(args.title);
             this.$el.find(".modal-body").html("<p>" + args.body + "</p>");
             this.cb = args.cb;
-        },
-        render: function() {
+
             this.$el.modal("show");
         },
-        close: function() {
+        hide: function() {
             this.$el.modal("hide");
         },
         run_callback: function() {
@@ -54,7 +54,7 @@ $(document).ready(function() {
             this.$el.modal("hide");
         }
     });
-    var confirm_modal_view = new ConfirmModelView;
+    var confirm_modal_view = new ConfirmModalView;
 
     var MemberItemView = Backbone.View.extend({
         tagName: "tr",
@@ -74,7 +74,7 @@ $(document).ready(function() {
         },
         delete_item: function() {
             var current_model = this.model;
-            confirm_modal_view.build({
+            confirm_modal_view.show({
                 cb: function() {
                     current_model.destroy({
                         wait: true,
@@ -95,7 +95,6 @@ $(document).ready(function() {
                 title: "确认删除",
                 body: "请确认您将删除用户名为 <strong><u>" + this.model.get('username') + "</u></strong> 的用户，该操作不可恢复。"
             });
-            confirm_modal_view.render();
         }
     });
 
