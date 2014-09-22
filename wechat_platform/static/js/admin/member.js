@@ -15,6 +15,16 @@ $(document).ready(function() {
         model: Group
     });
 
+    var ContentHeaderView = Backbone.View.extend({
+        initialize: function(args) {
+            this.template = _.template(args.html);
+        },
+        render: function() {
+            this.$el.html(this.template());
+            return this;
+        }
+    });
+
     var BreadcrumbView = Backbone.View.extend({
         tagName: "section",
         className: "content-header",
@@ -238,8 +248,6 @@ $(document).ready(function() {
     var AppView = Backbone.View.extend({
         el: $("#container"),
         template_container: _.template($("#app-template").html()),
-        template_header_list: _.template($("#app-header-list-template").html()),
-        template_header_add_user: _.template($("#app-header-add-user-template").html()),
         initialize: function() {
             this.render();
             this.breadcrumb = this.$el.find(".right-side");
@@ -247,6 +255,7 @@ $(document).ready(function() {
             this.content = this.$el.find("#content");
 
             this.breadcrumb_view = null;
+            this.header_view = null;
             this.content_view = null;
         },
         render: function() {
@@ -260,8 +269,12 @@ $(document).ready(function() {
             this.breadcrumb_view = view;
             this.breadcrumb.prepend(this.breadcrumb_view.render().el);
         },
-        set_header: function(html) {
-            this.header.html(html);
+        set_header: function(view) {
+            if (this.header_view !== null) {
+                this.header_view.remove();
+            }
+            this.header_view = view;
+            this.header.html(this.header_view.render().el);
         },
         set_content: function(view) {
             if (this.content_view !== null) {
@@ -277,7 +290,9 @@ $(document).ready(function() {
                 subtitle: '管理用户列表',
                 breadcrumbs: [{title:'用户', url:'#'}]
             }));
-            this.set_header(this.template_header_list());
+            this.set_header(new ContentHeaderView({
+                html: $("#app-header-list-template").html()
+            }));
             this.set_content(new MemberListView);
         },
         add_user_interface: function() {
@@ -286,7 +301,9 @@ $(document).ready(function() {
                 subtitle: '添加一个新的用户',
                 breadcrumbs: [{title:'用户', url:'#'},{title:'添加用户', url:'#/add_user'}],
             }));
-            this.set_header(this.template_header_add_user());
+            this.set_header(new ContentHeaderView({
+                html: $("#app-header-add-user-template").html()
+            }));
             this.set_content(new MemberItemAddView);
         }
     });
