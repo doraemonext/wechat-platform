@@ -6,7 +6,6 @@ $(document).ready(function() {
         url: '/api/member/',
         model: Member
     });
-    var members = new Members;
 
     var Group = Backbone.Model.extend({
         urlRoot: '/api/member/group/'
@@ -15,23 +14,25 @@ $(document).ready(function() {
         url: '/api/member/group/',
         model: Group
     });
-    var groups = new Groups;
 
     var BreadcrumbView = Backbone.View.extend({
         tagName: "section",
         className: "content-header",
         template: _.template($("#app-breadcrumb-template").html()),
-        initialize: function() {},
-        render: function(args) {
+        initialize: function(args) {
+            this.title = args.title;
+            this.subtitle = args.subtitle;
+            this.breadcrumbs = args.breadcrumbs;
+        },
+        render: function() {
             this.$el.html(this.template({
-                title: args.title,
-                subtitle: args.subtitle,
-                breadcrumbs: args.breadcrumbs
+                title: this.title,
+                subtitle: this.subtitle,
+                breadcrumbs: this.breadcrumbs
             }));
             return this;
         }
     });
-    var breadcrumb_view = new BreadcrumbView;
 
     var ConfirmModalView = Backbone.View.extend({
         el: "#confirm-modal",
@@ -100,8 +101,8 @@ $(document).ready(function() {
 
     var MemberListView = Backbone.View.extend({
         template: _.template($("#member-list-template").html()),
-        initialize: function(collection) {
-            this.collection = collection;
+        initialize: function() {
+            this.collection = new Members;
             this.listenTo(this.collection, 'add', this.add);
         },
         render: function() {
@@ -115,12 +116,11 @@ $(document).ready(function() {
             this.$el.find(".list").append(member_view.render().el);
         }
     });
-    var member_list_view = new MemberListView(members);
 
     var MemberItemAddView = Backbone.View.extend({
         template: _.template($("#member-add-user-template").html()),
-        initialize: function(args) {
-            this.groups = args.groups;
+        initialize: function() {
+            this.groups = new Groups;
             this.listenTo(this.groups, 'add', this.add_group);
         },
         render: function() {
@@ -234,7 +234,6 @@ $(document).ready(function() {
             });
         }
     });
-    var member_item_add_view = new MemberItemAddView({ groups: groups });
 
     var AppView = Backbone.View.extend({
         el: $("#container"),
@@ -246,34 +245,49 @@ $(document).ready(function() {
             this.breadcrumb = this.$el.find(".right-side");
             this.header = this.$el.find("#header");
             this.content = this.$el.find("#content");
+
+            this.breadcrumb_view = null;
+            this.content_view = null;
         },
         render: function() {
             this.$el.html(this.template_container());
         },
 
-        set_breadcrumb: function(title, subtitle, breadcrumbs) {
-            this.breadcrumb.prepend(breadcrumb_view.render({
-                title: title,
-                subtitle: subtitle,
-                breadcrumbs: breadcrumbs
-            }).el);
+        set_breadcrumb: function(view) {
+            if (this.breadcrumb_view !== null) {
+                this.breadcrumb_view.remove();
+            }
+            this.breadcrumb_view = view;
+            this.breadcrumb.prepend(this.breadcrumb_view.render().el);
         },
         set_header: function(html) {
             this.header.html(html);
         },
-        set_content: function(html) {
-            this.content.html(html);
+        set_content: function(view) {
+            if (this.content_view !== null) {
+                this.content_view.remove();
+            }
+            this.content_view = view;
+            this.content.html(this.content_view.render().el);
         },
 
         default_interface: function() {
-            this.set_breadcrumb('用户', '管理用户列表', [{title:'用户', url:'#'}]);
+            this.set_breadcrumb(new BreadcrumbView({
+                title: '用户',
+                subtitle: '管理用户列表',
+                breadcrumbs: [{title:'用户', url:'#'}]
+            }));
             this.set_header(this.template_header_list());
-            this.set_content(member_list_view.render().el);
+            this.set_content(new MemberListView);
         },
         add_user_interface: function() {
-            this.set_breadcrumb('添加用户', '添加一个新的用户', [{title:'用户', url:'#'},{title:'添加用户', url:'#/add_user'}]);
+            this.set_breadcrumb(new BreadcrumbView({
+                title: '添加用户',
+                subtitle: '添加一个新的用户',
+                breadcrumbs: [{title:'用户', url:'#'},{title:'添加用户', url:'#/add_user'}],
+            }));
             this.set_header(this.template_header_add_user());
-            this.set_content(member_item_add_view.render().el);
+            this.set_content(new MemberItemAddView);
         }
     });
     var app_view = new AppView;
