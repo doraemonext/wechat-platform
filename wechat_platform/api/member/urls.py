@@ -11,5 +11,5 @@ from .views import MemberListAPI, MemberDetailAPI, GroupListAPI
 urlpatterns = patterns('',
     url(r'^$', MemberListAPI.as_view(), name='member_list'),
     url(r'^(?P<pk>[0-9]+)', MemberDetailAPI.as_view(), name='member_detail'),
-    url(r'^group$', GroupListAPI.as_view(), name='group'),
+    url(r'^group/$', GroupListAPI.as_view(), name='group'),
 )

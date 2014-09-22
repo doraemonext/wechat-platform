@@ -250,3 +250,9 @@ class Common(Configuration):
     AUTH_USER_MODEL = 'users.User'
 
     # Your common stuff: Below this line define 3rd party libary settings
+    USERNAME_MIN_LEN = 2
+    USERNAME_MAX_LEN = 30
+    PASSWORD_MIN_LEN = 4
+    PASSWORD_MAX_LEN = 60
+    NICKNAME_MIN_LEN = 1
+    NICKNAME_MAX_LEN = 30

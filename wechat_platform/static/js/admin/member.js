@@ -8,6 +8,15 @@ $(document).ready(function() {
     });
     var members = new Members;
 
+    var Group = Backbone.Model.extend({
+        urlRoot: '/api/member/group/'
+    });
+    var Groups = Backbone.Collection.extend({
+        url: '/api/member/group/',
+        model: Group
+    });
+    var groups = new Groups;
+
     var BreadcrumbView = Backbone.View.extend({
         tagName: "section",
         className: "content-header",
@@ -94,9 +103,7 @@ $(document).ready(function() {
         template: _.template($("#member-list-template").html()),
         initialize: function(collection) {
             this.collection = collection;
-            this.render();
             this.listenTo(this.collection, 'add', this.add);
-            this.collection.fetch();
         },
         render: function() {
             this.$el.html(this.template());
@@ -113,12 +120,19 @@ $(document).ready(function() {
 
     var MemberItemAddView = Backbone.View.extend({
         template: _.template($("#member-add-user-template").html()),
-        initialize: function() {
+        initialize: function(args) {
+            this.groups = args.groups;
+            this.listenTo(this.groups, 'add', this.add_group);
         },
         render: function() {
             this.$el.html(this.template());
+            _(this.groups.models).each(this.add_group, this);
+            this.groups.fetch();
             this.set_validate();
             return this;
+        },
+        add_group: function(group) {
+            this.$el.find(".groups-checkbox").append("<label class=\"checkbox-inline\"><input type=\"checkbox\" class=\"groups\" name=\"groups\" value=\"" + group.get("id") + "\"> " + group.get("name") + "</label>");
         },
         set_validate: function() {
             this.$el.find("#add-user-form").validate({
@@ -161,7 +175,7 @@ $(document).ready(function() {
                 errorClass: 'control-label text-red',
                 errorPlacement: function(error, element) {
                     if ($(element).hasClass("groups")) {
-                        error.insertAfter($(element).parent().parent().find("span"));
+                        error.insertAfter($(element).parent().parent().parent().find("span"));
                     } else {
                         error.insertAfter(element);
                     }
@@ -191,7 +205,11 @@ $(document).ready(function() {
                             $("button[type=submit]").text("提交中…");
                         },
                         success: function(data) {
-                            alert(data);
+                            noty({
+                                type: "success",
+                                text: "成功添加 " + data["username"] + " 用户"
+                            });
+                            window.location.href = "#";
                         },
                         statusCode: {
                             400: function(xhr) {
@@ -217,7 +235,7 @@ $(document).ready(function() {
             });
         }
     });
-    var member_item_add_view = new MemberItemAddView;
+    var member_item_add_view = new MemberItemAddView({ groups: groups });
 
     var AppView = Backbone.View.extend({
         el: $("#container"),
