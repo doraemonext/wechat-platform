@@ -216,7 +216,7 @@ $(document).ready(function() {
                         success: function(data) {
                             noty({
                                 type: "success",
-                                text: "成功添加 " + data["username"] + " 用户"
+                                text: "成功添加 <strong>" + data["username"] + "</strong> 用户"
                             });
                             window.location.href = "#";
                         },
@@ -245,9 +245,143 @@ $(document).ready(function() {
         }
     });
 
+    var MemberItemEditView = Backbone.View.extend({
+        template: _.template($("#member-edit-user-template").html()),
+        initialize: function(args) {
+            var that = this;
+            this.member = new Member({id: args.id});
+            this.groups = new Groups;
+            this.listenTo(this.member, 'change', function(member) {
+                that.render_member(member);
+                that.set_validate();
+            });
+            this.listenTo(this.member, 'change', this.render_member);
+            this.listenTo(this.groups, 'add', this.render_group);
+            this.listenTo(this.groups, 'sync', function() {
+                that.render_member(that.member);
+                that.member.fetch();
+            });
+        },
+        render: function() {
+            this.$el.html(this.template());
+
+            _(this.groups.models).each(this.render_group, this);
+            this.groups.fetch();
+
+            return this;
+        },
+        render_member: function(member) {
+            var that = this;
+            this.$("input[name=username]").val(member.get("username"));
+            this.$("input[name=email]").val(member.get("email"));
+            this.$("input[name=nickname]").val(member.get("nickname"));
+            _.each(member.get("groups"), function(group) {
+                that.$("input[name=groups][value=" + group.id + "]").attr("checked", "checked");
+            });
+        },
+        render_group: function(group) {
+            this.$el.find(".groups-checkbox").append("<label class=\"checkbox-inline\"><input type=\"checkbox\" class=\"groups\" name=\"groups\" value=\"" + group.get("id") + "\"> " + group.get("name") + "</label>");
+        },
+        set_validate: function() {
+            var that = this;
+            this.$el.find("#edit-user-form").validate({
+                rules: {
+                    username: "required",
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    nickname: "required",
+                    password_confirm: {
+                        equalTo: "input[name=password]"
+                    },
+                    groups: "required"
+                },
+                messages: {
+                    username: {
+                        required: "用户名不能为空"
+                    },
+                    email: {
+                        required: "电子邮件不能为空",
+                        email: "电子邮件地址不合法"
+                    },
+                    nickname: {
+                        required: "昵称不能为空"
+                    },
+                    password_confirm: {
+                        equalTo: "两次密码输入不一致"
+                    },
+                    groups: {
+                        required: "最少选择一个用户组"
+                    }
+                },
+                errorClass: 'control-label text-red',
+                errorPlacement: function(error, element) {
+                    if ($(element).hasClass("groups")) {
+                        error.insertAfter($(element).parent().parent().parent().find("span"));
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                highlight: function(element) {},
+                unhighlight: function(element) {},
+                submitHandler: function(form) {
+                    var validator = this;
+
+                    $.ajax({
+                        type: "PATCH",
+                        dataType: "json",
+                        url: "/api/member/" + that.member.get('id'),
+                        cache: false,
+                        data: {
+                            username: $("input[name=username]").val(),
+                            email: $("input[name=email]").val(),
+                            nickname: $("input[name=nickname]").val(),
+                            password: $("input[name=password]").val(),
+                            groups: $("input[name=groups]:checked").map(function() {
+                                return $(this).val();
+                            }).get()
+                        },
+                        beforeSend: function(xhr, settings) {
+                            xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
+                            $("button[type=submit]").attr("disabled", "disabled");
+                            $("button[type=submit]").text("提交中…");
+                        },
+                        success: function(data) {
+                            noty({
+                                type: "success",
+                                text: "成功修改 <strong>" + data["username"] + "</strong> 用户"
+                            });
+                            window.location.href = "#";
+                        },
+                        statusCode: {
+                            400: function(xhr) {
+                                var data = $.parseJSON(xhr.responseText);
+                                var errors = {};
+                                for (var key in data) {
+                                    if (key == "non_field_errors") {
+                                        errors["username"] = data[key][0];
+                                    } else {
+                                        errors[key] = data[key][0];
+                                    }
+                                }
+                                validator.showErrors(errors);
+                            }
+                        },
+                        complete: function() {
+                            $("button[type=submit]").removeAttr("disabled");
+                            $("button[type=submit]").text("提交修改");
+                        }
+                    });
+                    return false;
+                }
+            });
+        }
+    });
+
     var AppView = Backbone.View.extend({
         el: $("#container"),
-        template_container: _.template($("#app-template").html()),
+        template: _.template($("#app-template").html()),
         initialize: function() {
             this.render();
             this.breadcrumb = this.$el.find(".right-side");
@@ -259,7 +393,7 @@ $(document).ready(function() {
             this.content_view = null;
         },
         render: function() {
-            this.$el.html(this.template_container());
+            this.$el.html(this.template());
         },
 
         set_breadcrumb: function(view) {
@@ -299,12 +433,23 @@ $(document).ready(function() {
             this.set_breadcrumb(new BreadcrumbView({
                 title: '添加用户',
                 subtitle: '添加一个新的用户',
-                breadcrumbs: [{title:'用户', url:'#'},{title:'添加用户', url:'#/add_user'}],
+                breadcrumbs: [{title:'用户', url:'#'},{title:'添加用户', url:'#/add_user'}]
             }));
             this.set_header(new ContentHeaderView({
                 html: $("#app-header-add-user-template").html()
             }));
             this.set_content(new MemberItemAddView);
+        },
+        edit_user_interface: function(id) {
+            this.set_breadcrumb(new BreadcrumbView({
+                title: '编辑用户',
+                subtitle: '编辑用户详细信息',
+                breadcrumbs: [{title:'用户', url:'#'},{title:'编辑用户', url:'#/edit_user/' + id}]
+            }));
+            this.set_header(new ContentHeaderView({
+                html: $("#app-header-edit-user-template").html()
+            }));
+            this.set_content(new MemberItemEditView({id: id}));
         }
     });
     var app_view = new AppView;
@@ -312,10 +457,14 @@ $(document).ready(function() {
     var AppRouter = Backbone.Router.extend({
         routes: {
             "add_user": "add_user",
+            "edit_user/:id": "edit_user",
             "*actions": "default_router"
         },
         add_user: function() {
             app_view.add_user_interface();
+        },
+        edit_user: function(id) {
+            app_view.edit_user_interface(id);
         },
         default_router: function(actions) {
             app_view.default_interface();
