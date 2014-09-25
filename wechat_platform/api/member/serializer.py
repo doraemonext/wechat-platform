@@ -65,12 +65,17 @@ class MemberSerializer(serializers.ModelSerializer):
         return attrs
 
     def save(self, **kwargs):
-        return get_user_model().objects.create_user(
-            username=self.object.username,
-            email=self.object.email,
-            nickname=self.object.nickname,
-            password=self.object.password
-        )
+        view = self.context.get('view')
+
+        if view and view.request.method == 'POST':
+            return get_user_model().objects.create_user(
+                username=self.object.username,
+                email=self.object.email,
+                nickname=self.object.nickname,
+                password=self.object.password
+            )
+        else:
+            return super(MemberSerializer, self).save(**kwargs)
 
     class Meta:
         model = get_user_model()

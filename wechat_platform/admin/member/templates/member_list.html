@@ -4,6 +4,19 @@
 {% block content %}
     <div id="container"></div>
 
+    <script type="text/template" id="app-template">
+        <aside class="right-side">
+            <section class="content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div id="header"></div>
+                        <div id="content"></div>
+                    </div>
+                </div>
+            </section>
+        </aside>
+    </script>
+
     <script type="text/template" id="app-breadcrumb-template">
         <h1>
             <span id="breadcrumb-title"><%= title %></span>
@@ -19,19 +32,6 @@
             <%     } %>
             <% }); %>
         </ol>
-    </script>
-
-    <script type="text/template" id="app-template">
-        <aside class="right-side">
-            <section class="content">
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div id="header"></div>
-                        <div id="content"></div>
-                    </div>
-                </div>
-            </section>
-        </aside>
     </script>
 
     <script type="text/template" id="app-header-list-template">
@@ -54,6 +54,17 @@
         </div>
     </script>
 
+    <script type="text/template" id="app-header-edit-user-template">
+        <div class="content-header">
+            <div class="list-operation">
+                <div>
+                    <a href="#" class="btn btn-default"><i class="fa fa-fw fa-arrow-circle-o-left"></i> <strong>返回用户列表</strong></a>
+                    <a href="#/add_user" class="btn btn-primary pull-right"><i class="fa fa-fw fa-plus-circle"></i> <strong>添加用户</strong></a>
+                </div>
+            </div>
+        </div>
+    </script>
+
     <script type="text/template" id="member-list-template">
         <div class="box">
             <div class="box-body table-responsive no-padding">
@@ -71,7 +82,6 @@
                     <tbody class="list"></tbody>
                 </table>
             </div>
-            <!-- /.box-body -->
         </div>
     </script>
 
@@ -96,8 +106,8 @@
         <% } %>
         <td><%= date_joined %></td>
         <td>
-            <button type="button" class="btn btn-xs btn-default edit">编辑</button>
-            <button type="button" class="btn btn-xs btn-danger delete">删除</button>
+            <a href="#/edit_user/<%= id %>" type="button" class="btn btn-xs btn-default edit">编辑</a>
+            <a type="button" class="btn btn-xs btn-danger delete">删除</a>
         </td>
     </script>
 
@@ -108,7 +118,6 @@
                 <label for="inputEmail3" class="col-sm-2 control-label">用户名 <span class="text-red">*</span></label>
                 <div class="col-sm-9">
                     <input type="text" class="form-control" name="username" id="username">
-                    <!--<label class="control-label text-red">用户名不能为空</label>-->
                 </div>
             </div>
             <div class="form-group">
@@ -151,6 +160,58 @@
         </form>
     </script>
 
+    <script type="text/template" id="member-edit-user-template">
+        <hr>
+        <form class="form-horizontal" role="form" id="edit-user-form">
+            <div class="form-group">
+                <label for="inputEmail3" class="col-sm-2 control-label">用户名 <span class="text-red">*</span></label>
+                <div class="col-sm-9">
+                    <input type="texSt" class="form-control" name="username" id="username">
+                    <span class="help-block">如非必要，请尽量不要更改用户名</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">电子邮件 <span class="text-red">*</span></label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" name="email" id="email">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">昵称 <span class="text-red">*</span></label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" name="nickname" id="nickname">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">密码 <span class="text-red">*</span></label>
+                <div class="col-sm-9">
+                    <input type="password" class="form-control" name="password" id="password">
+                    <span class="help-block">如果不需更改密码，直接留空此处即可</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">确认密码 <span class="text-red">*</span></label>
+                <div class="col-sm-9">
+                    <input type="password" class="form-control" name="password_confirm" id="password_confirm">
+                    <span class="help-block">如果不需更改密码，直接留空此处即可</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">所属用户组 <span class="text-red">*</span></label>
+                <div class="col-sm-9">
+                    <div class="groups-checkbox"></div>
+                    <span class="help-block">提示：用户组可多选，每次权限检查将取所选所有用户组中的最大值</span>
+                </div>
+            </div>
+            <hr>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-2">
+                    <button type="submit" class="btn btn-primary btn-block">提交修改</button>
+                </div>
+            </div>
+        </form>
+    </script>
+
     <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -160,7 +221,7 @@
                 </div>
                 <div class="modal-body"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-default btn-cancel">取消</button>
                     <button type="button" class="btn btn-danger btn-ok">确认</button>
                 </div>
             </div>
