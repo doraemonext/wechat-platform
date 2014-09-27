@@ -79,3 +79,4 @@ class OfficialAccount(models.Model):
 
     class Meta:
         db_table = 'official_account'
+        default_permissions = ('add', 'change', 'delete', 'view')
