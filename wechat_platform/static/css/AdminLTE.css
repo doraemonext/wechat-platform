@@ -3555,3 +3555,35 @@ fieldset[disabled] .btn-vk.active {
     margin-top: 5px;
     margin-bottom: 0;
 }
+.table-official-account>thead>tr>th,
+.table-official-account>tbody>tr>th,
+.table-official-account>tfoot>tr>th,
+.table-official-account>thead>tr>td,
+.table-official-account>tbody>tr>td,
+.table-official-account>tfoot>tr>td {
+    border-bottom: 1px solid #ddd;
+}
+
+.no-table-border>thead>tr>th,
+.no-table-border>tbody>tr>th,
+.no-table-border>tfoot>tr>th,
+.no-table-border>thead>tr>td,
+.no-table-border>tbody>tr>td,
+.no-table-border>tfoot>tr>td {
+    border: 0;
+}
+
+.nav-color {
+    background-color: #3c8dbc!important;
+    color: #f6f6f6!important;
+}
+
+.sub-panel-heading {
+    padding: 7px 15px;
+}
+.sub-panel-heading * {
+    font-size: 15px;
+}
+.sub-panel-body {
+    padding: 0 7px;
+}

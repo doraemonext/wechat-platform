@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.contrib.auth.models import Group
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 
@@ -31,7 +29,7 @@ class OfficialAccountListAPI(mixins.ListModelMixin, mixins.CreateModelMixin, Gen
 class OfficialAccountDetailAPI(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericAPIView):
     authentication_classes = (authentication.SessionAuthentication, )
     permission_classes = (permissions.IsAuthenticated, )
-    model = get_user_model()
+    model = OfficialAccount
     serializer_class = OfficialAccountSerializer
 
     def get(self, request, *args, **kwargs):

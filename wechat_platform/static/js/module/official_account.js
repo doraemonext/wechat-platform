@@ -5,6 +5,7 @@ define(function(require, exports, module) {
     var confirm_modal_view = new ConfirmModal;
     var item_template = require('text!templates/official_account/item.html');
     var list_template = require('text!templates/official_account/list.html');
+    var detail_template = require('text!templates/official_account/detail.html');
 
     var OfficialAccount = Backbone.Model.extend({
         urlRoot: '/api/official_account/'
@@ -55,6 +56,48 @@ define(function(require, exports, module) {
         }
     });
 
+    var OfficialAccountItemDetailView = Backbone.View.extend({
+        template: _.template(detail_template),
+        initialize: function(args) {
+            this.official_account = new OfficialAccount({id: args.id});
+            this.listenTo(this.official_account, 'change', this.render_official_account)
+        },
+        render: function() {
+            this.$el.html(this.template());
+            this.render_official_account(this.official_account);
+            this.official_account.fetch();
+            return this;
+        },
+        render_official_account: function(official_account) {
+            this.$('#account-name').html(official_account.get('name'));
+            this.$('#account-request-url').html(official_account.get('request_url'));
+            this.$('#account-token').html(official_account.get('token'));
+            this.$('#account-level').html(official_account.get('level_readable'));
+            if (official_account.get('is_advanced')) {
+                this.$('#account-is-advanced').html('是');
+            } else {
+                this.$('#account-is-advanced').html('否');
+            }
+
+            this.$('#account-appid').html(this.transform_value(official_account.get('appid')));
+            this.$('#account-appsecret').html(this.transform_value(official_account.get('appsecret')));
+            this.$('#account-username').html(this.transform_value(official_account.get('username')));
+            this.$('#account-password').html(this.transform_value(official_account.get('password')));
+            this.$('#account-email').html(this.transform_value(official_account.get('email')));
+            this.$('#account-original').html(this.transform_value(official_account.get('original')));
+            this.$('#account-wechat').html(this.transform_value(official_account.get('wechat')));
+            this.$('#account-introduction').html(this.transform_value(official_account.get('introduction')));
+            this.$('#account-address').html(this.transform_value(official_account.get('address')));
+        },
+        transform_value: function(value) {
+            if (value === null) {
+                return '尚未填写'
+            } else {
+                return value;
+            }
+        }
+    });
+
     var OfficialAccountListView = Backbone.View.extend({
         template: _.template(list_template),
         initialize: function() {
@@ -77,6 +120,7 @@ define(function(require, exports, module) {
         'OfficialAccount': OfficialAccount,
         'OfficialAccounts': OfficialAccounts,
         'OfficialAccountItemView': OfficialAccountItemView,
+        'OfficialAccountItemDetailView': OfficialAccountItemDetailView,
         'OfficialAccountListView': OfficialAccountListView
     }
 });
