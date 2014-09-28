@@ -17,13 +17,12 @@ define(function(require, exports, module) {
 
     var OfficialAccountItemView = Backbone.View.extend({
         template: _.template(item_template),
-        initialize: function(official_account) {
-            this.model = official_account;
+        initialize: function(args) {
+            this.model = args.model;
             this.listenTo(this.model, 'change', this.render);
             this.listenTo(this.model, 'destroy', this.remove);
         },
         events: {
-            "click .edit": "edit_item",
             "click .delete": "delete_item"
         },
         render: function() {
@@ -51,7 +50,7 @@ define(function(require, exports, module) {
                     });
                 },
                 title: "确认删除",
-                body: "请确认您将删除 <strong><u>" + this.model.get('username') + "</u></strong> 公众号，该操作不可恢复。"
+                body: "请确认您将删除 <strong><u>" + this.model.get('name') + "</u></strong> 公众号，该操作不可恢复。"
             });
         }
     });
@@ -63,7 +62,7 @@ define(function(require, exports, module) {
             this.listenTo(this.official_account, 'change', this.render_official_account)
         },
         render: function() {
-            this.$el.html(this.template());
+            this.$el.html(this.template({id: this.official_account.id}));
             this.render_official_account(this.official_account);
             this.official_account.fetch();
             return this;
@@ -111,7 +110,7 @@ define(function(require, exports, module) {
             return this;
         },
         add: function(official_account) {
-            var official_account_view = new OfficialAccountItemView(official_account);
+            var official_account_view = new OfficialAccountItemView({model: official_account});
             this.$el.find(".list").append(official_account_view.render().el);
         }
     });
