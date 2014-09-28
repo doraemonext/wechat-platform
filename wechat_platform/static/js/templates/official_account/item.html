@@ -23,7 +23,13 @@
                             <tr>
                             <tr>
                                 <th>高级支持</th>
-                                <td>是</td>
+                                <td>
+                                    <% if (is_advanced) { %>
+                                    是
+                                    <% } else { %>
+                                    否
+                                    <% } %>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

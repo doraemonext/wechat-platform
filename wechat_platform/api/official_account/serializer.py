@@ -21,12 +21,16 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
     appsecret = serializers.CharField(required=False)
     username = serializers.CharField(required=False)
     password = serializers.CharField(required=False)
+    is_advanced = serializers.BooleanField(error_messages={
+        'required': u'必须选择是否需要高级支持',
+        'invalid': u'输入数据不合法',
+    })
     level = serializers.IntegerField(error_messages={
         'required': u'必须选择您的公众号级别',
-        'invalid': u'公众号级别非法'
+        'invalid': u'公众号级别非法',
     }, validators=[validator.OfficialAccountLevelValue()])
     name = serializers.CharField(error_messages={
-        'required': u'公众号名称不能为空'
+        'required': u'公众号名称不能为空',
     }, validators=[
         validator.MaxValue(u'公众号名称', settings.OFFICIAL_ACCOUNT_NAME_MAX_LEN)
     ])
@@ -35,12 +39,12 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
         'invalid': u'公众号登录邮箱不合法',
     })
     original = serializers.CharField(error_messages={
-        'required': u'公众号原始ID不能为空'
+        'required': u'公众号原始ID不能为空',
     }, validators=[
         validator.MaxValue(u'公众号原始ID', settings.OFFICIAL_ACCOUNT_ORIGINAL_MAX_LEN)
     ])
     wechat = serializers.CharField(error_messages={
-        'required': u'微信号不能为空'
+        'required': u'微信号不能为空',
     }, validators=[
         validator.MaxValue(u'微信号', settings.OFFICIAL_ACCOUNT_WECHAT_MAX_LEN)
     ])
@@ -167,6 +171,6 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OfficialAccount
-        fields = ('id', 'iden', 'token', 'appid', 'appsecret', 'username', 'password', 'level',
+        fields = ('id', 'iden', 'token', 'appid', 'appsecret', 'username', 'password', 'is_advanced', 'level',
                   'name', 'email', 'original', 'wechat', 'introduction', 'address',
                   'request_url', 'level_readable')

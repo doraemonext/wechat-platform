@@ -7,7 +7,7 @@ from lib.tools.random import make_random_string
 
 class OfficialAccountManager(models.Manager):
     def add(self, level, name, email, original, wechat, introduction=None, address=None,
-            appid=None, appsecret=None, username=None, password=None, token=None):
+            appid=None, appsecret=None, username=None, password=None, is_advanced=False, token=None):
         """
         添加新公众号
 
@@ -22,6 +22,7 @@ class OfficialAccountManager(models.Manager):
         :param appsecret: 微信 App Secret, 认证订阅号/普通服务号/认证服务号必填
         :param username: 公众平台用户名
         :param password: 公众平台密码
+        :param is_advanced: 是否开启高级支持
         :param token: 微信 Token, 如不传入将自动生成
         """
         if not token:
@@ -34,6 +35,7 @@ class OfficialAccountManager(models.Manager):
             appsecret=appsecret,
             username=username,
             password=password,
+            is_advanced=is_advanced,
             level=level,
             name=name,
             email=email,
@@ -64,6 +66,7 @@ class OfficialAccount(models.Model):
     appsecret = models.CharField(u'微信App Secret', max_length=50, null=True, blank=True)
     username = models.CharField(u'公众平台用户名', max_length=255, null=True, blank=True)
     password = models.CharField(u'公众平台密码', max_length=255, null=True, blank=True)
+    is_advanced = models.BooleanField(u'是否开启高级支持', default=False)
     level = models.IntegerField(u'公众号级别', choices=LEVEL)
     name = models.CharField(u'公众号名称', max_length=100)
     email = models.EmailField(u'公众号登录邮箱', max_length=254)
