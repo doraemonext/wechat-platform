@@ -124,6 +124,9 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
         :return: 属性字典
         """
         username = attrs[source]
+        if attrs.get('is_advanced'):
+            if not username:
+                raise serializers.ValidationError(u'高级支持模式下必须输入公众平台用户名')
         if attrs.get('password'):
             if not username:
                 raise serializers.ValidationError(u'当提供公众平台密码后需要输入公众平台用户名')
@@ -138,10 +141,22 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
         :return: 属性字典
         """
         password = attrs[source]
+        if attrs.get('is_advanced'):
+            if not password:
+                raise serializers.ValidationError(u'高级支持模式下必须输入公众平台密码')
         if attrs.get('username'):
             if not password:
                 raise serializers.ValidationError(u'当提供公众平台用户名后需要输入公众平台密码')
         return attrs
+
+    def validate(self, attrs):
+        """
+        清理提交属性中得所有空字符串，确保如果没有相应数据，则存入数据库中的为 NULL
+
+        :param attrs: 属性字典
+        :return: 清理后的属性字典
+        """
+        return dict((k, v) for (k, v) in attrs.items() if v != '')
 
     def save(self, **kwargs):
         """
