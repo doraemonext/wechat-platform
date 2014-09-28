@@ -178,7 +178,8 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
                 appid=self.object.appid,
                 appsecret=self.object.appsecret,
                 username=self.object.username,
-                password=self.object.password
+                password=self.object.password,
+                is_advanced=self.object.is_advanced
             )
             return self.object
         else:
