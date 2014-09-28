@@ -68,12 +68,13 @@ class MemberSerializer(serializers.ModelSerializer):
         view = self.context.get('view')
 
         if view and view.request.method == 'POST':
-            return get_user_model().objects.create_user(
+            self.object = get_user_model().objects.create_user(
                 username=self.object.username,
                 email=self.object.email,
                 nickname=self.object.nickname,
                 password=self.object.password
             )
+            return self.object
         else:
             return super(MemberSerializer, self).save(**kwargs)
 

@@ -73,6 +73,7 @@ class OfficialAccount(models.Model):
     address = models.TextField(u'所在地址', null=True, blank=True)
 
     manager = OfficialAccountManager()
+    objects = models.Manager()
 
     def __unicode__(self):
         return self.name

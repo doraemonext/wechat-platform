@@ -1,5 +1,8 @@
 {% load staticfiles i18n %}
 
+{% url 'admin:dashboard:dashboard' as dashboard %}
+{% url 'admin:official_account:index' as official_account %}
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -25,7 +28,7 @@
     <body class="skin-blue">
         <!-- header logo: style can be found in header.less -->
         <header class="header">
-            <a href="../index.html" class="logo">
+            <a href="{{ dashboard }}" class="logo">
                 <!-- Add the class icon to your logo image or logo icon to add the margining -->
                 微信管理平台
             </a>
@@ -75,26 +78,18 @@
             <aside class="left-side sidebar-offcanvas">
                 <!-- sidebar: style can be found in sidebar.less -->
                 <section class="sidebar">
+                    <div class="user-panel">
+                        <div class="pull-left info">
+                            <p>欢迎你，{{ request.user.username }}</p>
+                            <span>当前身份：超级管理员</span>
+                        </div>
+                    </div>
                     <!-- sidebar menu: : style can be found in sidebar.less -->
                     <ul class="sidebar-menu">
-                        <li class="active">
-                            <a href="{% url 'admin:dashboard:dashboard' %}">
+                        <li{% if request.path == dashboard %} class="active"{% endif %}>
+                            <a href="{{ dashboard }}">
                                 <i class="fa fa-dashboard"></i> <span>仪表盘</span>
                             </a>
-                        </li>
-                        <li class="treeview active">
-                            <a href="#">
-                                <i class="fa fa-reply"></i>
-                                <span>自动回复</span>
-                                <i class="fa fa-angle-left pull-right"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li class="active"><a href="#"><i class="fa fa-angle-double-right"></i> 添加规则</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 规则管理</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 订阅回复</a>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 默认回复</a>
-                                </li>
-                            </ul>
                         </li>
                         <li class="treeview">
                             <a href="#">
@@ -116,7 +111,7 @@
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 用户组</a></li>
                             </ul>
                         </li>
-                        <li class="treeview">
+                        <li class="treeview {% if request.path == official_account %} active{% endif %}">
                             <a href="#">
                                 <i class="fa fa-cogs"></i> <span>系统设置</span>
                                 <i class="fa fa-angle-left pull-right"></i>
@@ -124,6 +119,8 @@
                             <ul class="treeview-menu">
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 系统设置</a></li>
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 插件管理</a></li>
+
+                                <li{% if request.path == official_account %} class="active"{% endif %}><a href="{{ official_account }}"><i class="fa fa-angle-double-right"></i> 公众号管理</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -138,15 +135,7 @@
         <!-- ./wrapper -->
 
         {% block javascript %}
-            <script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
-            <script src="{% static 'js/jquery.cookie.js' %}"></script>
-            <script src="{% static 'js/underscore-min.js' %}"></script>
-            <script src="{% static 'js/backbone-min.js' %}"></script>
-            <script src="{% static 'js/bootstrap.min.js' %}"></script>
-            <script src="{% static 'js/AdminLTE/app.js' %}"></script>
-            <script src="{% static 'js/plugins/noty/jquery.noty.packaged.min.js' %}"></script>
-            <script src="{% static 'js/admin/preload.js' %}"></script>
-            <script src="{% static 'js/admin/common.js' %}"></script>
+            <script src="{% static 'js/require.js' %}"></script>
         {% endblock %}
     </body>
 </html>

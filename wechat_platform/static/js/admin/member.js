@@ -15,58 +15,6 @@ $(document).ready(function() {
         model: Group
     });
 
-    var ContentHeaderView = Backbone.View.extend({
-        initialize: function(args) {
-            this.template = _.template(args.html);
-        },
-        render: function() {
-            this.$el.html(this.template());
-            return this;
-        }
-    });
-
-    var BreadcrumbView = Backbone.View.extend({
-        tagName: "section",
-        className: "content-header",
-        template: _.template($("#app-breadcrumb-template").html()),
-        initialize: function(args) {
-            this.title = args.title;
-            this.subtitle = args.subtitle;
-            this.breadcrumbs = args.breadcrumbs;
-        },
-        render: function() {
-            this.$el.html(this.template({
-                title: this.title,
-                subtitle: this.subtitle,
-                breadcrumbs: this.breadcrumbs
-            }));
-            return this;
-        }
-    });
-
-    var ConfirmModalView = Backbone.View.extend({
-        el: "#confirm-modal",
-        events: {
-            "click .btn-ok": "run_callback",
-            "click .btn-cancel": "hide"
-        },
-        show: function(args) {
-            this.$el.find(".modal-title").html(args.title);
-            this.$el.find(".modal-body").html("<p>" + args.body + "</p>");
-            this.cb = args.cb;
-
-            this.$el.modal("show");
-        },
-        hide: function() {
-            this.$el.modal("hide");
-        },
-        run_callback: function() {
-            this.cb();
-            this.$el.modal("hide");
-        }
-    });
-    var confirm_modal_view = new ConfirmModalView;
-
     var MemberItemView = Backbone.View.extend({
         tagName: "tr",
         template: _.template($("#member-item-template").html()),

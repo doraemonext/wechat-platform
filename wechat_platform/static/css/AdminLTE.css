@@ -699,7 +699,7 @@ body > .header .logo .icon {
 .user-panel > .info > p {
   margin-bottom: 9px;
 }
-.user-panel > .info > a {
+.user-panel > .info > span {
   text-decoration: none;
   padding-right: 5px;
   margin-top: 3px;
@@ -2592,7 +2592,7 @@ Component: timeline
   border: 1px solid #dfdfdf;
 }
 .skin-blue .user-panel > .info,
-.skin-blue .user-panel > .info > a {
+.skin-blue .user-panel > .info > span {
   color: #555555;
 }
 /* skin-blue sidebar */
@@ -3549,4 +3549,9 @@ fieldset[disabled] .btn-vk.active {
     width: 150px;
     float: left;
     margin-right: 6px;
+}
+
+.table-official-account {
+    margin-top: 5px;
+    margin-bottom: 0;
 }
