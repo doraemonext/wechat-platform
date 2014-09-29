@@ -13,6 +13,7 @@ define(function(require, exports, module) {
     var OfficialAccountItemView = OfficialAccountModule.OfficialAccountItemView;
     var OfficialAccountItemDetailView = OfficialAccountModule.OfficialAccountItemDetailView;
     var OfficialAccountListView = OfficialAccountModule.OfficialAccountListView;
+    var OfficialAccountItemAddView = OfficialAccountModule.OfficialAccountItemAddView;
 
     var AppView = CommonAppView.extend({
         default_interface: function() {
@@ -35,6 +36,7 @@ define(function(require, exports, module) {
             this.set_header(new ContentHeaderView({
                 html: require('text!templates/official_account/app_content_header_add.html')
             }));
+            this.set_content(new OfficialAccountItemAddView);
         },
         edit_interface: function(id) {
             this.set_breadcrumb(new BreadcrumbView({

@@ -1,0 +1,131 @@
+<form class="form-horizontal" role="form" id="form">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><span><strong>基本信息</strong></span></h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12 col-lg-12">
+                    <div class="form-group">
+                        <label for="name" class="col-sm-2 control-label">公众号名称 <span class="text-red">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="name" id="name">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">公众号级别 <span class="text-red">*</span></label>
+                        <div class="col-sm-9">
+                            <label class="radio-inline">
+                                <input type="radio" name="level" value="1"> 普通订阅号
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="level" value="2"> 认证订阅号/普通服务号
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="level" value="3"> 认证服务号
+                            </label>
+                            <span class="help-block">请确保您选择了正确的公众号级别，错误的级别将导致功能无效</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="appid" class="col-sm-2 control-label">App ID <span class="text-red">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="appid" id="appid">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="appsecret" class="col-sm-2 control-label">App Secret <span class="text-red">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="appsecret" id="appsecret">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><span><strong>高级支持</strong></span></h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12 col-lg-12">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">是否开启高级支持 <span class="text-red">*</span></label>
+                        <div class="col-sm-9">
+                            <label class="radio-inline">
+                                <input type="radio" name="is_advanced" value="1"> 是
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="is_advanced" value="0"> 否
+                            </label>
+                            <span class="help-block">开启高级支持将会提供更多的功能，但也存在相应风险，请慎重选择</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="username" class="col-sm-2 control-label">公众平台用户名 <span class="text-red">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="username" id="username">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="col-sm-2 control-label">公众平台密码 <span class="text-red">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="password" class="form-control" name="password" id="password">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><span><strong>扩展信息</strong></span></h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12 col-lg-12">
+                    <div class="form-group">
+                        <label for="email" class="col-sm-2 control-label">登录邮箱 <span class="text-red">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="email" id="email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="original" class="col-sm-2 control-label">原始ID <span class="text-red">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="original" id="original">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="wechat" class="col-sm-2 control-label">绑定微信号 <span class="text-red">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="wechat" id="wechat">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="introduction" class="col-sm-2 control-label">介绍</label>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" name="introduction" id="introduction" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="address" class="col-sm-2 control-label">地址</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="address" id="address">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-2">
+            <button type="submit" class="btn btn-primary btn-block">添加公众号</button>
+        </div>
+    </div>
+</form>

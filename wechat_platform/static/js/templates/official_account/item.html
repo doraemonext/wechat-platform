@@ -1,3 +1,4 @@
+<div class="url-container"></div>
 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 toppad">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -10,7 +11,11 @@
                         <tbody>
                             <tr>
                                 <th>接口地址</th>
-                                <td><%= request_url %></td>
+                                <td>
+                                    <a data-container=".url-container" data-toggle="popover" data-html="true" data-placement="top" data-content="<strong>请直接复制下面的链接粘贴到公众平台后台即可：</strong><br><textarea rows='2' class='form-control' disabled='disabled'><%= request_url %></textarea>">
+                                        点此获得接口地址
+                                    </a>
+                                </td>
                             </tr>
                             <tr>
                                 <th>Token</th>
@@ -46,3 +51,7 @@
         </div>
     </div>
 </div>
+<script>
+    $("[data-toggle='tooltip']").tooltip();
+    $("[data-toggle='popover']").popover();
+</script>

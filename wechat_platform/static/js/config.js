@@ -5,7 +5,8 @@ require.config({
         'bootstrap': { 'deps': ['jquery'] },
         'jquery-cookie': { 'deps': ['jquery'] },
         'noty': { 'deps': ['jquery'] },
-        'jquery-validate': { 'deps': ['jquery'] }
+        'jquery-validate': { 'deps': ['jquery'] },
+        'theme-app': { 'deps': ['jquery', 'bootstrap'] }
     },
     paths: {
         'jquery': 'plugins/jquery/jquery.min',
