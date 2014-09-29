@@ -122,51 +122,87 @@ define(function(require, exports, module) {
 
     var OfficialAccountItemAddView = Backbone.View.extend({
         template: _.template(add_template),
-        initialize: function() {
-
-        },
+        initialize: function() {},
+        /**
+         * 渲染添加公众号页面
+         * @returns {OfficialAccountItemAddView}
+         */
         render: function() {
             this.$el.html(this.template());
             this.set_validate();
+            this.$('input[name=level]').on('change', this, this.toggle_level);
+            this.$('input[name=is_advanced]').on('change', this, this.toggle_is_advanced);
             return this;
         },
+        /**
+         * 获得当前用户选择的公众号级别
+         * @returns {string}
+         */
+        get_level: function() {
+            return this.$el.find('input[name=level]:checked').val();
+        },
+        /**
+         * 判断当前用户是否选择了开启高级支持
+         * @returns {boolean}
+         */
+        get_is_advanced: function() {
+            // jQuery-Validation 对 undefined 情况处理不好
+            if (this.$el.find('input[name=is_advanced]:checked').val() === '1') {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        /**
+         * 切换公众号等级下面的AppID和AppSecret的显示和隐藏
+         * @param event
+         */
+        toggle_level: function(event) {
+            if (event.data.$el.find('input[name=level]:checked').val() === '1') {
+                event.data.$('#level_div').css('display', 'none');
+            } else {
+                event.data.$('#level_div').css('display', 'block');
+            }
+        },
+        /**
+         * 切换高级支持下面的公众平台用户名和密码的显示和隐藏
+         * @param event
+         */
+        toggle_is_advanced: function(event) {
+            if (event.data.$el.find('input[name=is_advanced]:checked').val() === '1') {
+                event.data.$('#is_advanced_div').css('display', 'block');
+            } else {
+                event.data.$('#is_advanced_div').css('display', 'none');
+            }
+        },
+        /**
+         * 设置表单的验证
+         */
         set_validate: function() {
             var that = this;
-            function get_level() {
-                return that.$el.find('input[name=level]:checked').val();
-            }
-            function get_is_advanced() {
-                // jQuery-Validation 对 undefined 情况处理不好
-                if (that.$el.find('input[name=is_advanced]:checked').val() === '1') {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
             this.$el.find('#form').validate({
                 rules: {
                     name: 'required',
                     level: 'required',
                     appid: {
                         required: function(element) {
-                            return (get_level() == 2 || get_level() == 3);
+                            return that.get_level() == 2 || that.get_level() == 3;
                         }
                     },
                     appsecret: {
                         required: function(element) {
-                            return (get_level() == 2 || get_level() == 3);
+                            return that.get_level() == 2 || that.get_level() == 3;
                         }
                     },
                     is_advanced: 'required',
                     username: {
                         required: function(element) {
-                            return get_is_advanced();
+                            return that.get_is_advanced();
                         }
                     },
                     password: {
                         required: function(element) {
-                            return get_is_advanced();
+                            return that.get_is_advanced();
                         }
                     },
                     email: {
