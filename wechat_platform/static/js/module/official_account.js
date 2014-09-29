@@ -9,6 +9,7 @@ define(function(require, exports, module) {
     var list_template = require('text!templates/official_account/list.html');
     var detail_template = require('text!templates/official_account/detail.html');
     var add_template = require('text!templates/official_account/add.html');
+    var edit_template = require('text!templates/official_account/add.html');
 
     var confirm_modal_view = new ConfirmModal;
 
@@ -305,7 +306,228 @@ define(function(require, exports, module) {
                         },
                         complete: function() {
                             $("button[type=submit]").removeAttr("disabled");
-                            $("button[type=submit]").text("添加公众号");
+                            $("button[type=submit]").text("提交");
+                        }
+                    });
+                    return false;
+                }
+            });
+        }
+    });
+
+    var OfficialAccountItemEditView = Backbone.View.extend({
+        template: _.template(edit_template),
+        initialize: function(args) {
+            this.official_account = new OfficialAccount({id: args.id});
+            this.listenTo(this.official_account, 'change', this.render_official_account);
+        },
+        /**
+         * 渲染编辑公众号页面
+         * @returns {OfficialAccountItemEditView}
+         */
+        render: function() {
+            this.$el.html(this.template());
+            this.$('input:radio[name=level]').on('change', this, this.toggle_level);
+            this.$('input:radio[name=is_advanced]').on('change', this, this.toggle_is_advanced);
+
+            this.render_official_account(this.official_account);
+            this.official_account.fetch();
+            this.set_validate();
+
+            return this;
+        },
+        /**
+         * 获得当前用户选择的公众号级别
+         * @returns {string}
+         */
+        get_level: function() {
+            return this.$el.find('input[name=level]:checked').val();
+        },
+        /**
+         * 判断当前用户是否选择了开启高级支持
+         * @returns {boolean}
+         */
+        get_is_advanced: function() {
+            // jQuery-Validation 对 undefined 情况处理不好
+            if (this.$el.find('input[name=is_advanced]:checked').val() === '1') {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        /**
+         * 切换公众号等级下面的AppID和AppSecret的显示和隐藏
+         * @param event
+         */
+        toggle_level: function(event) {
+            if (event.data.$el.find('input[name=level]:checked').val() === '1') {
+                event.data.$('#level_div').css('display', 'none');
+            } else {
+                event.data.$('#level_div').css('display', 'block');
+            }
+        },
+        /**
+         * 切换高级支持下面的公众平台用户名和密码的显示和隐藏
+         * @param event
+         */
+        toggle_is_advanced: function(event) {
+            if (event.data.$el.find('input[name=is_advanced]:checked').val() === '1') {
+                event.data.$('#is_advanced_div').css('display', 'block');
+            } else {
+                event.data.$('#is_advanced_div').css('display', 'none');
+            }
+        },
+        render_official_account: function(official_account) {
+            if (official_account.get('name')) {
+                this.$('input[name=name]').val(official_account.get('name'));
+                this.$('input[name=level][value=' + official_account.get('level') + ']').prop('checked', true).trigger('change');
+                this.$('input[name=appid]').val(official_account.get('appid'));
+                this.$('input[name=appsecret]').val(official_account.get('appsecret'));
+                if (official_account.get('is_advanced')) {
+                    this.$('input[name=is_advanced][value=1]').prop('checked', true).trigger('change');
+                } else {
+                    this.$('input[name=is_advanced][value=0]').prop('checked', true).trigger('change');
+                }
+                this.$('input[name=username]').val(official_account.get('username'));
+                this.$('input[name=password]').val(official_account.get('password'));
+                this.$('input[name=email]').val(official_account.get('email'));
+                this.$('input[name=original]').val(official_account.get('original'));
+                this.$('input[name=wechat]').val(official_account.get('wechat'));
+                this.$('textarea[name=introduction]').val(official_account.get('introduction'));
+                this.$('input[name=address]').val(official_account.get('address'));
+            }
+        },
+        /**
+         * 设置表单的验证
+         */
+        set_validate: function() {
+            var that = this;
+            this.$el.find('#form').validate({
+                rules: {
+                    name: 'required',
+                    level: 'required',
+                    appid: {
+                        required: function(element) {
+                            return that.get_level() == 2 || that.get_level() == 3;
+                        }
+                    },
+                    appsecret: {
+                        required: function(element) {
+                            return that.get_level() == 2 || that.get_level() == 3;
+                        }
+                    },
+                    is_advanced: 'required',
+                    username: {
+                        required: function(element) {
+                            return that.get_is_advanced();
+                        }
+                    },
+                    password: {
+                        required: function(element) {
+                            return that.get_is_advanced();
+                        }
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    original: 'required',
+                    wechat: 'required'
+                },
+                messages: {
+                    name: {
+                        required: '公众号名称不能为空'
+                    },
+                    level: {
+                        required: '必须选择一个公众号级别'
+                    },
+                    appid: {
+                        required: '当前公众号级别必须填入App ID'
+                    },
+                    appsecret: {
+                        required: '当前公众号级别必须填入App Secret'
+                    },
+                    is_advanced: {
+                        required: '必选选择是否开启高级支持'
+                    },
+                    username: {
+                        required: '开启高级支持时必须输入公众平台用户名'
+                    },
+                    password: {
+                        required: '开启高级支持时必须输入公众平台密码'
+                    },
+                    email: {
+                        required: '登录邮箱不能为空',
+                        email: '登录邮箱不合法'
+                    },
+                    original: {
+                        required: '原始ID不能为空'
+                    },
+                    wechat: {
+                        required: '绑定微信号不能为空'
+                    }
+                },
+                errorClass: 'control-label text-red',
+                errorPlacement: function(error, element) {
+                    if ($(element).prop('name') == 'level' || $(element).prop('name') == 'is_advanced') {
+                        $(element).parent().parent().append(error);
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                highlight: function(element) {},
+                unhighlight: function(element) {},
+                submitHandler: function(form) {
+                    var validator = this;
+
+                    $.ajax({
+                        type: 'PATCH',
+                        dataType: 'json',
+                        url: '/api/official_account/' + that.official_account.get('id'),
+                        cache: false,
+                        data: {
+                            name: $("input[name=name]").val(),
+                            level: $("input[name=level]:checked").val(),
+                            appid: $("input[name=appid]").val(),
+                            appsecret: $("input[name=appsecret]").val(),
+                            is_advanced: $("input[name=is_advanced]:checked").val(),
+                            username: $("input[name=username]").val(),
+                            password: $("input[name=password]").val(),
+                            email: $("input[name=email]").val(),
+                            original: $("input[name=original]").val(),
+                            wechat: $("input[name=wechat]").val(),
+                            introduction: $("textarea[name=introduction]").val(),
+                            address: $("input[name=address]").val()
+                        },
+                        beforeSend: function(xhr, settings) {
+                            xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
+                            $("button[type=submit]").attr("disabled", "disabled");
+                            $("button[type=submit]").text("提交中…");
+                        },
+                        success: function(data) {
+                            noty({
+                                type: "success",
+                                text: "成功编辑 <strong>" + data["name"] + "</strong> 公众号"
+                            });
+                            window.location.href = "#";
+                        },
+                        statusCode: {
+                            400: function(xhr) {
+                                var data = $.parseJSON(xhr.responseText);
+                                var errors = {};
+                                for (var key in data) {
+                                    if (key == "non_field_errors") {
+                                        errors["name"] = data[key][0];
+                                    } else {
+                                        errors[key] = data[key][0];
+                                    }
+                                }
+                                validator.showErrors(errors);
+                            }
+                        },
+                        complete: function() {
+                            $("button[type=submit]").removeAttr("disabled");
+                            $("button[type=submit]").text("提交");
                         }
                     });
                     return false;
@@ -320,6 +542,7 @@ define(function(require, exports, module) {
         'OfficialAccountItemView': OfficialAccountItemView,
         'OfficialAccountItemDetailView': OfficialAccountItemDetailView,
         'OfficialAccountListView': OfficialAccountListView,
-        'OfficialAccountItemAddView': OfficialAccountItemAddView
+        'OfficialAccountItemAddView': OfficialAccountItemAddView,
+        'OfficialAccountItemEditView': OfficialAccountItemEditView
     }
 });
