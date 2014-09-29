@@ -156,7 +156,13 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
         :param attrs: 属性字典
         :return: 清理后的属性字典
         """
-        return dict((k, v) for (k, v) in attrs.items() if v != '')
+        cleanned_dict = dict((k, v) for (k, v) in attrs.items() if v != '')
+
+        if cleanned_dict['level'] == OfficialAccount.LEVEL_1:
+            cleanned_dict['appid'] = None
+            cleanned_dict['appsecret'] = None
+
+        return cleanned_dict
 
     def save(self, **kwargs):
         """

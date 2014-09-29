@@ -8,8 +8,8 @@ define(function(require, exports, module) {
     var item_template = require('text!templates/official_account/item.html');
     var list_template = require('text!templates/official_account/list.html');
     var detail_template = require('text!templates/official_account/detail.html');
-    var add_template = require('text!templates/official_account/add.html');
-    var edit_template = require('text!templates/official_account/add.html');
+    var add_template = require('text!templates/official_account/edit.html');
+    var edit_template = require('text!templates/official_account/edit.html');
 
     var confirm_modal_view = new ConfirmModal;
 
@@ -67,6 +67,9 @@ define(function(require, exports, module) {
             this.official_account = new OfficialAccount({id: args.id});
             this.listenTo(this.official_account, 'change', this.render_official_account)
         },
+        events: {
+            'click .delete': 'delete_item'
+        },
         render: function() {
             this.$el.html(this.template({id: this.official_account.id}));
             this.render_official_account(this.official_account);
@@ -94,6 +97,31 @@ define(function(require, exports, module) {
             this.$('#account-introduction').html(this.transform_value(official_account.get('introduction')));
             this.$('#account-address').html(this.transform_value(official_account.get('address')));
         },
+        delete_item: function() {
+            var current_model = this.official_account;
+            confirm_modal_view.show({
+                cb: function() {
+                    current_model.destroy({
+                        wait: true,
+                        success: function(model, response) {
+                            noty({
+                                type: "success",
+                                text: "成功删除 <strong>" + model.get('name') + "</strong> 公众号"
+                            });
+                            window.location.href = '#';
+                        },
+                        error: function(model, response) {
+                            noty({
+                                type: "error",
+                                text: "尝试删除 <strong>" + model.get('name') + "</strong> 公众号时出错，请重试"
+                            });
+                        }
+                    });
+                },
+                title: "确认删除",
+                body: "请确认您将删除 <strong><u>" + this.official_account.get('name') + "</u></strong> 公众号，该操作不可恢复。"
+            });
+        },
         transform_value: function(value) {
             if (value === null) {
                 return '尚未填写'
@@ -110,14 +138,22 @@ define(function(require, exports, module) {
             this.listenTo(this.collection, 'add', this.add);
         },
         render: function() {
+            var that = this;
             this.$el.html(this.template());
             _(this.collection.models).each(this.add, this);
-            this.collection.fetch();
+            this.collection.fetch({
+                success: function(collection) {
+                    if (!collection.length) {
+                        that.$('#no-official-account').css('display', 'block');
+                    }
+                }
+            });
             return this;
         },
         add: function(official_account) {
             var official_account_view = new OfficialAccountItemView({model: official_account});
-            this.$el.find(".list").append(official_account_view.render().el);
+            this.$('#no-official-account').css('display', 'none');
+            this.$(".list").append(official_account_view.render().el);
         }
     });
 
