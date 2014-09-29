@@ -26,7 +26,6 @@ class Common(Configuration):
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
-        'django.contrib.sites',
         'django.contrib.messages',
         'django.contrib.staticfiles',
 
@@ -48,6 +47,7 @@ class Common(Configuration):
         'admin.dashboard',
         'admin.user',
         'admin.member',
+        'admin.official_account',
     )
 
     # Wechat Plugin App
@@ -256,3 +256,6 @@ class Common(Configuration):
     PASSWORD_MAX_LEN = 60
     NICKNAME_MIN_LEN = 1
     NICKNAME_MAX_LEN = 30
+    OFFICIAL_ACCOUNT_NAME_MAX_LEN = 100
+    OFFICIAL_ACCOUNT_ORIGINAL_MAX_LEN = 30
+    OFFICIAL_ACCOUNT_WECHAT_MAX_LEN = 100

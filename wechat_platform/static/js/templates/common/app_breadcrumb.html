@@ -1,0 +1,14 @@
+<h1>
+    <span id="breadcrumb-title"><%= title %></span>
+    <small id="breadcrumb-subtitle"><%= subtitle %></small>
+</h1>
+<ol class="breadcrumb">
+    <li><a href="{% url 'admin:dashboard:dashboard' %}"><i class="fa fa-dashboard"></i> 仪表盘</a></li>
+    <% _.each(breadcrumbs, function(breadcrumb, index, list) { %>
+    <%     if (index < _.size(list) - 1) { %>
+    <li><a href="<%= breadcrumb.url %>"><%= breadcrumb.title %></a></li>
+    <%     } else { %>
+    <li class="active"><%= breadcrumb.title %></li>
+    <%     } %>
+    <% }); %>
+</ol>

@@ -19,7 +19,8 @@ class OfficialAccountTest(TestCase):
             introduction=u'订阅号简介',
             address=u'订阅号地址详情',
             username='test',
-            password='test'
+            password='test',
+            is_advanced=True
         )
         self.assertEqual(account.level, OfficialAccount.LEVEL_1)
         self.assertEqual(account.name, u'测试普通订阅号名称')
@@ -34,6 +35,7 @@ class OfficialAccountTest(TestCase):
         self.assertIsInstance(account.token, str)
         self.assertEqual(len(account.iden), 32)
         self.assertIsInstance(account.iden, str)
+        self.assertEqual(account.is_advanced, True)
 
     def test_add_normal_service(self):
         """
@@ -49,6 +51,7 @@ class OfficialAccountTest(TestCase):
             address=u'订阅号地址详情',
             username='test',
             password='test',
+            is_advanced=False,
             appid='wxf32sf34ed2ccc2ab',
             appsecret='087sa087a9c087e07'
         )
@@ -61,6 +64,7 @@ class OfficialAccountTest(TestCase):
         self.assertEqual(account.address, u'订阅号地址详情')
         self.assertEqual(account.username, 'test')
         self.assertEqual(account.password, 'test')
+        self.assertEqual(account.is_advanced, False)
         self.assertEqual(account.appid, 'wxf32sf34ed2ccc2ab')
         self.assertEqual(account.appsecret, '087sa087a9c087e07')
         self.assertEqual(len(account.token), 32)
@@ -82,6 +86,7 @@ class OfficialAccountTest(TestCase):
             address=u'订阅号地址详情',
             username='test',
             password='test',
+            is_advanced=True,
             appid='wxf32sf34ed2ccc2ab',
             appsecret='087sa087a9c087e07'
         )
@@ -94,6 +99,7 @@ class OfficialAccountTest(TestCase):
         self.assertEqual(account.address, u'订阅号地址详情')
         self.assertEqual(account.username, 'test')
         self.assertEqual(account.password, 'test')
+        self.assertEqual(account.is_advanced, True)
         self.assertEqual(account.appid, 'wxf32sf34ed2ccc2ab')
         self.assertEqual(account.appsecret, '087sa087a9c087e07')
         self.assertEqual(len(account.token), 32)

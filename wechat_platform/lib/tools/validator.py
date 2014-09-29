@@ -4,6 +4,8 @@ import re
 
 from django.core.exceptions import ValidationError
 
+from system.official_account.models import OfficialAccount
+
 
 class MinValue(object):
     """
@@ -43,3 +45,19 @@ class SafeValue(object):
     def __call__(self, value, *args, **kwargs):
         if not re.search(u'^[_a-zA-Z0-9\u4e00-\u9fa5\-]+$', value):
             raise ValidationError(u'%s包含非法字符' % self.name)
+
+
+class OfficialAccountLevelValue(object):
+    """
+    公众号级别验证
+
+    仅允许在 OfficialAccount Model 中存在的级别
+    """
+    def __call__(self, value, *args, **kwargs):
+        valid = False
+        for level in OfficialAccount.LEVEL:
+            if value == level[0]:
+                valid = True
+                break
+        if not valid:
+            raise ValidationError(u'公众号级别非法')

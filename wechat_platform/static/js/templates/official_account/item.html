@@ -1,0 +1,57 @@
+<div class="url-container"></div>
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 toppad">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><span><strong>公众号名称：</strong></span><%= name %></h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12 col-lg-12">
+                    <table class="table table-official-account">
+                        <tbody>
+                            <tr>
+                                <th>接口地址</th>
+                                <td>
+                                    <a data-container=".url-container" data-toggle="popover" data-html="true" data-placement="top" data-content="<strong>请直接复制下面的链接粘贴到公众平台后台即可：</strong><br><textarea rows='2' class='form-control' disabled='disabled'><%= request_url %></textarea>">
+                                        点此获得接口地址
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Token</th>
+                                <td><%= token %></td>
+                            </tr>
+                            <tr>
+                                <th>公众号等级</th>
+                                <td><%= level_readable %></td>
+                            </tr>
+                            <tr>
+                            <tr>
+                                <th>高级支持</th>
+                                <td>
+                                    <% if (is_advanced) { %>
+                                    是
+                                    <% } else { %>
+                                    否
+                                    <% } %>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <a href="#/detail/<%= id %>" type="button" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-new-window"></i> <strong>查看详细信息</strong></a>
+            <span class="pull-right">
+                <a href="#/edit/<%= id %>" type="button" data-toggle="tooltip" data-placement="bottom" title="编辑该公众号设置" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i> <strong>编辑</strong></a>
+                <a type="button" data-toggle="tooltip" data-placement="bottom" title="删除该公众号" class="btn btn-sm btn-danger delete"><i class="glyphicon glyphicon-remove"></i> <strong>删除</strong></a>
+            </span>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<script>
+    $("[data-toggle='tooltip']").tooltip();
+    $("[data-toggle='popover']").popover();
+</script>

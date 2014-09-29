@@ -8,5 +8,5 @@ from .views import ListenView
 
 
 urlpatterns = patterns('',
-    url(r'^listen$', ListenView.as_view(), name="listen"),
+    url(r'^$', ListenView.as_view(), name="index"),
 )
