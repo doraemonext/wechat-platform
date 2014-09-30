@@ -24,8 +24,8 @@
 {% block javascript %}
     {{ block.super }}
     <script>
-    require(['/static/js/config.js'], function(config) {
-        require(['admin/official_account/index']);
-    });
+        require(['/static/js/config.js'], function(config) {
+            require(['admin/group/index']);
+        });
     </script>
 {% endblock %}

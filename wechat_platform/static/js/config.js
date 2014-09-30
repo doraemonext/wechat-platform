@@ -23,6 +23,7 @@ require.config({
         'module.common.app-view': 'module/common/app_view',
         'module.common.app-breadcrumb-view': 'module/common/app_breadcrumb_view',
         'module.common.app-content-header-view': 'module/common/app_content_header_view',
+        'module.group': 'module/group',
         'module.official-account': 'module/official_account',
 
         'helper.confirm-modal': 'helper/confirm_modal/confirm_modal'
