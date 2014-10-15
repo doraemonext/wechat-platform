@@ -108,9 +108,8 @@
                                 <i class="fa fa-angle-left pull-right"></i>
                             </a>
                             <ul class="treeview-menu">
-                                <li><a href="{% url 'admin:member:list' %}"><i class="fa fa-angle-double-right"></i> 用户管理</a></li>
+                                <li><a href="{% url 'admin:member:list' %}"><i class="fa fa-angle-double-right"></i> 用户</a></li>
                                 <li{% if request.path == group %} class="active"{% endif %}><a href="{{ group }}"><i class="fa fa-angle-double-right"></i> 用户组</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 用户组权限</a></li>
                             </ul>
                         </li>
                         <li class="treeview {% if request.path == official_account %} active{% endif %}">
