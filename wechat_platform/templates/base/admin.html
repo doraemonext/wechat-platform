@@ -79,12 +79,6 @@
             <aside class="left-side sidebar-offcanvas">
                 <!-- sidebar: style can be found in sidebar.less -->
                 <section class="sidebar">
-                    <div class="user-panel">
-                        <div class="pull-left info">
-                            <p>欢迎你，{{ request.user.username }}</p>
-                            <span>当前身份：超级管理员</span>
-                        </div>
-                    </div>
                     <!-- sidebar menu: : style can be found in sidebar.less -->
                     <ul class="sidebar-menu">
                         <li{% if request.path == dashboard %} class="active"{% endif %}>
@@ -100,17 +94,6 @@
                             </a>
                             <ul class="treeview-menu">
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 测试插件</a></li>
-                            </ul>
-                        </li>
-                        <li class="treeview {% if request.path == group %} active{% endif %}">
-                            <a href="#">
-                                <i class="fa fa-group"></i> <span>用户管理</span>
-                                <i class="fa fa-angle-left pull-right"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li><a href="{% url 'admin:member:list' %}"><i class="fa fa-angle-double-right"></i> 用户管理</a></li>
-                                <li{% if request.path == group %} class="active"{% endif %}><a href="{{ group }}"><i class="fa fa-angle-double-right"></i> 用户组</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 用户组权限</a></li>
                             </ul>
                         </li>
                         <li class="treeview {% if request.path == official_account %} active{% endif %}">

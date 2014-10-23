@@ -10,7 +10,5 @@ from django.views.generic import TemplateView
 urlpatterns = patterns('',
     url(r'^dashboard/', include('admin.dashboard.urls', namespace='dashboard')),
     url(r'^user/', include('admin.user.urls', namespace='user')),
-    url(r'^member/', include('admin.member.urls', namespace='member')),
-    url(r'^group/', include('admin.group.urls', namespace='group')),
     url(r'^official_account/', include('admin.official_account.urls', namespace='official_account')),
 )
