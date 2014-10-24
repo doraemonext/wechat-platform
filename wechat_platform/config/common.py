@@ -46,8 +46,6 @@ class Common(Configuration):
         'system.official_account',
         'admin.dashboard',
         'admin.user',
-        'admin.member',
-        'admin.group',
         'admin.official_account',
     )
 
