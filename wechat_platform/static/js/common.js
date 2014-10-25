@@ -1,4 +1,4 @@
-define(['jquery', 'bootstrap', 'noty', 'theme-app'], function($) {
+define(['jquery', 'bootstrap', 'noty', 'theme-app'], function ($) {
     // 设置CSRF
     function getCookie(name) {
         var cookieValue = null;
@@ -61,4 +61,18 @@ define(['jquery', 'bootstrap', 'noty', 'theme-app'], function($) {
         },
         buttons: false // an array of buttons
     };
+
+    $(function () {
+        $("#logout-button").bind("click", function () {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "/api/user/logout/",
+                cache: false,
+                success: function (data) {
+                    window.location.href = data["redirect_url"];
+                }
+            });
+        });
+    });
 });
