@@ -38,6 +38,7 @@ class Common(Configuration):
     THIRD_PARTY_APPS = (
         'crispy_forms',  # Form layouts
         'rest_framework',
+        'wechat_sdk.context.framework.django',
     )
 
     # Apps specific for this project go here.
