@@ -7,3 +7,7 @@ class WechatException(Exception):
 
 class WechatInstanceException(WechatException):
     pass
+
+
+class WechatRequestRepeatException(WechatException):
+    pass

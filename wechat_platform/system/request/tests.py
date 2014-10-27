@@ -2,11 +2,30 @@
 
 from wechat_sdk import WechatBasic
 
+from system.core.exceptions import WechatRequestRepeatException
 from system.core.test import WechatTestCase
 from system.request.models import RequestMessage
 
 
 class RequestTest(WechatTestCase):
+    def test_repeat_request_message(self):
+        """
+        测试重复消息请求
+        """
+        self.assertEqual(0, RequestMessage.objects.count())
+        wechat_instance_1 = WechatBasic()
+        wechat_instance_1.parse_data(data=self.make_raw_text_message())
+        request_1 = RequestMessage.manager.add(wechat_instance_1)
+        self.assertEqual(1, RequestMessage.objects.count())
+        wechat_instance_2 = WechatBasic()
+        wechat_instance_2.parse_data(data=self.make_raw_image_message(msgid=request_1.msgid))
+
+        # 检测is_repeat函数
+        self.assertTrue(RequestMessage.manager.is_repeat(wechat_instance_2))
+        # 检测触发异常
+        with self.assertRaises(WechatRequestRepeatException):
+            RequestMessage.manager.add(wechat_instance_2)
+
     def test_add_text_request(self):
         """
         测试添加文本消息请求
