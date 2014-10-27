@@ -130,7 +130,7 @@ class WechatTestCase(TestCase):
 
         return xml
 
-    def make_raw_image_message(self, msgid=None, target=None, source=None, time=None, picurl=None, media_id=None):
+    def make_raw_image_message(self, msgid=None, target=None, source=None, time=None, picurl=None):
         """
         生成图片消息请求的原生XML数据
 
@@ -152,8 +152,6 @@ class WechatTestCase(TestCase):
             time = self.make_time()
         if not picurl:
             picurl = 'http://www.baidu.com/img/bd_logo1.png'
-        if not media_id:
-            media_id = 'media_id'
 
         xml = u"""
         <xml>
@@ -162,7 +160,7 @@ class WechatTestCase(TestCase):
         <CreateTime>{time}</CreateTime>
         <MsgType><![CDATA[image]]></MsgType>
         <PicUrl><![CDATA[{picurl}]]></PicUrl>
-        <MediaId><![CDATA[{media_id}]]></MediaId>
+        <MediaId><![CDATA[media_id]]></MediaId>
         <MsgId>{msgid}</MsgId>
         </xml>
         """.format(
@@ -170,7 +168,6 @@ class WechatTestCase(TestCase):
             source=source,
             time=time,
             picurl=picurl,
-            media_id=media_id,
             msgid=msgid
         )
 
