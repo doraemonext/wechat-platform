@@ -180,23 +180,24 @@ class RequestEventManager(models.Manager):
         """
         message = wechat_instance.get_message()
         if message.type == 'subscribe':
-            return self.add_subscribe(target=message.target, source=message.source, time=message.time)
+            return self.add_subscribe(target=message.target, source=message.source, time=message.time, raw=message.raw)
         elif message.type == 'unsubscribe':
-            return self.add_unsubscribe(target=message.target, source=message.source, time=message.time)
+            return self.add_unsubscribe(target=message.target, source=message.source, time=message.time, raw=message.raw)
         elif message.type == 'click':
-            return self.add_click(target=message.target, source=message.source, time=message.time, key=message.key)
+            return self.add_click(target=message.target, source=message.source, time=message.time, key=message.key, raw=message.raw)
         elif message.type == 'location':
-            return self.add_location(target=message.target, source=message.source, time=message.time,
+            return self.add_location(target=message.target, source=message.source, time=message.time, raw=message.raw,
                                      latitude=message.latitude, longitude=message.longitude, precision=message.precision)
         else:
             raise WechatInstanceException()
 
-    def add_subscribe(self, target, source, time):
+    def add_subscribe(self, target, source, time, raw):
         """
         添加订阅请求记录
         :param target: 目标用户OpenID
         :param source: 来源用户OpenID
         :param time: 信息发送时间
+        :param raw: 原始XML
         """
         try:
             return super(RequestEventManager, self).create(
@@ -204,17 +205,19 @@ class RequestEventManager(models.Manager):
                 target=target,
                 source=source,
                 time=time,
-                type=RequestEvent.TYPE_SUBSCRIBE
+                type=RequestEvent.TYPE_SUBSCRIBE,
+                raw=raw
             )
         except IntegrityError, e:
             raise WechatRequestRepeatException(e)
 
-    def add_unsubscribe(self, target, source, time):
+    def add_unsubscribe(self, target, source, time, raw):
         """
         添加取消订阅请求记录
         :param target: 目标用户OpenID
         :param source: 来源用户OpenID
         :param time: 信息发送时间
+        :param raw: 原始XML
         """
         try:
             return super(RequestEventManager, self).create(
@@ -222,17 +225,19 @@ class RequestEventManager(models.Manager):
                 target=target,
                 source=source,
                 time=time,
-                type=RequestEvent.TYPE_UNSUBSCRIBE
+                type=RequestEvent.TYPE_UNSUBSCRIBE,
+                raw=raw
             )
         except IntegrityError, e:
             raise WechatRequestRepeatException(e)
 
-    def add_click(self, target, source, time, key):
+    def add_click(self, target, source, time, raw, key):
         """
         添加自定义菜单点击事件
         :param target: 目标用户OpenID
         :param source: 来源用户OpenID
         :param time: 信息发送时间
+        :param raw: 原始XML
         :param key: 事件KEY值
         """
         try:
@@ -242,17 +247,19 @@ class RequestEventManager(models.Manager):
                 source=source,
                 time=time,
                 type=RequestEvent.TYPE_CLICK,
+                raw=raw,
                 key=key
             )
         except IntegrityError, e:
             raise WechatRequestRepeatException(e)
 
-    def add_location(self, target, source, time, latitude, longitude, precision):
+    def add_location(self, target, source, time, raw, latitude, longitude, precision):
         """
         添加上报地理位置事件
         :param target: 目标用户OpenID
         :param source: 来源用户OpenID
         :param time: 信息发送时间
+        :param raw: 原始XML
         :param latitude: 纬度
         :param longitude: 经度
         :param precision: 精度
@@ -264,6 +271,7 @@ class RequestEventManager(models.Manager):
                 source=source,
                 time=time,
                 type=RequestEvent.TYPE_LOCATION,
+                raw=raw,
                 latitude=latitude,
                 longitude=longitude,
                 precision=precision
@@ -291,6 +299,7 @@ class RequestEvent(models.Model):
     target = models.CharField(u'目标用户OpenID', max_length=50)
     source = models.CharField(u'来源用户OpenID', max_length=50)
     time = models.IntegerField(u'信息发送时间')
+    raw = models.TextField(u'信息原始XML内容')
     type = models.CharField(u'事件类型', choices=TYPE, max_length=15, blank=True, null=True)
     key = models.TextField(u'事件key值', blank=True, null=True)
     latitude = models.FloatField(u'地理位置事件-纬度', blank=True, null=True)

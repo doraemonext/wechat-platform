@@ -4,7 +4,7 @@ from wechat_sdk import WechatBasic
 
 from system.core.exceptions import WechatRequestRepeatException
 from system.core.test import WechatTestCase
-from system.request.models import RequestMessage
+from system.request.models import RequestMessage, RequestEvent
 
 
 class RequestTest(WechatTestCase):
@@ -98,3 +98,41 @@ class RequestTest(WechatTestCase):
         self.assertEqual(request.image_picurl, picurl)
 
         self.assertEqual(1, RequestMessage.objects.count())
+
+    def test_add_event_subscribe_request(self):
+        """
+        测试添加订阅消息请求
+        """
+        self.assertEqual(0, RequestEvent.objects.count())
+
+        target = self.make_target()
+        source = self.make_source()
+        time = self.make_time()
+        raw = self.make_raw_event_subscribe_message()
+        request = RequestEvent.manager.add_subscribe(target=target, source=source, time=time, raw=raw)
+        self.assertEqual(request.type, 'subscribe')
+        self.assertEqual(request.target, target)
+        self.assertEqual(request.source, source)
+        self.assertEqual(request.time, time)
+        self.assertEqual(request.raw, raw)
+
+        self.assertEqual(1, RequestEvent.objects.count())
+
+    def test_add_event_unsubscribe_request(self):
+        """
+        测试添加取消订阅消息请求
+        """
+        self.assertEqual(0, RequestEvent.objects.count())
+
+        target = self.make_target()
+        source = self.make_source()
+        time = self.make_time()
+        raw = self.make_raw_event_unsubscribe_message()
+        request = RequestEvent.manager.add_unsubscribe(target=target, source=source, time=time, raw=raw)
+        self.assertEqual(request.type, 'unsubscribe')
+        self.assertEqual(request.target, target)
+        self.assertEqual(request.source, source)
+        self.assertEqual(request.time, time)
+        self.assertEqual(request.raw, raw)
+
+        self.assertEqual(1, RequestEvent.objects.count())

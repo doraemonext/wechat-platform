@@ -18,7 +18,7 @@ class WechatTestCase(TestCase):
         """
         生成微信请求的验证参数
         :param token: 微信 Token
-        :return:
+        :return: (signature, timestamp, nonce)
         """
         timestamp = str(int(time.time()))
         nonce = make_random_string(13)
@@ -169,6 +169,72 @@ class WechatTestCase(TestCase):
             time=time,
             picurl=picurl,
             msgid=msgid
+        )
+
+        return xml
+
+    def make_raw_event_subscribe_message(self, target=None, source=None, time=None):
+        """
+        生成订阅事件消息请求的原生XML数据
+
+        对应Keyword Argument如不提供，则自动随机
+        :param target: 目标用户OpenID
+        :param source: 来源用户OpenID
+        :param time: 信息发送时间
+        :return: XML
+        """
+        if not target:
+            target = self.make_target()
+        if not source:
+            source = self.make_source()
+        if not time:
+            time = self.make_time()
+
+        xml = u"""
+        <xml>
+        <ToUserName><![CDATA[{target}]]></ToUserName>
+        <FromUserName><![CDATA[{source}]]></FromUserName>
+        <CreateTime>{time}</CreateTime>
+        <MsgType><![CDATA[event]]></MsgType>
+        <Event><![CDATA[subscribe]]></Event>
+        </xml>
+        """.format(
+            target=target,
+            source=source,
+            time=time
+        )
+
+        return xml
+
+    def make_raw_event_unsubscribe_message(self, target=None, source=None, time=None):
+        """
+        生成取消订阅事件消息请求的原生XML数据
+
+        对应Keyword Argument如不提供，则自动随机
+        :param target: 目标用户OpenID
+        :param source: 来源用户OpenID
+        :param time: 信息发送时间
+        :return: XML
+        """
+        if not target:
+            target = self.make_target()
+        if not source:
+            source = self.make_source()
+        if not time:
+            time = self.make_time()
+
+        xml = u"""
+        <xml>
+        <ToUserName><![CDATA[{target}]]></ToUserName>
+        <FromUserName><![CDATA[{source}]]></FromUserName>
+        <CreateTime>{time}</CreateTime>
+        <MsgType><![CDATA[event]]></MsgType>
+        <Event><![CDATA[unsubscribe]]></Event>
+        </xml>
+        """.format(
+            target=target,
+            source=source,
+            time=time
         )
 
         return xml
