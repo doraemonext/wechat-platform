@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from django.http.response import HttpResponse
+
 from wechat_sdk.context.framework.django import DatabaseContextStore
+from wechat_sdk.messages import EventMessage
 
 
 class ControlCenter(object):
@@ -13,10 +16,14 @@ class ControlCenter(object):
         :param official_account: 公众号实例 (OfficialAccount)
         :param wechat_instance: 微信请求实例 (WechatBasic)
         """
-        self.official_account = official_account
-        self.wechat = wechat_instance
-        self.context = DatabaseContextStore(self.wechat.get_message().source)
+        self.official_account = official_account  # 公众号实例
+        self.wechat = wechat_instance  # 微信请求
+        self.message = self.wechat.get_message()  # 微信消息
+        self.context = DatabaseContextStore(openid=self.message.source)  # 微信上下文对话
 
     @property
     def response(self):
-        pass
+        # 保存所有上下文对话到数据库中
+        self.context.save()
+
+        return HttpResponse('hello')
