@@ -2,7 +2,7 @@
 
 from django.db import models
 
-from lib.tools.random import make_random_string
+from lib.tools.rand import make_unique_random_string
 
 
 class OfficialAccountManager(models.Manager):
@@ -26,10 +26,10 @@ class OfficialAccountManager(models.Manager):
         :param token: 微信 Token, 如不传入将自动生成
         """
         if not token:
-            token = make_random_string()
+            token = make_unique_random_string()
 
         return super(OfficialAccountManager, self).create(
-            iden=make_random_string(),
+            iden=make_unique_random_string(),
             token=token,
             appid=appid,
             appsecret=appsecret,

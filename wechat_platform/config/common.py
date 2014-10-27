@@ -38,12 +38,14 @@ class Common(Configuration):
     THIRD_PARTY_APPS = (
         'crispy_forms',  # Form layouts
         'rest_framework',
+        'wechat_sdk.context.framework.django',
     )
 
     # Apps specific for this project go here.
     LOCAL_APPS = (
         'system.users',
         'system.official_account',
+        'system.request',
         'admin.dashboard',
         'admin.user',
         'admin.official_account',
