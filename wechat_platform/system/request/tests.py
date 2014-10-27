@@ -18,13 +18,31 @@ class RequestTest(WechatTestCase):
         request_1 = RequestMessage.manager.add(wechat_instance_1)
         self.assertEqual(1, RequestMessage.objects.count())
         wechat_instance_2 = WechatBasic()
-        wechat_instance_2.parse_data(data=self.make_raw_image_message(msgid=request_1.msgid))
+        wechat_instance_2.parse_data(data=self.make_raw_text_message(msgid=request_1.msgid))
 
         # 检测is_repeat函数
         self.assertTrue(RequestMessage.manager.is_repeat(wechat_instance_2))
         # 检测触发异常
         with self.assertRaises(WechatRequestRepeatException):
             RequestMessage.manager.add(wechat_instance_2)
+
+    def test_repeat_request_event(self):
+        """
+        测试重复事件请求
+        """
+        self.assertEqual(0, RequestEvent.objects.count())
+        wechat_instance_1 = WechatBasic()
+        wechat_instance_1.parse_data(data=self.make_raw_event_subscribe_message())
+        request_1 = RequestEvent.manager.add(wechat_instance_1)
+        self.assertEqual(1, RequestEvent.objects.count())
+        wechat_instance_2 = WechatBasic()
+        wechat_instance_2.parse_data(data=self.make_raw_event_subscribe_message(source=request_1.source, time=request_1.time))
+
+        # 检测is_repeat函数
+        self.assertTrue(RequestEvent.manager.is_repeat(wechat_instance_2))
+        # 检测触发异常
+        with self.assertRaises(WechatRequestRepeatException):
+            RequestEvent.manager.add(wechat_instance_2)
 
     def test_add_text_request(self):
         """
