@@ -45,6 +45,7 @@ class Common(Configuration):
     LOCAL_APPS = (
         'system.users',
         'system.official_account',
+        'system.request',
         'admin.dashboard',
         'admin.user',
         'admin.official_account',
