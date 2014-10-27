@@ -47,6 +47,8 @@ class Common(Configuration):
         'system.official_account',
         'system.request',
         'system.rule',
+        'system.plugin',
+
         'admin.dashboard',
         'admin.user',
         'admin.official_account',
