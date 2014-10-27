@@ -2,7 +2,7 @@
 
 from django.db import models
 
-from lib.tools.random import make_unique_random_string
+from lib.tools.rand import make_unique_random_string
 
 
 class OfficialAccountManager(models.Manager):

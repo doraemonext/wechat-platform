@@ -6,7 +6,7 @@ from hashlib import sha1
 from django.test import TestCase
 from django.test.client import Client
 
-from lib.tools.random import make_random_string, make_unique_random_string
+from lib.tools.rand import make_random_string, make_unique_random_string
 from system.official_account.models import OfficialAccount
 
 
@@ -48,6 +48,130 @@ class WechatTestCase(TestCase):
         :param password: 公众平台密码
         :param is_advanced: 是否开启高级支持
         :param token: 微信 Token, 如不传入将自动生成
+        :return: 公众号实例 (OfficialAccount)
         """
         return OfficialAccount.manager.add(level, name, email, original, wechat, introduction, address,
                                            appid, appsecret, username, password, is_advanced, token)
+
+    def make_msgid(self):
+        """
+        生成一个消息ID
+        :return: 消息ID
+        """
+        return int(make_random_string(length=16, integer=True))
+
+    def make_target(self):
+        """
+        生成一个目标OpenID
+        :return: 目标OpenID
+        """
+        return make_random_string(length=29)
+
+    def make_source(self):
+        """
+        生成一个来源OpenID
+        :return: 来源OpenID
+        """
+        return make_random_string(length=29)
+
+    def make_time(self):
+        """
+        生成当前时间的UNIX时间戳
+        :return: 整型时间戳
+        """
+        return int(time.time())
+
+    def make_url(self):
+        """
+        生成随机URL
+        :return: URL地址
+        """
+        return 'http://test.oott.me/' + make_random_string(length=5)
+
+    def make_raw_text_message(self, msgid=None, target=None, source=None, time=None, content=None):
+        """
+        生成文本消息请求的原生XML数据
+
+        对应Keyword Argument如不提供，则自动随机
+        :param msgid: 消息ID
+        :param target: 目标用户OpenID
+        :param source: 来源用户OpenID
+        :param time: 信息发送时间
+        :param content: 文本内容
+        :return: XML
+        """
+        if not msgid:
+            msgid = self.make_msgid()
+        if not target:
+            target = self.make_target()
+        if not source:
+            source = self.make_source()
+        if not time:
+            time = self.make_time()
+        if not content:
+            content = make_random_string(length=255)
+
+        xml = u"""
+        <xml>
+        <ToUserName><![CDATA[{target}]]></ToUserName>
+        <FromUserName><![CDATA[{source}]]></FromUserName>
+        <CreateTime>{time}</CreateTime>
+        <MsgType><![CDATA[text]]></MsgType>
+        <Content><![CDATA[{content}]]></Content>
+        <MsgId>{msgid}</MsgId>
+        </xml>
+        """.format(
+            target=target,
+            source=source,
+            time=time,
+            content=content,
+            msgid=msgid
+        )
+
+        return xml
+
+    def make_raw_image_message(self, msgid=None, target=None, source=None, time=None, picurl=None, media_id=None):
+        """
+        生成图片消息请求的原生XML数据
+
+        对应Keyword Argument如不提供，则自动随机
+        :param msgid: 消息ID
+        :param target: 目标用户OpenID
+        :param source: 来源用户OpenID
+        :param time: 信息发送时间
+        :param picurl: 图片链接
+        :return: XML
+        """
+        if not msgid:
+            msgid = self.make_msgid()
+        if not target:
+            target = self.make_target()
+        if not source:
+            source = self.make_source()
+        if not time:
+            time = self.make_time()
+        if not picurl:
+            picurl = 'http://www.baidu.com/img/bd_logo1.png'
+        if not media_id:
+            media_id = 'media_id'
+
+        xml = u"""
+        <xml>
+        <ToUserName><![CDATA[{target}]]></ToUserName>
+        <FromUserName><![CDATA[{source}]]></FromUserName>
+        <CreateTime>{time}</CreateTime>
+        <MsgType><![CDATA[image]]></MsgType>
+        <PicUrl><![CDATA[{picurl}]]></PicUrl>
+        <MediaId><![CDATA[{media_id}]]></MediaId>
+        <MsgId>{msgid}</MsgId>
+        </xml>
+        """.format(
+            target=target,
+            source=source,
+            time=time,
+            picurl=picurl,
+            media_id=media_id,
+            msgid=msgid
+        )
+
+        return xml
