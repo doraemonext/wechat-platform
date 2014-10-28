@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='RuleResponse',
+            name='RuleMatch',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('plugin_iden', models.CharField(max_length=50, verbose_name='\u54cd\u5e94\u63d2\u4ef6\u6807\u8bc6\u7b26')),
@@ -22,9 +22,9 @@ class Migration(migrations.Migration):
                 ('rule', models.ForeignKey(verbose_name='\u6240\u5c5e\u89c4\u5219', to='rule.Rule')),
             ],
             options={
-                'db_table': 'wechat_rule_response',
-                'verbose_name': '\u5fae\u4fe1\u89c4\u5219\u56de\u590d\u8868',
-                'verbose_name_plural': '\u5fae\u4fe1\u89c4\u5219\u56de\u590d\u8868',
+                'db_table': 'wechat_rule_match',
+                'verbose_name': '\u5fae\u4fe1\u89c4\u5219\u5339\u914d\u8868',
+                'verbose_name_plural': '\u5fae\u4fe1\u89c4\u5219\u5339\u914d\u8868',
             },
             bases=(models.Model,),
         ),

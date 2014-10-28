@@ -47,7 +47,7 @@ class Common(Configuration):
         'system.official_account',
         'system.request',
         'system.rule',
-        'system.rule_response',
+        'system.rule_match',
         'system.keyword',
         'system.plugin',
 
