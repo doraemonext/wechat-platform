@@ -6,7 +6,26 @@ from system.keyword.models import Keyword
 
 
 class KeywordTest(WechatTestCase):
+    def test_add_keyword(self):
+        """
+        测试添加关键字
+        """
+        self.assertEqual(0, Keyword.objects.count())
+        rule = Rule.manager.add(name='rule test', reply_pattern=Rule.REPLY_PATTERN_ALL)
+        keyword = Keyword.manager.add(rule, keyword='keyword')
+        self.assertEqual(1, Keyword.objects.count())
+        self.assertEqual(keyword.rule, rule)
+        self.assertEqual(keyword.keyword, 'keyword')
+        self.assertEqual(keyword.status, True)
+        self.assertEqual(keyword.type, Keyword.TYPE_FULL)
+
     def test_keyword_search(self):
+        """
+        测试关键字搜索
+        """
+        self.assertEqual(0, Rule.objects.count())
+        self.assertEqual(0, Keyword.objects.count())
+
         rule_1 = Rule.manager.add(name='rule 1', reply_pattern=Rule.REPLY_PATTERN_RANDOM)
         rule_2 = Rule.manager.add(name='rule 2', reply_pattern=Rule.REPLY_PATTERN_ALL)
         rule_3 = Rule.manager.add(name='rule 3', reply_pattern=Rule.REPLY_PATTERN_FORWARD, status=False)
