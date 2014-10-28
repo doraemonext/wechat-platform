@@ -8,6 +8,9 @@ from system.rule.models import Rule
 
 
 class KeywordManager(models.Manager):
+    """
+    微信关键字表 Manager
+    """
     def add(self, rule, keyword, status=True, type=0):
         """
         添加新的关键字
@@ -34,7 +37,7 @@ class KeywordManager(models.Manager):
         result_full = super(KeywordManager, self).get_queryset().filter(
             status=True
         ).filter(
-            type=0
+            type=self.model.TYPE_FULL
         ).filter(
             keyword=keyword
         ).filter(
@@ -46,24 +49,30 @@ class KeywordManager(models.Manager):
         )[:1]
 
         # 进行包含匹配搜索
-        result_contain = super(KeywordManager, self).raw(
-            "SELECT keyword.id AS id, keyword.rule_id AS rule_id,  \
-            keyword.keyword AS keyword FROM wechat_keyword AS keyword \
-            LEFT JOIN wechat_rule AS rule ON keyword.rule_id = rule.id \
-            WHERE rule.status='1' AND keyword.status='1' AND keyword.type='1' \
-            AND INSTR(%s, `keyword`) > 0 ORDER BY rule.top DESC, rule.order DESC \
-            LIMIT 1", [keyword]
-        )
+        result_contain = super(KeywordManager, self).raw(" \
+        SELECT keyword.id AS id, keyword.rule_id AS rule_id, \
+        keyword.keyword AS keyword FROM {keyword_table} AS keyword \
+        LEFT JOIN {rule_table} AS rule ON keyword.rule_id = rule.id \
+        WHERE rule.status='1' AND keyword.status='1' AND keyword.type='{keyword_type}' \
+        AND INSTR(%s, `keyword`) > 0 ORDER BY rule.top DESC, rule.order DESC \
+        LIMIT 1".format(
+            keyword_table=Keyword._meta.db_table,
+            rule_table=Rule._meta.db_table,
+            keyword_type=self.model.TYPE_CONTAIN
+        ), [keyword])
 
         # 进行正则匹配搜索
-        result_regex = super(KeywordManager, self).raw(
-            "SELECT keyword.id AS id, keyword.rule_id AS rule_id,  \
-            keyword.keyword AS keyword FROM wechat_keyword AS keyword \
-            LEFT JOIN wechat_rule AS rule ON keyword.rule_id = rule.id \
-            WHERE rule.status='1' AND keyword.status='1' AND keyword.type='2' \
-            AND %s REGEXP `keyword` ORDER BY rule.top DESC, rule.order DESC \
-            LIMIT 1", [keyword]
-        )
+        result_regex = super(KeywordManager, self).raw(" \
+        SELECT keyword.id AS id, keyword.rule_id AS rule_id, \
+        keyword.keyword AS keyword FROM {keyword_table} AS keyword \
+        LEFT JOIN {rule_table} AS rule ON keyword.rule_id = rule.id \
+        WHERE rule.status='1' AND keyword.status='1' AND keyword.type='{keyword_type}' \
+        AND %s REGEXP `keyword` ORDER BY rule.top DESC, rule.order DESC \
+        LIMIT 1".format(
+            keyword_table=Keyword._meta.db_table,
+            rule_table=Rule._meta.db_table,
+            keyword_type=self.model.TYPE_REGEX
+        ), [keyword])
 
         # 取得查询所得结果并排序, 按照rule选择优先级最高的一个作为结果返回
         result = list()
