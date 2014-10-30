@@ -11,3 +11,11 @@ class WechatInstanceException(WechatException):
 
 class WechatRequestRepeatException(WechatException):
     pass
+
+
+class PluginException(Exception):
+    pass
+
+
+class PluginLoadError(PluginException):
+    pass
