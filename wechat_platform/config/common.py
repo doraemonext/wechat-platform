@@ -19,6 +19,7 @@ BASE_DIR = dirname(dirname(__file__))
 
 
 class Common(Configuration):
+    PROJECT_DIR = BASE_DIR
 
     # APP CONFIGURATION
     DJANGO_APPS = (

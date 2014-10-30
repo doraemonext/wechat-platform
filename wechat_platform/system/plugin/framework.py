@@ -31,7 +31,7 @@ class PluginProcessor(object):
         self.official_account = official_account
         self.wechat = wechat
         self.context = context
-        if not self.message:
+        if not message:
             self.message = self.wechat.get_message()
         else:
             self.message = message
@@ -93,9 +93,9 @@ def load_plugin(official_account, wechat, context, message=None, in_context=Fals
     :param is_system: 是否为系统插件
     """
     if is_system:
-        directory = os.path.join(settings.BASE_DIR, 'plugins/system')
+        directory = os.path.join(settings.PROJECT_DIR, 'plugins/system')
     else:
-        directory = os.path.join(settings.BASE_DIR, 'plugins')
+        directory = os.path.join(settings.PROJECT_DIR, 'plugins')
         try:
             plugin = Plugin.objects.get(pk=plugin.iden)
         except ObjectDoesNotExist:
@@ -137,3 +137,4 @@ def load_plugin(official_account, wechat, context, message=None, in_context=Fals
                     plugin=plugin,
                     is_system=is_system
                 )
+    raise PluginLoadError('you should set __all__ variable in process.py')
