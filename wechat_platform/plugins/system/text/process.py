@@ -6,4 +6,5 @@ __all__ = ['PluginSystemText']
 
 
 class PluginSystemText(PluginProcessorSystem):
-    pass
+    def process(self):
+        return 'test'

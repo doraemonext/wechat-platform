@@ -84,14 +84,14 @@ class ControlCenter(object):
             })
 
         # 根据规则的返回模式返回相应的列表
-        if rule.reply_pattern == Rule.REPLY_PATTERN_ALL:
+        if rule.reply_pattern == Rule.REPLY_PATTERN_ALL:  # 全部回复
             return plugin_list
-        elif rule.reply_pattern == Rule.REPLY_PATTERN_RANDOM:
+        elif rule.reply_pattern == Rule.REPLY_PATTERN_RANDOM:  # 随机回复
             return [random.choice(plugin_list), ]
-        elif rule.reply_pattern == Rule.REPLY_PATTERN_FORWARD:
+        elif rule.reply_pattern == Rule.REPLY_PATTERN_FORWARD:  # 顺序回复
             # TODO: return the plugin list by means of response model
             raise Exception('have not yet implemented')
-        elif rule.reply_pattern == Rule.REPLY_PATTERN_REVERSE:
+        elif rule.reply_pattern == Rule.REPLY_PATTERN_REVERSE:  # 逆序回复
             # TODO: return the plugin list by means of response model
             raise Exception('have not yet implemented')
 
@@ -105,10 +105,13 @@ class ControlCenter(object):
         iden = plugin_dict['iden']
         reply_id = plugin_dict['reply_id']
 
-        try:
-            plugin = Plugin.objects.get(pk=iden)
-        except ObjectDoesNotExist:
-            raise PluginLoadError('no plugin iden found in database')
+        if self._is_system_plugin(iden=iden):
+            plugin = Plugin(iden=iden, name=iden)
+        else:
+            try:
+                plugin = Plugin.objects.get(pk=iden)
+            except ObjectDoesNotExist:
+                raise PluginLoadError('no plugin iden found in database')
 
         plugin_loaded = load_plugin(
             official_account=self.official_account,
