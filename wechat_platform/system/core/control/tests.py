@@ -9,6 +9,7 @@ from system.rule.models import Rule
 from system.keyword.models import Keyword
 from system.rule_match.models import RuleMatch
 from system.request.models import RequestMessage, RequestEvent
+from system.library.text.models import LibraryText
 from .control import ControlCenter
 
 
@@ -39,8 +40,10 @@ class ControlCenterTest(WechatTestCase):
 
         rule = Rule.manager.add(name='rule one', reply_pattern=Rule.REPLY_PATTERN_ALL)
         keyword = Keyword.manager.add(rule=rule, keyword=u'乐者为王', type=Keyword.TYPE_CONTAIN)
-        rule_match = RuleMatch.manager.add(rule=rule, plugin_iden='text', reply_id=0)
+        library_text = LibraryText.manager.add(content=u'测试回复文字哟')
+        rule_match = RuleMatch.manager.add(rule=rule, plugin_iden='text', reply_id=library_text.pk)
 
         response = control.response
         self.assertEqual(1, RequestMessage.objects.count())
-        self.assertEqual([{'iden': 'text', 'reply_id': 0}], control.match_plugin_list)
+        self.assertEqual([{'iden': 'text', 'reply_id': library_text.pk}], control.match_plugin_list)
+        self.assertIsNotNone(response)

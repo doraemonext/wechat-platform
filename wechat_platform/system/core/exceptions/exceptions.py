@@ -26,3 +26,7 @@ class PluginException(Exception):
 
 class PluginLoadError(PluginException):
     pass
+
+
+class PluginRuntimeError(PluginException):
+    pass

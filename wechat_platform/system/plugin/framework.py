@@ -57,7 +57,11 @@ class PluginProcessor(object):
         self.in_context = False
 
     def response_text(self, text):
-        pass
+        """
+        向用户发送文字信息
+        :param text: 文本内容
+        """
+        return self.wechat.response_text(content=text)
 
     def response_image(self, mid):
         pass
