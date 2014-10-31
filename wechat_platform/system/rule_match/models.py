@@ -21,6 +21,14 @@ class RuleMatchManager(models.Manager):
             status=status
         )
 
+    def get(self, rule):
+        """
+        根据 rule 返回相应的 QuerySet 集合
+
+        返回的集合已经按照优先级排序完毕, 且剔除掉了没有启用的匹配
+        """
+        return super(RuleMatchManager, self).get_queryset().filter(rule=rule).filter(status=True).order_by('-order')
+
 
 class RuleMatch(models.Model):
     """
