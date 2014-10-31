@@ -15,7 +15,7 @@ class PluginProcessor(object):
     """
     插件响应过程基类, 每个插件响应过程都要在此基础上进行扩展
     """
-    def __init__(self, official_account, wechat, context, message=None, in_context=False, is_exclusive=False, plugin=None, is_system=False):
+    def __init__(self, official_account, wechat, context, message=None, in_context=False, is_exclusive=False, plugin=None, is_system=False, **kwargs):
         """
         初始化插件, 将状态信息存储
         :param official_account: 公众号实例 (OfficialAccount)
@@ -27,7 +27,6 @@ class PluginProcessor(object):
         :param plugin: 插件信息实例 (Plugin)
         :param is_system: 是否为系统插件
         """
-
         self.official_account = official_account
         self.wechat = wechat
         self.context = context
@@ -80,7 +79,16 @@ class PluginProcessor(object):
         raise NotImplementedError('subclasses of PluginProcess must provide an response() method')
 
 
-def load_plugin(official_account, wechat, context, message=None, in_context=False, is_exclusive=False, plugin=None, is_system=False):
+class PluginProcessorSystem(PluginProcessor):
+    """
+    系统插件响应过程基类, 每个系统插件响应过程都要在此基础上进行扩展
+    """
+    def __init__(self, *args, **kwargs):
+        super(PluginProcessorSystem, self).__init__(*args, **kwargs)
+        self.reply_id = kwargs.get('reply_id')
+
+
+def load_plugin(official_account, wechat, context, message=None, in_context=False, is_exclusive=False, plugin=None, is_system=False, **kwargs):
     """
     加载插件并做初始化工作，返回插件实例 (PluginProcess)
     :param official_account: 公众号实例 (OfficialAccount)
@@ -91,6 +99,8 @@ def load_plugin(official_account, wechat, context, message=None, in_context=Fals
     :param is_exclusive: 插件是否可以独享响应内容
     :param plugin: 插件信息实例 (Plugin)
     :param is_system: 是否为系统插件
+
+    :param reply_id: (hidden) 系统插件可选传入, 作为库ID使用
     """
     if is_system:
         directory = os.path.join(settings.PROJECT_DIR, 'plugins/system')
@@ -126,15 +136,29 @@ def load_plugin(official_account, wechat, context, message=None, in_context=Fals
     if hasattr(mod, "__all__"):
         attrs = [getattr(mod, x) for x in mod.__all__]
         for plug in attrs:
-            if issubclass(plug, PluginProcessor):
-                return plug(
-                    official_account=official_account,
-                    wechat=wechat,
-                    context=context,
-                    message=message,
-                    in_context=in_context,
-                    is_exclusive=is_exclusive,
-                    plugin=plugin,
-                    is_system=is_system
-                )
+            if is_system:
+                if issubclass(plug, PluginProcessorSystem):
+                    return plug(
+                        official_account=official_account,
+                        wechat=wechat,
+                        context=context,
+                        message=message,
+                        in_context=in_context,
+                        is_exclusive=is_exclusive,
+                        plugin=plugin,
+                        is_system=is_system,
+                        reply_id=kwargs.get('reply_id')
+                    )
+            else:
+                if issubclass(plug, PluginProcessor):
+                    return plug(
+                        official_account=official_account,
+                        wechat=wechat,
+                        context=context,
+                        message=message,
+                        in_context=in_context,
+                        is_exclusive=is_exclusive,
+                        plugin=plugin,
+                        is_system=is_system
+                    )
     raise PluginLoadError('you should set __all__ variable in process.py')
