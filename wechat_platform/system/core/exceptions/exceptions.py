@@ -30,3 +30,7 @@ class PluginLoadError(PluginException):
 
 class PluginRuntimeError(PluginException):
     pass
+
+
+class PluginDoesNotExist(PluginException):
+    pass

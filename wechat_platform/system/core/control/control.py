@@ -108,10 +108,7 @@ class ControlCenter(object):
         if self._is_system_plugin(iden=iden):
             plugin = Plugin(iden=iden, name=iden)
         else:
-            try:
-                plugin = Plugin.objects.get(pk=iden)
-            except ObjectDoesNotExist:
-                raise PluginLoadError('no plugin iden found in database')
+            plugin = Plugin.manager.get(official_account=self.official_account, iden=iden)
 
         plugin_loaded = load_plugin(
             official_account=self.official_account,

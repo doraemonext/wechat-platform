@@ -112,10 +112,6 @@ def load_plugin(official_account, wechat, context, message=None, in_context=Fals
         directory = os.path.join(settings.PROJECT_DIR, 'plugins/system')
     else:
         directory = os.path.join(settings.PROJECT_DIR, 'plugins')
-        try:
-            plugin = Plugin.objects.get(pk=plugin.iden)
-        except ObjectDoesNotExist:
-            raise PluginLoadError('plugin iden does not exist')
 
     try:
         full_path = os.path.join(directory, plugin.iden)
