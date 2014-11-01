@@ -40,7 +40,7 @@ class ControlCenterTest(WechatTestCase):
 
         rule = Rule.manager.add(official_account=official_account, name='rule one', reply_pattern=Rule.REPLY_PATTERN_ALL)
         keyword = Keyword.manager.add(rule=rule, keyword=u'乐者为王', type=Keyword.TYPE_CONTAIN)
-        library_text = LibraryText.manager.add(content=u'测试回复文字哟')
+        library_text = LibraryText.manager.add(official_account=official_account, content=u'测试回复文字哟')
         rule_match = RuleMatch.manager.add(rule=rule, plugin_iden='text', reply_id=library_text.pk)
 
         response = control.response
