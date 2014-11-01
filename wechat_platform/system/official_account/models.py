@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from wechat_sdk import WechatBasic, WechatExt
+from wechat_sdk.exceptions import OfficialAPIError
 
 from lib.tools.rand import make_unique_random_string
+from system.official_account import OfficialAccountIncomplete, OfficialAccountIncorrect
 
 
 class OfficialAccountManager(models.Manager):
@@ -75,7 +78,7 @@ class OfficialAccount(models.Model):
     introduction = models.TextField(u'公众号介绍', null=True, blank=True)
     address = models.TextField(u'所在地址', null=True, blank=True)
     cache_access_token = models.CharField(u'缓存access token', max_length=512, blank=True, null=True)
-    cache_access_token_expire = models.DateTimeField(u'缓存access token过期时间', blank=True, null=True)
+    cache_access_token_expires_at = models.BigIntegerField(u'缓存access token过期时间', blank=True, null=True)
     cache_token = models.CharField(u'缓存模拟登陆token', max_length=512, blank=True, null=True)
     cache_cookies = models.TextField(u'缓存模拟登陆cookies', blank=True, null=True)
 
@@ -88,3 +91,50 @@ class OfficialAccount(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def get_cache_access_token(self, force_update=False):
+        """
+        获取缓存的access_token
+        :param force_update: 强制刷新access_token
+        :return: dict, exp: {'access_token': 'access_token', 'access_token_expires_at': 1234241244}
+        :raise OfficialAccountIncomplete: 当公众号中不存在appid或appsecret时抛出
+        :raise OfficialAccountIncorrect: 当公众号appid或apppsecret非法时抛出
+        """
+        if not self.appid or not self.appsecret:
+            raise OfficialAccountIncomplete('lack of appid or appsecret in the official account')
+        if force_update:
+            wechat = WechatBasic(appid=self.appid, appsecret=self.appsecret)
+        else:
+            wechat = WechatBasic(appid=self.appid, appsecret=self.appsecret, access_token=self.cache_access_token,
+                                 access_token_expires_at=self.cache_access_token_expires_at)
+        try:
+            access_token_dict = wechat.get_access_token()
+        except OfficialAPIError:
+            raise OfficialAccountIncorrect('appid or appsecret is incorrect')
+
+        # 更新自身的access_token及access_token_expires_at
+        self.cache_access_token = access_token_dict['access_token']
+        self.cache_access_token_expires_at = access_token_dict['access_token_expires_at']
+        self.save()
+
+        return access_token_dict
+
+    def set_cache_access_token(self, access_token_dict=None, access_token=None, access_token_expires_at=None):
+        """
+        设置缓存access_token
+
+        access_token_dict 和 access_token/access_token_expires_at 任选一组提供
+        :param access_token_dict: Access Token 组合字典 (WechatBasic的get_access_token()返回值), exp:
+                                  {'access_token': 'access_token', 'access_token_expires_at': 1234241244}
+        :param access_token: Access Token
+        :param access_token_expires_at: Access Token 过期日期
+        """
+        if access_token_dict:
+            self.cache_access_token = access_token_dict['access_token']
+            self.cache_access_token_expires_at = access_token_dict['access_token_expires_at']
+        elif access_token and access_token_expires_at:
+            self.cache_access_token = access_token
+            self.cache_access_token_expires_at = access_token_expires_at
+        else:
+            raise AttributeError('must provide one of the keyword argument groups')
+        self.save()
