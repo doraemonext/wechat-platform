@@ -2,11 +2,14 @@
 
 from django.db import models
 
+from system.official_account.models import OfficialAccount
+
 
 class RuleManager(models.Manager):
-    def add(self, name, reply_pattern, status=True, top=False, order=0):
+    def add(self, official_account, name, reply_pattern, status=True, top=False, order=0):
         """
         添加一条新的规则
+        :param official_account: 所属公众号
         :param name: 规则名称
         :param reply_pattern: 回复方式
         :param status: 是否启用, 默认启用
@@ -15,6 +18,7 @@ class RuleManager(models.Manager):
         :return: 规则 Rule 实例
         """
         return super(RuleManager, self).create(
+            official_account=official_account,
             name=name,
             reply_pattern=reply_pattern,
             status=status,
@@ -38,6 +42,7 @@ class Rule(models.Model):
         (REPLY_PATTERN_REVERSE, u'逆序回复'),
     )
 
+    official_account = models.ForeignKey(OfficialAccount, verbose_name=u'所属公众号')
     name = models.CharField(u'规则名称', max_length=50)
     reply_pattern = models.IntegerField(u'回复方式', choices=REPLY_PATTERN, default=REPLY_PATTERN_RANDOM)
     status = models.BooleanField(u'是否启用', default=True)

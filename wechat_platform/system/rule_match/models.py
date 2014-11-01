@@ -2,6 +2,7 @@
 
 from django.db import models
 
+from system.official_account.models import OfficialAccount
 from system.rule.models import Rule
 
 
@@ -14,6 +15,7 @@ class RuleMatchManager(models.Manager):
         添加微信规则回复
         """
         return super(RuleMatchManager, self).create(
+            official_account=rule.official_account,
             rule=rule,
             plugin_iden=plugin_iden,
             reply_id=reply_id,
@@ -27,13 +29,22 @@ class RuleMatchManager(models.Manager):
 
         返回的集合已经按照优先级排序完毕, 且剔除掉了没有启用的匹配
         """
-        return super(RuleMatchManager, self).get_queryset().filter(rule=rule).filter(status=True).order_by('-order')
+        return super(RuleMatchManager, self).get_queryset().filter(
+            official_account=rule.official_account
+        ).filter(
+            rule=rule
+        ).filter(
+            status=True
+        ).order_by(
+            '-order'
+        )
 
 
 class RuleMatch(models.Model):
     """
     微信规则匹配表
     """
+    official_account = models.ForeignKey(OfficialAccount, verbose_name=u'所属公众号')
     rule = models.ForeignKey(Rule, verbose_name=u'所属规则')
     plugin_iden = models.CharField(u'响应插件标识符', max_length=50)
     reply_id = models.PositiveIntegerField(u'响应ID号', default=0)

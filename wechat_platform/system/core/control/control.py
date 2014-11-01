@@ -60,7 +60,7 @@ class ControlCenter(object):
         对文本请求信息进行匹配, 并返回匹配的插件标识符列表
         :return: 插件标识符列表, 格式描述参见 __init__ 函数
         """
-        keyword = Keyword.manager.search(keyword=self.message.content)
+        keyword = Keyword.manager.search(official_account=self.official_account, keyword=self.message.content)
         if not keyword:  # 当没有找到匹配关键字时返回默认回复插件
             return [{
                 'iden': 'default',

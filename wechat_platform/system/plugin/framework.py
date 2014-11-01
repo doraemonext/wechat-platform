@@ -79,7 +79,9 @@ class PluginProcessor(object):
         pass
 
     def response(self):
-        """ 响应函数, 由继承的类进行扩展, 当对本插件初始化完成后, 调用此函数即可得到响应结果 """
+        """
+        响应函数, 由继承的类进行扩展, 当对本插件初始化完成后, 调用此函数即可得到响应结果
+        """
         raise NotImplementedError('subclasses of PluginProcess must provide an response() method')
 
 

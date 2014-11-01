@@ -4,6 +4,7 @@ from operator import attrgetter
 
 from django.db import models
 
+from system.official_account.models import OfficialAccount
 from system.rule.models import Rule
 
 
@@ -21,20 +22,24 @@ class KeywordManager(models.Manager):
         :return: Keyword 实例
         """
         return super(KeywordManager, self).create(
+            official_account=rule.official_account,
             rule=rule,
             keyword=keyword,
             status=status,
             type=type
         )
 
-    def search(self, keyword):
+    def search(self, official_account, keyword):
         """
         根据用户请求中的文本内容在关键字表中进行数据库检索, 并返回对应的关键字实例
+        :param official_account: 所属公众号
         :param keyword: 请求查询的文本内容
         :return: Keyword 实例
         """
         # 进行完全匹配搜索
         result_full = super(KeywordManager, self).get_queryset().filter(
+            official_account=official_account
+        ).filter(
             status=True
         ).filter(
             type=self.model.TYPE_FULL
@@ -53,11 +58,13 @@ class KeywordManager(models.Manager):
         SELECT keyword.id AS id, keyword.rule_id AS rule_id, \
         keyword.keyword AS keyword FROM {keyword_table} AS keyword \
         LEFT JOIN {rule_table} AS rule ON keyword.rule_id = rule.id \
-        WHERE rule.status='1' AND keyword.status='1' AND keyword.type='{keyword_type}' \
+        WHERE keyword.official_account_id={official_account_id} AND rule.status='1' \
+        AND keyword.status='1' AND keyword.type='{keyword_type}' \
         AND INSTR(%s, `keyword`) > 0 ORDER BY rule.top DESC, rule.order DESC \
         LIMIT 1".format(
             keyword_table=Keyword._meta.db_table,
             rule_table=Rule._meta.db_table,
+            official_account_id=official_account.pk,
             keyword_type=self.model.TYPE_CONTAIN
         ), [keyword])
 
@@ -66,11 +73,13 @@ class KeywordManager(models.Manager):
         SELECT keyword.id AS id, keyword.rule_id AS rule_id, \
         keyword.keyword AS keyword FROM {keyword_table} AS keyword \
         LEFT JOIN {rule_table} AS rule ON keyword.rule_id = rule.id \
-        WHERE rule.status='1' AND keyword.status='1' AND keyword.type='{keyword_type}' \
+        WHERE keyword.official_account_id={official_account_id} \
+        AND rule.status='1' AND keyword.status='1' AND keyword.type='{keyword_type}' \
         AND %s REGEXP `keyword` ORDER BY rule.top DESC, rule.order DESC \
         LIMIT 1".format(
             keyword_table=Keyword._meta.db_table,
             rule_table=Rule._meta.db_table,
+            official_account_id=official_account.pk,
             keyword_type=self.model.TYPE_REGEX
         ), [keyword])
 
@@ -103,6 +112,7 @@ class Keyword(models.Model):
         (TYPE_REGEX, u'正则表达式匹配'),
     )
 
+    official_account = models.ForeignKey(OfficialAccount, verbose_name=u'所属公众号')
     rule = models.ForeignKey(Rule, verbose_name=u'所属规则')
     keyword = models.CharField(u'关键字', max_length=255)
     status = models.BooleanField(u'是否启用', default=True)

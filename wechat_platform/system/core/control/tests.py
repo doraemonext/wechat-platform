@@ -38,7 +38,7 @@ class ControlCenterTest(WechatTestCase):
         self.assertEqual(control.message, wechat.get_message())
         self.assertEqual(control.context.get('test_context'), u'测试上下文')
 
-        rule = Rule.manager.add(name='rule one', reply_pattern=Rule.REPLY_PATTERN_ALL)
+        rule = Rule.manager.add(official_account=official_account, name='rule one', reply_pattern=Rule.REPLY_PATTERN_ALL)
         keyword = Keyword.manager.add(rule=rule, keyword=u'乐者为王', type=Keyword.TYPE_CONTAIN)
         library_text = LibraryText.manager.add(content=u'测试回复文字哟')
         rule_match = RuleMatch.manager.add(rule=rule, plugin_iden='text', reply_id=library_text.pk)
