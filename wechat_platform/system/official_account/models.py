@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from wechat_sdk import WechatBasic, WechatExt
+from wechat_sdk.exceptions import OfficialAPIError, UnOfficialAPIError
 
 from lib.tools.rand import make_unique_random_string
+from system.official_account import OfficialAccountIncomplete, OfficialAccountIncorrect
 
 
 class OfficialAccountManager(models.Manager):
@@ -75,7 +78,7 @@ class OfficialAccount(models.Model):
     introduction = models.TextField(u'公众号介绍', null=True, blank=True)
     address = models.TextField(u'所在地址', null=True, blank=True)
     cache_access_token = models.CharField(u'缓存access token', max_length=512, blank=True, null=True)
-    cache_access_token_expire = models.DateTimeField(u'缓存access token过期时间', blank=True, null=True)
+    cache_access_token_expires_at = models.BigIntegerField(u'缓存access token过期时间', blank=True, null=True)
     cache_token = models.CharField(u'缓存模拟登陆token', max_length=512, blank=True, null=True)
     cache_cookies = models.TextField(u'缓存模拟登陆cookies', blank=True, null=True)
 
@@ -88,3 +91,99 @@ class OfficialAccount(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def get_cache_access_token(self, force_update=False):
+        """
+        获取缓存的access_token
+        :param force_update: 强制刷新access_token
+        :return: dict, exp: {'access_token': 'access_token', 'access_token_expires_at': 1234241244}
+        :raise OfficialAccountIncomplete: 当公众号中不存在appid或appsecret时抛出
+        :raise OfficialAccountIncorrect: 当公众号appid或apppsecret非法时抛出
+        """
+        if not self.appid or not self.appsecret:
+            raise OfficialAccountIncomplete('lack of appid or appsecret in the official account')
+
+        if force_update:
+            wechat = WechatBasic(appid=self.appid, appsecret=self.appsecret)
+        else:
+            wechat = WechatBasic(appid=self.appid, appsecret=self.appsecret, access_token=self.cache_access_token,
+                                 access_token_expires_at=self.cache_access_token_expires_at)
+        try:
+            access_token_dict = wechat.get_access_token()
+        except OfficialAPIError:
+            raise OfficialAccountIncorrect('appid or appsecret is incorrect')
+
+        # 更新自身的access_token及access_token_expires_at
+        self.cache_access_token = access_token_dict['access_token']
+        self.cache_access_token_expires_at = access_token_dict['access_token_expires_at']
+        self.save()
+
+        return access_token_dict
+
+    def set_cache_access_token(self, access_token_dict=None, access_token=None, access_token_expires_at=None):
+        """
+        设置缓存access_token
+
+        access_token_dict 和 access_token/access_token_expires_at 任选一组提供
+        :param access_token_dict: Access Token 组合字典 (WechatBasic的get_access_token()返回值), exp:
+                                  {'access_token': 'access_token', 'access_token_expires_at': 1234241244}
+        :param access_token: Access Token
+        :param access_token_expires_at: Access Token 过期日期
+        """
+        if access_token_dict:
+            self.cache_access_token = access_token_dict['access_token']
+            self.cache_access_token_expires_at = access_token_dict['access_token_expires_at']
+        elif access_token and access_token_expires_at:
+            self.cache_access_token = access_token
+            self.cache_access_token_expires_at = access_token_expires_at
+        else:
+            raise AttributeError('must provide one of the keyword argument groups')
+        self.save()
+
+    def get_cache_token_cookies(self, force_update=False):
+        """
+        获取缓存的模拟登陆token和cookies
+        :param force_update: 是否强制刷新token及cookies
+        :return: dict, exp: {'token': 'token', 'cookies': 'cookies string'}
+        :raise OfficialAccountIncomplete: 当公众号中不存在username或password时抛出
+        :raise OfficialAccountIncorrect: 当公众号username或password非法时抛出
+        """
+        if not self.username or not self.password:
+            raise OfficialAccountIncomplete('lack of username or password in the official account')
+
+        try:
+            if force_update:
+                wechat = WechatExt(username=self.username, password=self.password)
+            else:
+                wechat = WechatExt(username=self.username, password=self.password, token=self.cache_token,
+                                   cookies=self.cache_cookies)
+            token_cookies_dict = wechat.get_token_cookies()
+
+            # 更新自身的cache_token及cache_cookies
+            self.cache_token = token_cookies_dict['token']
+            self.cache_cookies = token_cookies_dict['cookies']
+            self.save()
+
+            return token_cookies_dict
+        except UnOfficialAPIError:
+            raise OfficialAccountIncorrect('username or password is incorrect')
+
+    def set_cache_token_cookies(self, token_cookies_dict=None, token=None, cookies=None):
+        """
+        设置缓存token及cookies
+
+        token_cookies_dict 和 token/cookies 任选一组提供
+        :param token_cookies_dict: Token及Cookies 组合字典 (WechatExt的get_token_cookies()返回值), exp:
+                                   {'token': 'token', 'cookies': 'cookies string'}
+        :param token: Token
+        :param cookies: Cookie
+        """
+        if token_cookies_dict:
+            self.cache_token = token_cookies_dict['token']
+            self.cache_cookies = token_cookies_dict['cookies']
+        elif token and cookies:
+            self.cache_token = token
+            self.cache_cookies = cookies
+        else:
+            raise AttributeError('must provide one of the keyword argument groups')
+        self.save()
