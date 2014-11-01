@@ -6,8 +6,10 @@ from imp import find_module, load_module, acquire_lock, release_lock
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
+from wechat_sdk import WechatExt
 
-from system.core.exceptions import PluginLoadError
+from system.core.exceptions import PluginLoadError, PluginResponseError
+from system.official_account.models import OfficialAccount
 from .models import Plugin
 
 
@@ -56,12 +58,26 @@ class PluginProcessor(object):
             pass
         self.in_context = False
 
-    def response_text(self, text):
+    def response_text(self, text, pattern='auto'):
         """
         向用户发送文字信息
         :param text: 文本内容
+        :param pattern: 发送模式, 可选字符串: 'auto'(自动选择), 'basic'(基本被动响应发送模式), 'service'(多客服发送模式),
+                        'simulation'(模拟登陆发送模式)
         """
-        return self.wechat.response_text(content=text)
+        if pattern == 'auto':
+            pattern = self._best_pattern(response_type='text')
+
+        if pattern == 'basic':
+            return self.wechat.response_text(content=text)
+        elif pattern == 'service':
+            raise Exception('have not yet implemented')
+        else:
+            token_cookies_dict = self.official_account.get_cache_token_cookies()
+            wechat = WechatExt(username=self.official_account.username, password=self.official_account.password,
+                               token=token_cookies_dict['token'], cookies=token_cookies_dict['cookies'])
+
+            raise Exception('have not yet implemented')
 
     def response_image(self, mid):
         pass
@@ -83,6 +99,25 @@ class PluginProcessor(object):
         响应函数, 由继承的类进行扩展, 当对本插件初始化完成后, 调用此函数即可得到响应结果
         """
         raise NotImplementedError('subclasses of PluginProcess must provide an response() method')
+
+    def _best_pattern(self, response_type):
+        """
+        根据返回类型选择最恰当的返回方法
+        :param response_type: 返回信息类型
+        :return: 返回方法字符串
+        """
+        if self.official_account.level in [OfficialAccount.LEVEL_1, OfficialAccount.LEVEL_2]:
+            if response_type in ['text', 'music', 'news'] and self.is_exclusive:
+                return 'basic'
+            elif self.official_account.is_advanced and self.official_account.username and self.official_account.password:
+                return 'simulation'
+            else:
+                raise PluginResponseError('no method available to response message')
+        else:
+            if response_type in ['text', 'music', 'news', 'image', 'voice', 'video'] and self.is_exclusive:
+                return 'basic'
+            else:
+                return 'service'
 
 
 class PluginProcessorSystem(PluginProcessor):

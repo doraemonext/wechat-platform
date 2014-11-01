@@ -34,3 +34,7 @@ class PluginRuntimeError(PluginException):
 
 class PluginDoesNotExist(PluginException):
     pass
+
+
+class PluginResponseError(PluginException):
+    pass
