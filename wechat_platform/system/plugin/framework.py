@@ -79,7 +79,9 @@ class PluginProcessor(object):
         pass
 
     def response(self):
-        """ 响应函数, 由继承的类进行扩展, 当对本插件初始化完成后, 调用此函数即可得到响应结果 """
+        """
+        响应函数, 由继承的类进行扩展, 当对本插件初始化完成后, 调用此函数即可得到响应结果
+        """
         raise NotImplementedError('subclasses of PluginProcess must provide an response() method')
 
 
@@ -110,10 +112,6 @@ def load_plugin(official_account, wechat, context, message=None, in_context=Fals
         directory = os.path.join(settings.PROJECT_DIR, 'plugins/system')
     else:
         directory = os.path.join(settings.PROJECT_DIR, 'plugins')
-        try:
-            plugin = Plugin.objects.get(pk=plugin.iden)
-        except ObjectDoesNotExist:
-            raise PluginLoadError('plugin iden does not exist')
 
     try:
         full_path = os.path.join(directory, plugin.iden)

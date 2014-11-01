@@ -2,22 +2,27 @@
 
 from django.db import models
 
+from system.official_account.models import OfficialAccount
+
 
 class LibraryTextManager(models.Manager):
     """
     素材库 - 文字表 Manager
     """
-    def add(self, content):
+    def add(self, official_account, content):
         """
-        添加一条新的文字记录
+        添加一条新的文字素材
+        :param official_account: 所属公众号
+        :param content: 文字内容
         """
-        return super(LibraryTextManager, self).create(content=content)
+        return super(LibraryTextManager, self).create(official_account=official_account, content=content)
 
 
 class LibraryText(models.Model):
     """
     素材库 - 文字表
     """
+    official_account = models.ForeignKey(OfficialAccount, verbose_name=u'所属公众号')
     content = models.TextField(u'文字')
 
     objects = models.Manager()

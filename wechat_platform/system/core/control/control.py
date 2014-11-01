@@ -60,7 +60,7 @@ class ControlCenter(object):
         对文本请求信息进行匹配, 并返回匹配的插件标识符列表
         :return: 插件标识符列表, 格式描述参见 __init__ 函数
         """
-        keyword = Keyword.manager.search(keyword=self.message.content)
+        keyword = Keyword.manager.search(official_account=self.official_account, keyword=self.message.content)
         if not keyword:  # 当没有找到匹配关键字时返回默认回复插件
             return [{
                 'iden': 'default',
@@ -108,10 +108,7 @@ class ControlCenter(object):
         if self._is_system_plugin(iden=iden):
             plugin = Plugin(iden=iden, name=iden)
         else:
-            try:
-                plugin = Plugin.objects.get(pk=iden)
-            except ObjectDoesNotExist:
-                raise PluginLoadError('no plugin iden found in database')
+            plugin = Plugin.manager.get(official_account=self.official_account, iden=iden)
 
         plugin_loaded = load_plugin(
             official_account=self.official_account,
@@ -131,15 +128,15 @@ class ControlCenter(object):
 
         # 判断请求是否重复, 如果重复则返回原响应内容, 否则保存当前请求
         if isinstance(self.message, EventMessage):
-            if RequestEvent.manager.is_repeat(self.wechat):
+            if RequestEvent.manager.is_repeat(official_account=self.official_account, wechat_instance=self.wechat):
                 # TODO: return the response
                 raise Exception('have not yet implemented')
-            RequestEvent.manager.add(self.wechat)
+            RequestEvent.manager.add(official_account=self.official_account, wechat_instance=self.wechat)
         else:
-            if RequestMessage.manager.is_repeat(self.wechat):
+            if RequestMessage.manager.is_repeat(official_account=self.official_account, wechat_instance=self.wechat):
                 # TODO: return the response
                 raise Exception('have not yet implemented')
-            RequestMessage.manager.add(self.wechat)
+            RequestMessage.manager.add(official_account=self.official_account, wechat_instance=self.wechat)
 
         self.match_plugin_list = self.match()
         if len(self.match_plugin_list) == 1:

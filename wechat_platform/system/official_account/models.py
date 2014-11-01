@@ -74,13 +74,17 @@ class OfficialAccount(models.Model):
     wechat = models.CharField(u'微信号', max_length=100)
     introduction = models.TextField(u'公众号介绍', null=True, blank=True)
     address = models.TextField(u'所在地址', null=True, blank=True)
+    cache_access_token = models.CharField(u'缓存access token', max_length=512, blank=True, null=True)
+    cache_access_token_expire = models.DateTimeField(u'缓存access token过期时间', blank=True, null=True)
+    cache_token = models.CharField(u'缓存模拟登陆token', max_length=512, blank=True, null=True)
+    cache_cookies = models.TextField(u'缓存模拟登陆cookies', blank=True, null=True)
 
     manager = OfficialAccountManager()
     objects = models.Manager()
 
-    def __unicode__(self):
-        return self.name
-
     class Meta:
         db_table = 'official_account'
         default_permissions = ('add', 'change', 'delete', 'view')
+
+    def __unicode__(self):
+        return self.name

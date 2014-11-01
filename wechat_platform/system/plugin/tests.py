@@ -3,7 +3,7 @@
 from wechat_sdk import WechatBasic
 from wechat_sdk.context.framework.django import DatabaseContextStore
 
-from system.core.exceptions import PluginLoadError
+from system.core.exceptions import PluginLoadError, PluginDoesNotExist
 from system.core.test import WechatTestCase
 from system.plugin.models import Plugin
 from system.official_account.models import OfficialAccount
@@ -11,13 +11,39 @@ from .framework import load_plugin
 
 
 class PluginTest(WechatTestCase):
+    def test_get_plugin(self):
+        """
+        测试获取插件
+        """
+        official_account_1 = OfficialAccount.manager.add(level=OfficialAccount.LEVEL_1, name='Ace Kwok', email='doraemonext@gmail.com', original='original', wechat='wechat')
+        official_account_2 = OfficialAccount.manager.add(level=OfficialAccount.LEVEL_2, name='doraemonext', email='doraemonext@gmail.com', original='original', wechat='wechat')
+        plugin_1 = Plugin.manager.add(iden='myplugin1', name=u'测试插件1')
+        plugin_1.official_account.add(official_account_1)
+        plugin_2 = Plugin.manager.add(iden='myplugin2', name=u'测试插件2')
+        plugin_2.official_account.add(official_account_2)
+        plugin_3 = Plugin.manager.add(iden='myplugin3', name=u'测试插件3')
+        plugin_3.official_account.add(official_account_1, official_account_2)
+        plugin_4 = Plugin.manager.add(iden='myplugin4', name=u'测试插件4')
+
+        self.assertEqual(Plugin.manager.get(official_account=official_account_1, iden='myplugin1'), plugin_1)
+        self.assertEqual(Plugin.manager.get(official_account=official_account_2, iden='myplugin2'), plugin_2)
+        self.assertEqual(Plugin.manager.get(official_account=official_account_1, iden='myplugin3'), plugin_3)
+        self.assertEqual(Plugin.manager.get(official_account=official_account_2, iden='myplugin3'), plugin_3)
+        with self.assertRaises(PluginDoesNotExist):
+            Plugin.manager.get(official_account=official_account_1, iden='myplugin2')
+        with self.assertRaises(PluginDoesNotExist):
+            Plugin.manager.get(official_account=official_account_2, iden='myplugin1')
+        with self.assertRaises(PluginDoesNotExist):
+            Plugin.manager.get(official_account=official_account_1, iden='myplugin4')
+        with self.assertRaises(PluginDoesNotExist):
+            Plugin.manager.get(official_account=official_account_2, iden='myplugin4')
+
     def test_add_plugin(self):
         """
         测试添加新插件
         """
         iden = u'test_plugin_iden'
         name = u'伟大的插件'
-        status = True
         description = u'这里是插件的描述'
         author = u'插件作者'
         website = u'http://oott.me',
@@ -28,7 +54,6 @@ class PluginTest(WechatTestCase):
         plugin = Plugin.manager.add(
             iden=iden,
             name=name,
-            status=status,
             description=description,
             author=author,
             website=website,
@@ -38,7 +63,6 @@ class PluginTest(WechatTestCase):
         self.assertEqual(1, Plugin.objects.count())
         self.assertEqual(iden, plugin.iden)
         self.assertEqual(name, plugin.name)
-        self.assertEqual(status, plugin.status)
         self.assertEqual(description, plugin.description)
         self.assertEqual(author, plugin.author)
         self.assertEqual(website, plugin.website)
