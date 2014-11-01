@@ -4,28 +4,35 @@ from django.db import models
 from django.db import IntegrityError
 
 from system.core.exceptions import WechatInstanceException, WechatRequestRepeatException
+from system.official_account.models import OfficialAccount
 
 
 class RequestMessageManager(models.Manager):
     """
     微信服务器请求记录表 Manager
     """
-    def is_repeat(self, wechat_instance=None, msgid=None):
+    def is_repeat(self, official_account, wechat_instance=None, msgid=None):
         """
         根据msgid判断改请求是否重复
 
-        两个Keyword Argument二选一传入即可
+        wechat_instance和msgid二选一传入即可
+        :param official_account: 所属公众号
         :param wechat_instance: wechat实例
         :param msgid: 消息ID
         :return: 当重复时返回True
         """
         if wechat_instance is not None:
             msgid = wechat_instance.get_message().id
-        return super(RequestMessageManager, self).get_queryset().filter(pk=msgid).exists()
+        return super(RequestMessageManager, self).get_queryset().filter(
+            official_account=official_account
+        ).filter(
+            pk=msgid
+        ).exists()
 
-    def add(self, wechat_instance):
+    def add(self, official_account, wechat_instance):
         """
         根据wechat实例自动添加事件
+        :param official_account: 所属公众号
         :param wechat_instance: Wechat 实例 (WechatBasic)
         :raise WechatInstanceException: 当传入Wechat实例非法时抛出此异常
         """
@@ -33,6 +40,7 @@ class RequestMessageManager(models.Manager):
 
         if message.type == 'text':
             return self.add_text(
+                official_account=official_account,
                 msgid=message.id,
                 target=message.target,
                 source=message.source,
@@ -42,6 +50,7 @@ class RequestMessageManager(models.Manager):
             )
         elif message.type == 'image':
             return self.add_image(
+                official_account=official_account,
                 msgid=message.id,
                 target=message.target,
                 source=message.source,
@@ -52,10 +61,11 @@ class RequestMessageManager(models.Manager):
         else:
             raise WechatInstanceException()
 
-    def add_text(self, msgid, target, source, time, raw, content):
+    def add_text(self, official_account, msgid, target, source, time, raw, content):
         """
         添加文本消息请求
 
+        :param official_account: 所属公众号
         :param msgid: 消息ID
         :param target: 目标用户OpenID
         :param source: 来源用户OpenID
@@ -65,6 +75,7 @@ class RequestMessageManager(models.Manager):
         """
         try:
             return super(RequestMessageManager, self).create(
+                official_account=official_account,
                 msgid=msgid,
                 target=target,
                 source=source,
@@ -76,10 +87,11 @@ class RequestMessageManager(models.Manager):
         except IntegrityError, e:
             raise WechatRequestRepeatException(e)
 
-    def add_image(self, msgid, target, source, time, raw, picurl):
+    def add_image(self, official_account, msgid, target, source, time, raw, picurl):
         """
         添加图片消息请求
 
+        :param official_account: 所属公众号
         :param msgid: 消息ID
         :param target: 目标用户OpenID
         :param source: 来源用户OpenID
@@ -89,6 +101,7 @@ class RequestMessageManager(models.Manager):
         """
         try:
             return super(RequestMessageManager, self).create(
+                official_account=official_account,
                 msgid=msgid,
                 target=target,
                 source=source,
@@ -120,6 +133,7 @@ class RequestMessage(models.Model):
         (TYPE_VOICE, u'语音消息'),
     )
 
+    official_account = models.ForeignKey(OfficialAccount, verbose_name=u'所属公众号')
     msgid = models.BigIntegerField(u'消息ID', primary_key=True)
     target = models.CharField(u'目标用户OpenID', max_length=50)
     source = models.CharField(u'来源用户OpenID', max_length=50)
@@ -157,11 +171,12 @@ class RequestEventManager(models.Manager):
     """
     微信服务器请求事件记录表 Manager
     """
-    def is_repeat(self, wechat_instance=None, source=None, time=None):
+    def is_repeat(self, official_account, wechat_instance=None, source=None, time=None):
         """
         根据source+time判断改请求是否重复 (微信官方推荐方式)
 
         wechat实例和source/time二选一传入即可
+        :param official_account: 所属公众号
         :param wechat_instance: wechat实例
         :param source: 来源用户OpenID
         :param time: 信息发送时间
@@ -170,30 +185,63 @@ class RequestEventManager(models.Manager):
         if wechat_instance is not None:
             source = wechat_instance.get_message().source
             time = wechat_instance.get_message().time
-        return super(RequestEventManager, self).get_queryset().filter(pk=source+str(time)).exists()
+        return super(RequestEventManager, self).get_queryset().filter(
+            official_account=official_account
+        ).filter(
+            pk=source+str(time)
+        ).exists()
 
-    def add(self, wechat_instance):
+    def add(self, official_account, wechat_instance):
         """
         根据wechat实例自动添加事件
+        :param official_account: 所属公众号
         :param wechat_instance: Wechat 实例 (WechatBasic), 请保证传入实例为的消息类型为 EventMessage
         :raise WechatInstanceException: 当传入Wechat实例非法时抛出此异常
         """
         message = wechat_instance.get_message()
         if message.type == 'subscribe':
-            return self.add_subscribe(target=message.target, source=message.source, time=message.time, raw=message.raw)
+            return self.add_subscribe(
+                official_account=official_account,
+                target=message.target,
+                source=message.source,
+                time=message.time,
+                raw=message.raw
+            )
         elif message.type == 'unsubscribe':
-            return self.add_unsubscribe(target=message.target, source=message.source, time=message.time, raw=message.raw)
+            return self.add_unsubscribe(
+                official_account=official_account,
+                target=message.target,
+                source=message.source,
+                time=message.time,
+                raw=message.raw
+            )
         elif message.type == 'click':
-            return self.add_click(target=message.target, source=message.source, time=message.time, key=message.key, raw=message.raw)
+            return self.add_click(
+                official_account=official_account,
+                target=message.target,
+                source=message.source,
+                time=message.time,
+                key=message.key,
+                raw=message.raw
+            )
         elif message.type == 'location':
-            return self.add_location(target=message.target, source=message.source, time=message.time, raw=message.raw,
-                                     latitude=message.latitude, longitude=message.longitude, precision=message.precision)
+            return self.add_location(
+                official_account=official_account,
+                target=message.target,
+                source=message.source,
+                time=message.time,
+                raw=message.raw,
+                latitude=message.latitude,
+                longitude=message.longitude,
+                precision=message.precision
+            )
         else:
             raise WechatInstanceException()
 
-    def add_subscribe(self, target, source, time, raw):
+    def add_subscribe(self, official_account, target, source, time, raw):
         """
         添加订阅请求记录
+        :param official_account: 所属公众号
         :param target: 目标用户OpenID
         :param source: 来源用户OpenID
         :param time: 信息发送时间
@@ -201,6 +249,7 @@ class RequestEventManager(models.Manager):
         """
         try:
             return super(RequestEventManager, self).create(
+                official_account=official_account,
                 eventid=source+str(time),
                 target=target,
                 source=source,
@@ -211,9 +260,10 @@ class RequestEventManager(models.Manager):
         except IntegrityError, e:
             raise WechatRequestRepeatException(e)
 
-    def add_unsubscribe(self, target, source, time, raw):
+    def add_unsubscribe(self, official_account, target, source, time, raw):
         """
         添加取消订阅请求记录
+        :param official_account: 所属公众号
         :param target: 目标用户OpenID
         :param source: 来源用户OpenID
         :param time: 信息发送时间
@@ -221,6 +271,7 @@ class RequestEventManager(models.Manager):
         """
         try:
             return super(RequestEventManager, self).create(
+                official_account=official_account,
                 eventid=source+str(time),
                 target=target,
                 source=source,
@@ -231,9 +282,10 @@ class RequestEventManager(models.Manager):
         except IntegrityError, e:
             raise WechatRequestRepeatException(e)
 
-    def add_click(self, target, source, time, raw, key):
+    def add_click(self, official_account, target, source, time, raw, key):
         """
         添加自定义菜单点击事件
+        :param official_account: 所属公众号
         :param target: 目标用户OpenID
         :param source: 来源用户OpenID
         :param time: 信息发送时间
@@ -242,6 +294,7 @@ class RequestEventManager(models.Manager):
         """
         try:
             return super(RequestEventManager, self).create(
+                official_account=official_account,
                 eventid=source+str(time),
                 target=target,
                 source=source,
@@ -253,9 +306,10 @@ class RequestEventManager(models.Manager):
         except IntegrityError, e:
             raise WechatRequestRepeatException(e)
 
-    def add_location(self, target, source, time, raw, latitude, longitude, precision):
+    def add_location(self, official_account, target, source, time, raw, latitude, longitude, precision):
         """
         添加上报地理位置事件
+        :param official_account: 所属公众号
         :param target: 目标用户OpenID
         :param source: 来源用户OpenID
         :param time: 信息发送时间
@@ -266,6 +320,7 @@ class RequestEventManager(models.Manager):
         """
         try:
             return super(RequestEventManager, self).create(
+                official_account=official_account,
                 eventid=source+str(time),
                 target=target,
                 source=source,
@@ -295,6 +350,7 @@ class RequestEvent(models.Model):
         (TYPE_LOCATION, u'地理位置事件'),
     )
 
+    official_account = models.ForeignKey(OfficialAccount, verbose_name=u'所属公众号')
     eventid = models.CharField(u'事件ID', max_length=50, primary_key=True)
     target = models.CharField(u'目标用户OpenID', max_length=50)
     source = models.CharField(u'来源用户OpenID', max_length=50)

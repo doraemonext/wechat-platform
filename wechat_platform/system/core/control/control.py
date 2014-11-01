@@ -131,15 +131,15 @@ class ControlCenter(object):
 
         # 判断请求是否重复, 如果重复则返回原响应内容, 否则保存当前请求
         if isinstance(self.message, EventMessage):
-            if RequestEvent.manager.is_repeat(self.wechat):
+            if RequestEvent.manager.is_repeat(official_account=self.official_account, wechat_instance=self.wechat):
                 # TODO: return the response
                 raise Exception('have not yet implemented')
-            RequestEvent.manager.add(self.wechat)
+            RequestEvent.manager.add(official_account=self.official_account, wechat_instance=self.wechat)
         else:
-            if RequestMessage.manager.is_repeat(self.wechat):
+            if RequestMessage.manager.is_repeat(official_account=self.official_account, wechat_instance=self.wechat):
                 # TODO: return the response
                 raise Exception('have not yet implemented')
-            RequestMessage.manager.add(self.wechat)
+            RequestMessage.manager.add(official_account=self.official_account, wechat_instance=self.wechat)
 
         self.match_plugin_list = self.match()
         if len(self.match_plugin_list) == 1:
