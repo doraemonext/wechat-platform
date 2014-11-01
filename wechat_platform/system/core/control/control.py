@@ -147,7 +147,7 @@ class ControlCenter(object):
         else:
             is_exclusive = False
         for plugin in self.match_plugin_list:
-            try:
+#            try:
                 result = self.process(plugin_dict=plugin, is_exclusive=is_exclusive)
                 if result and is_exclusive:  # 说明该插件需要返回XML数据
                     # TODO: write the result to response model
@@ -155,9 +155,9 @@ class ControlCenter(object):
                 else:  # 说明该插件不需要返回XML数据, 已经自行处理完成, 返回空字符串即可
                     # TODO: write the result to response model
                     final_response = ''
-            except PluginException:
-                # TODO: write log files
-                pass
+#            except PluginException:
+#                # TODO: write log files
+#                pass
 
         self.context.save()  # 保存所有上下文对话到数据库中
         return HttpResponse(final_response)
