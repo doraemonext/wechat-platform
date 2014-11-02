@@ -78,7 +78,6 @@ class PluginProcessor(object):
                                token=token_cookies_dict['token'], cookies=token_cookies_dict['cookies'])
 
             raise Exception('have not yet implemented')
-
     def response_image(self, mid):
         pass
 
