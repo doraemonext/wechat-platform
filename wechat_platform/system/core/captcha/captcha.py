@@ -3,7 +3,7 @@
 import json
 import requests
 
-from system.core.captcha import CaptchaException
+from system.core.captcha.utils import CaptchaException
 from system.setting.models import Setting
 
 

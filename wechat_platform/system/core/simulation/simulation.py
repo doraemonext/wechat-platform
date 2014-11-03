@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import json
+import tempfile
 
 from wechat_sdk import WechatExt
-from wechat_sdk.exceptions import UnOfficialAPIError, NeedLoginError, LoginError
+from wechat_sdk.exceptions import UnOfficialAPIError, NeedLoginError, LoginError, LoginVerifyCodeError
 
 from system.core.simulation import SimulationException
+from system.core.captcha import Captcha
+from system.core.captcha import CaptchaException
 
 
 class Simulation(object):
@@ -37,12 +40,32 @@ class Simulation(object):
             self.wechat_ext = wechat_ext
         elif username and password:
             self.wechat_ext = WechatExt(username=username, password=password, login=False)
-            self.login()
+            try:
+                self.login()
+            except LoginError, e:
+                raise SimulationException(e)
         else:
             raise SimulationException('the initialization parameter is insufficient')
 
     def login(self):
-        pass
+        """
+        登录微信公众平台
+
+        如果不需要验证码则直接登录, 需要验证码将会自动识别(需在后台配置人工识别验证码接口), 在识别结果不正确情况下会重试3次
+        :raise LoginError: 当无法登录时抛出
+        """
+        try:
+            self.wechat_ext.login()
+            return
+        except LoginVerifyCodeError:
+            for x in range(0, 3):
+                fd, name = tempfile.mkstemp()
+                self.wechat_ext.get_verify_code(file_path=name)
+                try:
+                    self.wechat_ext.login(verify_code=Captcha(file_path=name).recognition())
+                    return
+                except (CaptchaException, LoginVerifyCodeError):
+                    pass
 
     def get_message_list(self, lastid=0, offset=0, count=20, day=7, star=False):
         """
