@@ -50,6 +50,7 @@ class Common(Configuration):
         'system.rule',
         'system.rule_match',
         'system.keyword',
+        'system.setting',
         'system.plugin',
         'system.library.text',
 
