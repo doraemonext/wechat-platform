@@ -1,17 +1,28 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class SettingManager(models.Manager):
-    def add(self, name, value):
+    def add(self, name, value, force=False):
         """
         添加一条新的设置项
         :param name: 名称
         :param value: 内容
+        :param force: 当force=True时, 如果添加的该设置项已经存在, 则强制更新
+                      当force=False时, 如果添加的该设置项已经存在, 则不做任何操作
         :return: Setting实例
         """
-        return super(SettingManager, self).create(name=name, value=value)
+        try:
+            setting = super(SettingManager, self).get_queryset().get(name=name)
+        except ObjectDoesNotExist:
+            return super(SettingManager, self).create(name=name, value=value)
+
+        if force:
+            setting.value = value
+            setting.save()
+        return setting
 
     def get(self, name):
         """
