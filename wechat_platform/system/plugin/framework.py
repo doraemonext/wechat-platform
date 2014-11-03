@@ -75,15 +75,19 @@ class PluginProcessor(object):
             raise Exception('have not yet implemented')
         else:
             token_cookies_dict = self.official_account.get_cache_token_cookies()
-            wechat_ext = WechatExt(username=self.official_account.username, password=self.official_account.password,
-                                   token=token_cookies_dict['token'], cookies=token_cookies_dict['cookies'])
+            wechat_ext = WechatExt(
+                username=self.official_account.username,
+                password=self.official_account.password,
+                token=token_cookies_dict['token'],
+                cookies=token_cookies_dict['cookies']
+            )
             simulation = Simulation(
                 official_account=self.official_account,
                 wechat_basic=self.wechat,
                 wechat_ext=wechat_ext
             )
 
-            raise Exception('have not yet implemented')
+            # TODO
 
     def response_image(self, mid):
         pass

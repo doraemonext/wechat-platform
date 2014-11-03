@@ -2,6 +2,7 @@
 
 import json
 import tempfile
+from collections import OrderedDict
 
 from wechat_sdk import WechatExt
 from wechat_sdk.exceptions import UnOfficialAPIError, NeedLoginError, LoginError, LoginVerifyCodeError
@@ -36,6 +37,7 @@ class Simulation(object):
         """
         self.official_account = official_account
         self.wechat_basic = wechat_basic
+        self.message = self.wechat_basic.get_message()
         if wechat_ext:
             self.wechat_ext = wechat_ext
         elif username and password:
@@ -66,6 +68,39 @@ class Simulation(object):
                     return
                 except (CaptchaException, LoginVerifyCodeError):
                     pass  # 此处直接忽略, 进行下一次重试
+
+    def find_latest_user(self, count=20):
+        """
+        从公众平台抓取最新的消息列表和当前的 wechat 请求匹配, 找出该请求所对应的人在公众平台中的唯一标识符 fakeid
+
+        注意: 如果并发量过大导致获取的 fakeid 列表为空, 请适当调高 count 参数值, 理想情况下返回的 fakeid 列表只会存在一个用户,
+        如果列表中存在不只一个用户的 fakeid, 说明匹配到多个用户, 无法精确匹配, 请妥善处理
+        :param count: 抓取消息列表中的消息个数, 推荐为 20 , 无特殊需要不需修改
+        :return: 返回一个列表, 列表中的每个元素为匹配到的用户 fakeid , 理想情况下列表中只会有一个 fakeid 存在
+        """
+        message_list = self.get_message_list(count=count)
+        fakeid_list = []
+        for item in message_list['msg_item']:
+            if self.message.type == 'text':
+                if item.get('date_time') == self.message.time and item.get('type') == self.TYPE_TEXT and item.get('content') == self.message.content:
+                    fakeid_list.append(item.get('fakeid'))
+            elif self.message.type == 'location':
+                if item.get('date_time') == self.message.time and item.get('type') == self.TYPE_LOCATION:
+                    fakeid_list.append(item.get('fakeid'))
+            elif self.message.type == 'image':
+                if item.get('date_time') == self.message.time and item.get('type') == self.TYPE_IMAGE:
+                    fakeid_list.append(item.get('fakeid'))
+            elif self.message.type == 'voice':
+                if item.get('date_time') == self.message.time and item.get('type') == self.TYPE_VOICE:
+                    fakeid_list.append(item.get('fakeid'))
+            elif self.message.type == 'video':
+                if item.get('date_time') == self.message.time and item.get('type') == self.TYPE_VIDEO:
+                    fakeid_list.append(item.get('fakeid'))
+            elif self.message.type == 'link':
+                if item.get('date_time') == self.message.time and item.get('type') == self.TYPE_LINK:
+                    fakeid_list.append(item['fakeid'])
+
+        return list(OrderedDict.fromkeys(fakeid_list))
 
     def get_message_list(self, lastid=0, offset=0, count=20, day=7, star=False):
         """
