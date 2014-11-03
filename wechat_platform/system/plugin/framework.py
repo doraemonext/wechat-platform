@@ -9,8 +9,9 @@ from django.conf import settings
 from wechat_sdk import WechatExt
 
 from system.core.exceptions import PluginLoadError, PluginResponseError
+from system.core.simulation import Simulation
 from system.official_account.models import OfficialAccount
-from .models import Plugin
+from system.plugin.models import Plugin
 
 
 class PluginProcessor(object):
@@ -74,10 +75,16 @@ class PluginProcessor(object):
             raise Exception('have not yet implemented')
         else:
             token_cookies_dict = self.official_account.get_cache_token_cookies()
-            wechat = WechatExt(username=self.official_account.username, password=self.official_account.password,
-                               token=token_cookies_dict['token'], cookies=token_cookies_dict['cookies'])
+            wechat_ext = WechatExt(username=self.official_account.username, password=self.official_account.password,
+                                   token=token_cookies_dict['token'], cookies=token_cookies_dict['cookies'])
+            simulation = Simulation(
+                official_account=self.official_account,
+                wechat_basic=self.wechat,
+                wechat_ext=wechat_ext
+            )
 
             raise Exception('have not yet implemented')
+
     def response_image(self, mid):
         pass
 

@@ -140,33 +140,15 @@ class OfficialAccount(models.Model):
             raise AttributeError('must provide one of the keyword argument groups')
         self.save()
 
-    def get_cache_token_cookies(self, force_update=False):
+    def get_cache_token_cookies(self):
         """
         获取缓存的模拟登陆token和cookies
-        :param force_update: 是否强制刷新token及cookies
         :return: dict, exp: {'token': 'token', 'cookies': 'cookies string'}
-        :raise OfficialAccountIncomplete: 当公众号中不存在username或password时抛出
-        :raise OfficialAccountIncorrect: 当公众号username或password非法时抛出
         """
-        if not self.username or not self.password:
-            raise OfficialAccountIncomplete('lack of username or password in the official account')
-
-        try:
-            if force_update:
-                wechat = WechatExt(username=self.username, password=self.password)
-            else:
-                wechat = WechatExt(username=self.username, password=self.password, token=self.cache_token,
-                                   cookies=self.cache_cookies)
-            token_cookies_dict = wechat.get_token_cookies()
-
-            # 更新自身的cache_token及cache_cookies
-            self.cache_token = token_cookies_dict['token']
-            self.cache_cookies = token_cookies_dict['cookies']
-            self.save()
-
-            return token_cookies_dict
-        except UnOfficialAPIError:
-            raise OfficialAccountIncorrect('username or password is incorrect')
+        return {
+            'token': self.cache_token,
+            'cookies': self.cache_cookies,
+        }
 
     def set_cache_token_cookies(self, token_cookies_dict=None, token=None, cookies=None):
         """
