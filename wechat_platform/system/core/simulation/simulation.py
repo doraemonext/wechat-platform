@@ -15,12 +15,12 @@ class Simulation(object):
     """
     模拟登陆辅助类
     """
-    TYPE_TEXT = 1
-    TYPE_LOCATION = 1
-    TYPE_IMAGE = 2
-    TYPE_VOICE = 3
-    TYPE_VIDEO = 4
-    TYPE_LINK = 5
+    TYPE_TEXT = 1  # 文本类型
+    TYPE_LOCATION = 1  # 地理位置类型
+    TYPE_IMAGE = 2  # 图片类型
+    TYPE_VOICE = 3  # 语音类型
+    TYPE_VIDEO = 4  # 视频类型
+    TYPE_LINK = 5  # 链接类型
 
     def __init__(self, official_account, wechat_basic, wechat_ext=None, username=None, password=None):
         """
