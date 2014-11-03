@@ -83,7 +83,7 @@ class Simulation(object):
                     message_list_json = self.wechat_ext.get_message_list(lastid=lastid, offset=offset, count=count, day=day, star=star)
                     return json.loads(message_list_json)
                 except NeedLoginError:
-                    self.wechat_ext.login()
+                    self.login()
             except LoginError:
                 raise SimulationException('login error')
         raise SimulationException('login error')
