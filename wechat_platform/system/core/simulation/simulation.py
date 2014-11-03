@@ -58,14 +58,14 @@ class Simulation(object):
             self.wechat_ext.login()
             return
         except LoginVerifyCodeError:
-            for x in range(0, 3):
+            for x in range(0, 3):  # 对于验证码重试3次
                 fd, name = tempfile.mkstemp()
                 self.wechat_ext.get_verify_code(file_path=name)
                 try:
                     self.wechat_ext.login(verify_code=Captcha(file_path=name).recognition())
                     return
                 except (CaptchaException, LoginVerifyCodeError):
-                    pass
+                    pass  # 此处直接忽略, 进行下一次重试
 
     def get_message_list(self, lastid=0, offset=0, count=20, day=7, star=False):
         """
