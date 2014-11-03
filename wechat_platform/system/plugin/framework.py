@@ -87,7 +87,12 @@ class PluginProcessor(object):
                 wechat_ext=wechat_ext
             )
 
-            # TODO
+            fakeid_list = simulation.find_latest_user()
+            if len(fakeid_list) == 1:
+                simulation.send_message(fakeid=fakeid_list[0], content=text)
+                return None
+            else:
+                return self.wechat.response_text(content=u'萌萌的话语让用户再输入一次')
 
     def response_image(self, mid):
         pass

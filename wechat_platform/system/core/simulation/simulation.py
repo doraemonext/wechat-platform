@@ -123,3 +123,20 @@ class Simulation(object):
                 raise SimulationException('login error')
         raise SimulationException('login error')
 
+    def send_message(self, fakeid, content):
+        """
+        主动发送文本消息
+        :param fakeid: 用户的 UID (即 fakeid )
+        :param content: 发送的内容
+        :raises ValueError: 参数出错, 具体内容有 ``fake id not exist``
+        """
+        for i in range(0, 2):
+            try:
+                try:
+                    self.wechat_ext.send_message(fakeid=fakeid, content=content)
+                    return
+                except NeedLoginError:
+                    self.login()
+            except LoginError:
+                raise SimulationException('login error')
+        raise SimulationException('login error')
