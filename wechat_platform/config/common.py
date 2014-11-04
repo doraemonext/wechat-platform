@@ -234,23 +234,110 @@ class Common(Configuration):
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
+        'formatters': {
+            'simple': {
+                'format': '[%(asctime)s] %(levelname)s %(message)s',
+                'datefmt': '%Y-%m-%d %H:%M:%S'
+            },
+            'verbose': {
+                'format': '[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s',
+                'datefmt': '%Y-%m-%d %H:%M:%S'
+            },
+        },
         'filters': {
             'require_debug_false': {
-                '()': 'django.utils.log.RequireDebugFalse'
-            }
+                '()': 'django.utils.log.RequireDebugFalse',
+            },
+            'require_debug_true': {
+                '()': 'django.utils.log.RequireDebugTrue',
+            },
         },
         'handlers': {
-            'mail_admins': {
+            'console': {
+                'level': 'DEBUG',
+                'filters': ['require_debug_true'],
+                'class': 'logging.StreamHandler',
+                'formatter': 'simple'
+            },
+            'development_logfile': {
+                'level': 'DEBUG',
+                'filters': ['require_debug_true'],
+                'class': 'logging.FileHandler',
+                'filename': os.path.join(PROJECT_DIR, 'logs/development.log'),
+                'formatter': 'verbose'
+            },
+            'production_logfile': {
                 'level': 'ERROR',
                 'filters': ['require_debug_false'],
-                'class': 'django.utils.log.AdminEmailHandler'
-            }
+                'class': 'logging.FileHandler',
+                'filename': os.path.join(PROJECT_DIR, 'logs/production.log'),
+                'formatter': 'simple'
+            },
         },
         'loggers': {
-            'django.request': {
-                'handlers': ['mail_admins'],
-                'level': 'ERROR',
-                'propagate': True,
+            # 系统核心日志
+            'system.core': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+            'system.keyword': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+            'system.library': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+            'system.listen': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+            'system.official_account': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+            'system.plugin': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+            'system.request': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+            'system.rule': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+            'system.rule_match': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+            'system.setting': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+            'system.users': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+
+            # 插件日志
+            'plugins': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+
+            # API日志
+            'api': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+
+            'django': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+            },
+            'py.warnings': {
+                'handlers': ['console', 'development_logfile'],
             },
         }
     }
