@@ -92,6 +92,30 @@ class OfficialAccount(models.Model):
     def __unicode__(self):
         return self.name
 
+    @property
+    def simulation_available(self):
+        """
+        判断模拟登陆方式是否可用
+        :return: 可用返回 True
+        """
+        return self.is_advanced and self.username and self.password
+
+    @property
+    def service_available(self):
+        """
+        判断多客服方式是否可用
+        :return: 可用返回 True
+        """
+        return self.level == self.LEVEL_3 and self.appid and self.appsecret
+
+    @property
+    def has_token_cookies(self):
+        """
+        判断当前是否已经缓存 token 和 cookies
+        :return: 已经缓存则返回 True
+        """
+        return self.cache_token and self.cache_cookies
+
     def get_cache_access_token(self, force_update=False):
         """
         获取缓存的access_token

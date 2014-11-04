@@ -59,7 +59,8 @@ class Simulation(object):
         try:
             self.wechat_ext.login()
             return
-        except LoginVerifyCodeError:
+        except LoginVerifyCodeError, e:
+            print e
             for x in range(0, 3):  # 对于验证码重试3次
                 fd, name = tempfile.mkstemp()
                 self.wechat_ext.get_verify_code(file_path=name)
@@ -117,10 +118,10 @@ class Simulation(object):
                 try:
                     message_list_json = self.wechat_ext.get_message_list(lastid=lastid, offset=offset, count=count, day=day, star=star)
                     return json.loads(message_list_json)
-                except NeedLoginError:
+                except NeedLoginError, e:
                     self.login()
-            except LoginError:
-                raise SimulationException('login error')
+            except LoginError, e:
+                raise SimulationException(e)
         raise SimulationException('login error')
 
     def send_message(self, fakeid, content):
@@ -137,6 +138,6 @@ class Simulation(object):
                     return
                 except NeedLoginError:
                     self.login()
-            except LoginError:
-                raise SimulationException('login error')
+            except LoginError, e:
+                raise SimulationException(e)
         raise SimulationException('login error')

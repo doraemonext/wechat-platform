@@ -74,25 +74,39 @@ class PluginProcessor(object):
         elif pattern == 'service':
             raise Exception('have not yet implemented')
         else:
-            token_cookies_dict = self.official_account.get_cache_token_cookies()
-            wechat_ext = WechatExt(
-                username=self.official_account.username,
-                password=self.official_account.password,
-                token=token_cookies_dict['token'],
-                cookies=token_cookies_dict['cookies']
-            )
-            simulation = Simulation(
-                official_account=self.official_account,
-                wechat_basic=self.wechat,
-                wechat_ext=wechat_ext
-            )
+            if not self.official_account.simulation_available:
+                raise PluginResponseError('simulation is not available in current settings')
 
+            if self.official_account.has_token_cookies:  # 当已经存在缓存的 token 和 cookies 时直接利用它们初始化
+                token_cookies_dict = self.official_account.get_cache_token_cookies()
+                wechat_ext = WechatExt(
+                    username=self.official_account.username,
+                    password=self.official_account.password,
+                    token=token_cookies_dict['token'],
+                    cookies=token_cookies_dict['cookies'],
+                )
+                simulation = Simulation(
+                    official_account=self.official_account,
+                    wechat_basic=self.wechat,
+                    wechat_ext=wechat_ext
+                )
+            else:  # 当不存在缓存的 token 和 cookies 时利用用户名密码初始化
+                simulation = Simulation(
+                    official_account=self.official_account,
+                    wechat_basic=self.wechat,
+                    username=self.official_account.username,
+                    password=self.official_account.password,
+                )
+
+            #print simulation.get_message_list()
             fakeid_list = simulation.find_latest_user()
             if len(fakeid_list) == 1:
                 simulation.send_message(fakeid=fakeid_list[0], content=text)
                 return None
+            elif len(fakeid_list) == 0:
+                raise PluginResponseError('no user matched')
             else:
-                return self.wechat.response_text(content=u'萌萌的话语让用户再输入一次')
+                raise PluginResponseError('multiple users matched')
 
     def response_image(self, mid):
         pass
