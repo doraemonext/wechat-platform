@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponseBadRequest
 from django.views.generic import View
@@ -11,9 +13,13 @@ from system.core.exceptions import WechatException
 from system.core.control import ControlCenter
 from system.official_account.models import OfficialAccount
 
+logger_listen = logging.getLogger(__name__)
+
 
 class ListenView(View):
     def post(self, request, *args, **kwargs):
+        logger_listen.info('[REQUEST] [REMOTE_IP:%s] [METHOD:%s] [PATH:%s]' % (request.META['REMOTE_ADDR'], request.method, request.get_full_path()))
+
         # 获取公众号 ID
         iden = request.GET.get('iden')
         # 获取微信请求中的 GET 参数
