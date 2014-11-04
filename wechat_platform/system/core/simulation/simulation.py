@@ -60,7 +60,6 @@ class Simulation(object):
             self.wechat_ext.login()
             return
         except LoginVerifyCodeError, e:
-            print e
             for x in range(0, 3):  # 对于验证码重试3次
                 fd, name = tempfile.mkstemp()
                 self.wechat_ext.get_verify_code(file_path=name)
