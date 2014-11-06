@@ -8,11 +8,12 @@ from django.http.response import HttpResponse
 from wechat_sdk.context.framework.django import DatabaseContextStore
 from wechat_sdk.messages import EventMessage
 
-from system.core.exceptions import WechatCriticalException, PluginException, PluginLoadError
+from system.core.exceptions import WechatCriticalException
 from system.rule.models import Rule
 from system.keyword.models import Keyword
 from system.rule_match.models import RuleMatch
 from system.request.models import RequestMessage, RequestEvent
+from system.plugin import PluginLoadError, PluginException
 from system.plugin.models import Plugin
 from system.plugin.framework import load_plugin
 

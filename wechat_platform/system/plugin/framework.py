@@ -9,9 +9,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from wechat_sdk import WechatExt
 
-from system.core.exceptions import PluginLoadError, PluginResponseError
 from system.core.simulation import Simulation
 from system.official_account.models import OfficialAccount
+from system.plugin import PluginLoadError, PluginResponseError
 from system.plugin.models import Plugin
 
 logger_plugin = logging.getLogger(__name__)

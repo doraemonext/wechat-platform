@@ -4,8 +4,8 @@ import logging
 
 from django.db import models
 
-from system.core.exceptions import PluginDoesNotExist
 from system.official_account.models import OfficialAccount
+from system.plugin import PluginDoesNotExist
 
 logger_plugin = logging.getLogger(__name__)
 

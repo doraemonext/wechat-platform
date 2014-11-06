@@ -4,7 +4,7 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from system.core.exceptions import PluginRuntimeError
+from system.plugin import PluginRuntimeError
 from system.plugin.framework import PluginProcessorSystem
 from system.library.text.models import LibraryText
 

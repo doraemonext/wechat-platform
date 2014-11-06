@@ -3,8 +3,8 @@
 from wechat_sdk import WechatBasic
 from wechat_sdk.context.framework.django import DatabaseContextStore
 
-from system.core.exceptions import PluginLoadError, PluginDoesNotExist
 from system.core.test import WechatTestCase
+from system.plugin import PluginDoesNotExist, PluginLoadError
 from system.plugin.models import Plugin
 from system.official_account.models import OfficialAccount
 from .framework import load_plugin

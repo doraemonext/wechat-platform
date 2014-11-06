@@ -18,23 +18,3 @@ class WechatInstanceException(WechatException):
 
 class WechatRequestRepeatException(WechatException):
     pass
-
-
-class PluginException(Exception):
-    pass
-
-
-class PluginLoadError(PluginException):
-    pass
-
-
-class PluginRuntimeError(PluginException):
-    pass
-
-
-class PluginDoesNotExist(PluginException):
-    pass
-
-
-class PluginResponseError(PluginException):
-    pass
