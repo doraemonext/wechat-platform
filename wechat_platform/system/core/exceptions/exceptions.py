@@ -14,7 +14,3 @@ class WechatCriticalException(WechatException):
 
 class WechatInstanceException(WechatException):
     pass
-
-
-class WechatRequestRepeatException(WechatException):
-    pass

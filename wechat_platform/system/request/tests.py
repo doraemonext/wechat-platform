@@ -2,9 +2,9 @@
 
 from wechat_sdk import WechatBasic
 
-from system.core.exceptions import WechatRequestRepeatException
 from system.core.test import WechatTestCase
 from system.official_account.models import OfficialAccount
+from system.request import RequestRepeatException
 from system.request.models import RequestMessage, RequestEvent
 
 
@@ -26,7 +26,7 @@ class RequestTest(WechatTestCase):
         # 检测is_repeat函数
         self.assertTrue(RequestMessage.manager.is_repeat(official_account=official_account, wechat_instance=wechat_instance_2))
         # 检测触发异常
-        with self.assertRaises(WechatRequestRepeatException):
+        with self.assertRaises(RequestRepeatException):
             RequestMessage.manager.add(official_account=official_account, wechat_instance=wechat_instance_2)
 
     def test_repeat_request_event(self):
@@ -46,7 +46,7 @@ class RequestTest(WechatTestCase):
         # 检测is_repeat函数
         self.assertTrue(RequestEvent.manager.is_repeat(official_account=official_account, wechat_instance=wechat_instance_2))
         # 检测触发异常
-        with self.assertRaises(WechatRequestRepeatException):
+        with self.assertRaises(RequestRepeatException):
             RequestEvent.manager.add(official_account=official_account, wechat_instance=wechat_instance_2)
 
     def test_add_text_request(self):

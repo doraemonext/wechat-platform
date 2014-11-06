@@ -6,8 +6,9 @@ import traceback
 from django.db import models
 from django.db import IntegrityError
 
-from system.core.exceptions import WechatInstanceException, WechatRequestRepeatException
+from system.core.exceptions import WechatInstanceException
 from system.official_account.models import OfficialAccount
+from system.request import RequestRepeatException
 
 logger_request = logging.getLogger(__name__)
 
@@ -91,7 +92,7 @@ class RequestMessageManager(models.Manager):
             )
         except IntegrityError, e:
             logger_request.error('%s [Traceback] %s' % (e, traceback.format_exc()))
-            raise WechatRequestRepeatException(e)
+            raise RequestRepeatException(e)
 
     def add_image(self, official_account, msgid, target, source, time, raw, picurl):
         """
@@ -118,7 +119,7 @@ class RequestMessageManager(models.Manager):
             )
         except IntegrityError, e:
             logger_request.error('%s [Traceback] %s' % (e, traceback.format_exc()))
-            raise WechatRequestRepeatException(e)
+            raise RequestRepeatException(e)
 
 
 class RequestMessage(models.Model):
@@ -266,7 +267,7 @@ class RequestEventManager(models.Manager):
             )
         except IntegrityError, e:
             logger_request.error('%s [Traceback] %s' % (e, traceback.format_exc()))
-            raise WechatRequestRepeatException(e)
+            raise RequestRepeatException(e)
 
     def add_unsubscribe(self, official_account, target, source, time, raw):
         """
@@ -289,7 +290,7 @@ class RequestEventManager(models.Manager):
             )
         except IntegrityError, e:
             logger_request.error('%s [Traceback] %s' % (e, traceback.format_exc()))
-            raise WechatRequestRepeatException(e)
+            raise RequestRepeatException(e)
 
     def add_click(self, official_account, target, source, time, raw, key):
         """
@@ -314,7 +315,7 @@ class RequestEventManager(models.Manager):
             )
         except IntegrityError, e:
             logger_request.error('%s [Traceback] %s' % (e, traceback.format_exc()))
-            raise WechatRequestRepeatException(e)
+            raise RequestRepeatException(e)
 
     def add_location(self, official_account, target, source, time, raw, latitude, longitude, precision):
         """
@@ -343,7 +344,7 @@ class RequestEventManager(models.Manager):
             )
         except IntegrityError, e:
             logger_request.error('%s [Traceback] %s' % (e, traceback.format_exc()))
-            raise WechatRequestRepeatException(e)
+            raise RequestRepeatException(e)
 
 
 class RequestEvent(models.Model):
