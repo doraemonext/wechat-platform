@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import json
 import tempfile
 from collections import OrderedDict
@@ -10,6 +11,8 @@ from wechat_sdk.exceptions import UnOfficialAPIError, NeedLoginError, LoginError
 from system.core.simulation import SimulationException
 from system.core.captcha import Captcha
 from system.core.captcha import CaptchaException
+
+logger_simulation = logging.getLogger(__name__)
 
 
 class Simulation(object):
@@ -45,6 +48,13 @@ class Simulation(object):
             try:
                 self.login()
             except LoginError, e:
+                logger_simulation.error('Simulated login failed: %s [OfficialAccount] %s [WechatBasic] %s [WechatExt] username: \'%s\' password: \'%s\'' % (
+                    e,
+                    self.official_account.__dict__,
+                    self.wechat_basic.__dict__,
+                    username,
+                    password,
+                ))
                 raise SimulationException(e)
         else:
             raise SimulationException('the initialization parameter is insufficient')
@@ -120,7 +130,18 @@ class Simulation(object):
                 except NeedLoginError, e:
                     self.login()
             except LoginError, e:
+                logger_simulation.error('Simulated login failed: %s [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+                    e,
+                    self.official_account.__dict__,
+                    self.wechat_basic.__dict__,
+                    self.wechat_ext.__dict__,
+                ))
                 raise SimulationException(e)
+        logger_simulation.error('Simulated login failed [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+            self.official_account.__dict__,
+            self.wechat_basic.__dict__,
+            self.wechat_ext.__dict__,
+        ))
         raise SimulationException('login error')
 
     def send_message(self, fakeid, content):
@@ -138,5 +159,16 @@ class Simulation(object):
                 except NeedLoginError:
                     self.login()
             except LoginError, e:
+                logger_simulation.error('Simulated login failed: %s [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+                    e,
+                    self.official_account.__dict__,
+                    self.wechat_basic.__dict__,
+                    self.wechat_ext.__dict__,
+                ))
                 raise SimulationException(e)
+        logger_simulation.error('Simulated login failed [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+            self.official_account.__dict__,
+            self.wechat_basic.__dict__,
+            self.wechat_ext.__dict__,
+        ))
         raise SimulationException('login error')
