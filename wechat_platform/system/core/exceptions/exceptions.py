@@ -14,3 +14,6 @@ class WechatCriticalException(WechatException):
 
 class WechatInstanceException(WechatException):
     pass
+
+
+# asdfasdf
