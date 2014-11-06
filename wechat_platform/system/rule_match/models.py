@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from django.db import models
 
 from system.official_account.models import OfficialAccount
 from system.rule.models import Rule
+
+logger_rule_match = logging.getLogger(__name__)
 
 
 class RuleMatchManager(models.Manager):
@@ -14,7 +18,7 @@ class RuleMatchManager(models.Manager):
         """
         添加微信规则回复
         """
-        return super(RuleMatchManager, self).create(
+        rule_match = super(RuleMatchManager, self).create(
             official_account=rule.official_account,
             rule=rule,
             plugin_iden=plugin_iden,
@@ -22,6 +26,8 @@ class RuleMatchManager(models.Manager):
             order=order,
             status=status
         )
+        logger_rule_match.info('New rule_match created [Detail] %s' % rule_match.__dict__)
+        return rule_match
 
     def get(self, rule):
         """
