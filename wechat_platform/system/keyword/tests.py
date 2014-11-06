@@ -13,10 +13,8 @@ class KeywordTest(WechatTestCase):
         """
         official_account = OfficialAccount.manager.add(level=OfficialAccount.LEVEL_3, name='name', email='email@email.com', original='original', wechat='wechat')
 
-        self.assertEqual(0, Keyword.objects.count())
         rule = Rule.manager.add(official_account=official_account, name='rule test', reply_pattern=Rule.REPLY_PATTERN_ALL)
         keyword = Keyword.manager.add(rule, keyword='keyword')
-        self.assertEqual(1, Keyword.objects.count())
         self.assertEqual(keyword.rule, rule)
         self.assertEqual(keyword.keyword, 'keyword')
         self.assertEqual(keyword.status, True)
@@ -27,9 +25,6 @@ class KeywordTest(WechatTestCase):
         测试关键字搜索
         """
         official_account = OfficialAccount.manager.add(level=OfficialAccount.LEVEL_3, name='name', email='email@email.com', original='original', wechat='wechat')
-
-        self.assertEqual(0, Rule.objects.count())
-        self.assertEqual(0, Keyword.objects.count())
 
         rule_1 = Rule.manager.add(official_account=official_account, name='rule 1', reply_pattern=Rule.REPLY_PATTERN_RANDOM)
         rule_2 = Rule.manager.add(official_account=official_account, name='rule 2', reply_pattern=Rule.REPLY_PATTERN_ALL)

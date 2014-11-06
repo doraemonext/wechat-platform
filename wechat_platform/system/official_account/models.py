@@ -51,6 +51,23 @@ class OfficialAccountManager(models.Manager):
             introduction=introduction,
             address=address
         )
+
+        # 为默认回复插件添加规则及规则匹配
+        rule = Rule.manager.add(
+            official_account=official_account,
+            name='_system_default_' + official_account.iden,
+            reply_pattern=Rule.REPLY_PATTERN_RANDOM,
+        )
+        library_text = LibraryText.manager.add(
+            official_account=official_account,
+            content=u'此处为默认回复内容，请在后台更改',
+        )
+        rule_match = RuleMatch.manager.add(
+            rule=rule,
+            plugin_iden='text',
+            reply_id=library_text.pk,
+        )
+
         logger_official_account.debug('New model created with iden %s [Model] %s' % (official_account.iden, official_account.__dict__))
         return official_account
 
@@ -208,3 +225,8 @@ class OfficialAccount(models.Model):
             raise AttributeError('must provide one of the keyword argument groups')
         self.save()
         logger_official_account.debug('The model has been updated [Model] %s' % self.__dict__)
+
+
+from system.rule.models import Rule
+from system.rule_match.models import RuleMatch
+from system.library.text.models import LibraryText

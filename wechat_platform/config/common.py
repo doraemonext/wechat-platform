@@ -44,8 +44,8 @@ class Common(Configuration):
 
     # Apps specific for this project go here.
     LOCAL_APPS = (
-        'system.users',
         'system.official_account',
+        'system.users',
         'system.request',
         'system.rule',
         'system.rule_match',
