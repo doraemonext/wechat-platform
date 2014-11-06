@@ -48,7 +48,9 @@ class Captcha(object):
             logger_captcha.warning('Captcha recognition failed [Detail] %s' % e)
 
         try:
-            return json.loads(r.text)['Result']
+            result = json.loads(r.text)['Result']
+            logger_captcha.debug('Captcha recogniation result: %s' % result)
+            return result
         except (KeyError, ValueError):
             logger_captcha.warning('Captcha recognition failed [Detail] %s' % r.text)
             raise CaptchaException(r.text)

@@ -68,13 +68,19 @@ class Simulation(object):
         """
         try:
             self.wechat_ext.login()
+            self.official_account.set_cache_token_cookies(self.wechat_ext.get_token_cookies())
+            self.official_account.save()
+            logger_simulation.debug('Successful simulated login without captcha')
             return
-        except LoginVerifyCodeError, e:
+        except LoginVerifyCodeError:
             for x in range(0, 3):  # 对于验证码重试3次
                 fd, name = tempfile.mkstemp()
                 self.wechat_ext.get_verify_code(file_path=name)
                 try:
                     self.wechat_ext.login(verify_code=Captcha(file_path=name).recognition())
+                    self.official_account.set_cache_token_cookies(self.wechat_ext.get_token_cookies())
+                    self.official_account.save()
+                    logger_simulation.debug('Successful simulated login with captcha')
                     return
                 except (CaptchaException, LoginVerifyCodeError):
                     pass  # 此处直接忽略, 进行下一次重试
@@ -92,7 +98,7 @@ class Simulation(object):
         fakeid_list = []
         for item in message_list['msg_item']:
             if self.message.type == 'text':
-                if item.get('date_time') == self.message.time and item.get('type') == self.TYPE_TEXT and item.get('content') == self.message.content:
+                if abs(item.get('date_time') - self.message.time) <= 1 and item.get('type') == self.TYPE_TEXT and item.get('content') == self.message.content:
                     fakeid_list.append(item.get('fakeid'))
             elif self.message.type == 'location':
                 if item.get('date_time') == self.message.time and item.get('type') == self.TYPE_LOCATION:

@@ -99,31 +99,6 @@ class ControlCenter(object):
             # TODO: return the plugin list by means of response model
             raise Exception('have not yet implemented')
 
-    def _get_default_list(self):
-        """
-        返回默认回复的插件 iden 及 reply_id 所组成的列表
-        :return: 列表
-        """
-        rule = Rule.objects.get(name='_system_default_' + self.official_account.iden)
-        rule_match = RuleMatch.manager.get(rule=rule)
-        plugin_list = []
-        for item in rule_match:
-            plugin_list.append({
-                'iden': item.plugin_iden,
-                'reply_id': item.reply_id
-            })
-
-        if rule.reply_pattern == Rule.REPLY_PATTERN_ALL:  # 全部回复
-            return plugin_list
-        elif rule.reply_pattern == Rule.REPLY_PATTERN_RANDOM:  # 随机回复
-            return [random.choice(plugin_list), ]
-        elif rule.reply_pattern == Rule.REPLY_PATTERN_FORWARD:  # 顺序回复
-            # TODO: return the plugin list by means of response model
-            raise Exception('have not yet implemented')
-        elif rule.reply_pattern == Rule.REPLY_PATTERN_REVERSE:  # 逆序回复
-            # TODO: return the plugin list by means of response model
-            raise Exception('have not yet implemented')
-
     def process(self, plugin_dict, is_exclusive=False):
         """
         插件处理过程, 负责调用插件并返回执行结果
@@ -173,7 +148,7 @@ class ControlCenter(object):
         else:
             is_exclusive = False
         for plugin in self.match_plugin_list:
-#            try:
+            try:
                 result = self.process(plugin_dict=plugin, is_exclusive=is_exclusive)
                 if result and is_exclusive:  # 说明该插件需要返回XML数据
                     # TODO: write the result to response model
@@ -181,12 +156,37 @@ class ControlCenter(object):
                 else:  # 说明该插件不需要返回XML数据, 已经自行处理完成, 返回空字符串即可
                     # TODO: write the result to response model
                     final_response = ''
-#            except PluginException:
-#                # TODO: write log files
-#                pass
+            except PluginException, e:
+                logger_control.error('The plugin \'%s\' response error [Exception: %s]' % (plugin['iden'], e))
+                pass
 
         self.context.save()  # 保存所有上下文对话到数据库中
         return HttpResponse(final_response)
+
+    def _get_default_list(self):
+        """
+        返回默认回复的插件 iden 及 reply_id 所组成的列表
+        :return: 列表
+        """
+        rule = Rule.objects.get(name='_system_default_' + self.official_account.iden)
+        rule_match = RuleMatch.manager.get(rule=rule)
+        plugin_list = []
+        for item in rule_match:
+            plugin_list.append({
+                'iden': item.plugin_iden,
+                'reply_id': item.reply_id
+            })
+
+        if rule.reply_pattern == Rule.REPLY_PATTERN_ALL:  # 全部回复
+            return plugin_list
+        elif rule.reply_pattern == Rule.REPLY_PATTERN_RANDOM:  # 随机回复
+            return [random.choice(plugin_list), ]
+        elif rule.reply_pattern == Rule.REPLY_PATTERN_FORWARD:  # 顺序回复
+            # TODO: return the plugin list by means of response model
+            raise Exception('have not yet implemented')
+        elif rule.reply_pattern == Rule.REPLY_PATTERN_REVERSE:  # 逆序回复
+            # TODO: return the plugin list by means of response model
+            raise Exception('have not yet implemented')
 
     def _is_system_plugin(self, iden):
         """
