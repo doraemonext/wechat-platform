@@ -44,8 +44,8 @@ class Common(Configuration):
 
     # Apps specific for this project go here.
     LOCAL_APPS = (
-        'system.users',
         'system.official_account',
+        'system.users',
         'system.request',
         'system.rule',
         'system.rule_match',
@@ -240,7 +240,7 @@ class Common(Configuration):
                 'datefmt': '%Y-%m-%d %H:%M:%S'
             },
             'verbose': {
-                'format': '[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s',
+                'format': '%(asctime)s [%(pathname)s:%(funcName)s:%(lineno)d] [%(threadName)s:%(thread)d] [%(name)s] [%(levelname)s] - %(message)s',
                 'datefmt': '%Y-%m-%d %H:%M:%S'
             },
         },

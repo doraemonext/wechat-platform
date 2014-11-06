@@ -32,7 +32,7 @@ class ListenView(View):
         try:
             official_account = OfficialAccount.objects.get(iden=iden)
         except ObjectDoesNotExist, e:
-            logger_listen.info('[RESPONSE] Invalid IDEN Parameter [Exception]: %s [Request]: %s' % (e, request.__dict__))
+            logger_listen.info('[RESPONSE] Invalid IDEN Parameter [Exception: %s]' % e)
             return HttpResponseBadRequest('Invalid IDEN Parameter')
 
         # 对请求进行校验并预解析数据，并转发数据给控制中心获得响应数据
@@ -42,7 +42,7 @@ class ListenView(View):
             appsecret=official_account.appsecret
         )
         if not wechat_instance.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
-            logger_listen.info('[RESPONSE] Invalid Verify Parameter [Request]: %s' % request.__dict__)
+            logger_listen.info('[RESPONSE] Invalid Verify Parameter')
             return HttpResponseBadRequest('Invalid Verify Parameter')
         else:
             return HttpResponse(echostr)
@@ -63,7 +63,7 @@ class ListenView(View):
         try:
             official_account = OfficialAccount.objects.get(iden=iden)
         except ObjectDoesNotExist, e:
-            logger_listen.info('[RESPONSE] Invalid IDEN Parameter [Exception]: %s [Request]: %s' % (e, request.__dict__))
+            logger_listen.info('[RESPONSE] Invalid IDEN Parameter [Exception: %s]' % e)
             return HttpResponseBadRequest('Invalid IDEN Parameter')
 
         # 对请求进行校验并预解析数据，并转发数据给控制中心获得响应数据
@@ -73,7 +73,7 @@ class ListenView(View):
             appsecret=official_account.appsecret
         )
         if not wechat_instance.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
-            logger_listen.info('[RESPONSE] Invalid Verify Parameter [Request]: %s' % request.__dict__)
+            logger_listen.info('[RESPONSE] Invalid Verify Parameter')
             return HttpResponseBadRequest('Invalid Verify Parameter')
         try:
             wechat_instance.parse_data(data=xml)
@@ -82,13 +82,13 @@ class ListenView(View):
                 wechat_instance=wechat_instance
             ).response
 
-            logger_listen.info('[RESPONSE] %s' % response)
+            logger_listen.info('[RESPONSE] %s' % response.content.replace('\n', ''))
             return response
         except ParseError, e:
-            logger_listen.info('[RESPONSE] Invalid XML Data [Exception] %s [Request] %s ' % (e, request.__dict__))
+            logger_listen.info('[RESPONSE] Invalid XML Data [Exception: %s]' % e)
             return HttpResponseBadRequest('Invalid XML Data')
         except WechatException, e:
-            logger_listen.info('[RESPONSE] Internal Error [Exception] %s [Request] %s' % (e, request.__dict__))
+            logger_listen.info('[RESPONSE] Internal Error [Exception: %s]' % e)
             return HttpResponseBadRequest('Internal Error')
 
     @csrf_exempt

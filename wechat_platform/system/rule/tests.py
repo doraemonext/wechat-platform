@@ -9,9 +9,7 @@ class RuleTest(WechatTestCase):
     def test_add_rule_with_default_value(self):
         official_account = OfficialAccount.manager.add(level=OfficialAccount.LEVEL_3, name='name', email='email@email.com', original='original', wechat='wechat')
 
-        self.assertEqual(0, Rule.objects.count())
         rule = Rule.manager.add(official_account=official_account, name=u'测试规则', reply_pattern=Rule.REPLY_PATTERN_ALL)
-        self.assertEqual(1, Rule.objects.count())
         self.assertEqual(rule.name, u'测试规则')
         self.assertEqual(rule.reply_pattern, Rule.REPLY_PATTERN_ALL)
         self.assertTrue(rule.status)
@@ -21,9 +19,7 @@ class RuleTest(WechatTestCase):
     def test_add_rule(self):
         official_account = OfficialAccount.manager.add(level=OfficialAccount.LEVEL_3, name='name', email='email@email.com', original='original', wechat='wechat')
 
-        self.assertEqual(0, Rule.objects.count())
         rule = Rule.manager.add(official_account=official_account, name=u'测试规则', reply_pattern=Rule.REPLY_PATTERN_ALL, status=False, top=True, order=100)
-        self.assertEqual(1, Rule.objects.count())
         self.assertEqual(rule.name, u'测试规则')
         self.assertEqual(rule.reply_pattern, Rule.REPLY_PATTERN_ALL)
         self.assertFalse(rule.status)
