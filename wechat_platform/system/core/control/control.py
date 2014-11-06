@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import random
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -14,6 +15,8 @@ from system.rule_match.models import RuleMatch
 from system.request.models import RequestMessage, RequestEvent
 from system.plugin.models import Plugin
 from system.plugin.framework import load_plugin
+
+logger_control = logging.getLogger(__name__)
 
 
 class ControlCenter(object):
@@ -53,7 +56,13 @@ class ControlCenter(object):
         if hasattr(self, func):
             return getattr(self, func)()
         else:
-            raise WechatCriticalException('no match method found')
+            logger_control.error('No method matched [OfficialAccount] %s [Wechat] %s [Message] %s [Context] %s' % (
+                self.official_account.__dict__,
+                self.wechat.__dict__,
+                self.message.__dict__,
+                self.context.__dict__,
+            ))
+            raise WechatCriticalException('No method matched')
 
     def match_text(self):
         """

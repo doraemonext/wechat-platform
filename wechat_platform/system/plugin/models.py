@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from django.db import models
 
 from system.core.exceptions import PluginDoesNotExist
 from system.official_account.models import OfficialAccount
+
+logger_plugin = logging.getLogger(__name__)
 
 
 class PluginManager(models.Manager):
@@ -17,9 +21,11 @@ class PluginManager(models.Manager):
         """
         plugin = super(PluginManager, self).get_queryset().filter(pk=iden)
         if not plugin:
-            raise PluginDoesNotExist('the plugin iden does not exist')
+            logger_plugin.warning('The plugin iden %s does not exist [OfficialAccount] %s' % (iden, official_account.__dict__))
+            raise PluginDoesNotExist('The plugin iden %s does not exist' % iden)
         if official_account not in plugin[0].official_account.all():
-            raise PluginDoesNotExist('the plugin is not enabled in the official account')
+            logger_plugin.warning('The plugin is not enabled in the official account [OfficialAccount] %s [Plugin] %s' % (official_account.__dict__, plugin[0].__dict__))
+            raise PluginDoesNotExist('The plugin is not enabled in the official account')
         return plugin[0]
 
     def add(self, iden, name, description=None, author=None, website=None, email=None, version=None):
@@ -34,7 +40,7 @@ class PluginManager(models.Manager):
         :param version: 插件版本
         :return:
         """
-        return super(PluginManager, self).create(
+        plugin = super(PluginManager, self).create(
             iden=iden,
             name=name,
             description=description,
@@ -43,6 +49,8 @@ class PluginManager(models.Manager):
             email=email,
             version=version
         )
+        logger_plugin.info('New plugin created [Detail] %s' % plugin.__dict__)
+        return plugin
 
 
 class Plugin(models.Model):

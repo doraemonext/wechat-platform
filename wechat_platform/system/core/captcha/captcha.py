@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import json
 import requests
 
 from system.core.captcha.utils import CaptchaException
 from system.setting.models import Setting
+
+logger_captcha = logging.getLogger(__name__)
 
 
 class Captcha(object):
@@ -39,9 +42,13 @@ class Captcha(object):
         files = {
             'image': self.__file,
         }
-        r = requests.post(url, data=payload, files=files)
+        try:
+            r = requests.post(url, data=payload, files=files)
+        except Exception, e:
+            logger_captcha.warning('Captcha recognition failed [Detail] %s' % e)
 
         try:
             return json.loads(r.text)['Result']
         except (KeyError, ValueError):
+            logger_captcha.warning('Captcha recognition failed [Detail] %s' % r.text)
             raise CaptchaException(r.text)

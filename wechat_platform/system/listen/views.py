@@ -32,7 +32,8 @@ class ListenView(View):
         # 根据 iden 获取对应的公众账号
         try:
             official_account = OfficialAccount.objects.get(iden=iden)
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist, e:
+            logger_listen.info('[RESPONSE] Invalid IDEN Parameter [Exception]: %s [Request]: %s' % (e, request))
             return HttpResponseBadRequest('Invalid IDEN Parameter')
 
         # 对请求进行校验并预解析数据，并转发数据给控制中心获得响应数据
@@ -42,16 +43,22 @@ class ListenView(View):
             appsecret=official_account.appsecret
         )
         if not wechat_instance.check_signature(signature=signature, timestamp=timestamp, nonce=nonce):
+            logger_listen.info('[RESPONSE] Invalid Verify Parameter [Request]: %s' % request)
             return HttpResponseBadRequest('Invalid Verify Parameter')
         try:
             wechat_instance.parse_data(data=xml)
-            return ControlCenter(
+            response = ControlCenter(
                 official_account=official_account,
                 wechat_instance=wechat_instance
             ).response
-        except ParseError:
+
+            logger_listen.info('[RESPONSE] %s' % response)
+            return response
+        except ParseError, e:
+            logger_listen.info('[RESPONSE] Invalid XML Data [Exception] %s [Request] %s ' % (e, request))
             return HttpResponseBadRequest('Invalid XML Data')
-        except WechatException:
+        except WechatException, e:
+            logger_listen.info('[RESPONSE] Internal Error [Exception] %s [Request] %s' % (e, request))
             return HttpResponseBadRequest('Internal Error')
 
     @csrf_exempt

@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
+
+logger_setting = logging.getLogger(__name__)
 
 
 class SettingManager(models.Manager):
@@ -17,11 +21,14 @@ class SettingManager(models.Manager):
         try:
             setting = super(SettingManager, self).get_queryset().get(name=name)
         except ObjectDoesNotExist:
-            return super(SettingManager, self).create(name=name, value=value)
+            setting = super(SettingManager, self).create(name=name, value=value)
+            logger_setting.info('Settings created [Detail] %s' % setting.__dict__)
+            return setting
 
         if force:
             setting.value = value
             setting.save()
+            logger_setting.info('Settings saved [Detail] %s' % setting.__dict__)
         return setting
 
     def get(self, name):

@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from django.db import models
 from wechat_sdk import WechatBasic, WechatExt
 from wechat_sdk.exceptions import OfficialAPIError, UnOfficialAPIError
 
 from lib.tools.rand import make_unique_random_string
 from system.official_account import OfficialAccountIncomplete, OfficialAccountIncorrect
+
+logger_official_account = logging.getLogger(__name__)
 
 
 class OfficialAccountManager(models.Manager):
@@ -31,7 +35,7 @@ class OfficialAccountManager(models.Manager):
         if not token:
             token = make_unique_random_string()
 
-        return super(OfficialAccountManager, self).create(
+        official_account = super(OfficialAccountManager, self).create(
             iden=make_unique_random_string(),
             token=token,
             appid=appid,
@@ -47,6 +51,8 @@ class OfficialAccountManager(models.Manager):
             introduction=introduction,
             address=address
         )
+        logger_official_account.debug('New model created with iden %s [Model] %s' % (official_account.iden, official_account.__dict__))
+        return official_account
 
 
 class OfficialAccount(models.Model):
@@ -125,7 +131,8 @@ class OfficialAccount(models.Model):
         :raise OfficialAccountIncorrect: 当公众号appid或apppsecret非法时抛出
         """
         if not self.appid or not self.appsecret:
-            raise OfficialAccountIncomplete('lack of appid or appsecret in the official account')
+            logger_official_account.warning('Lack of appid or appsecret in the official account [Model] %s' % self.__dict__)
+            raise OfficialAccountIncomplete('Lack of appid or appsecret in the official account')
 
         if force_update:
             wechat = WechatBasic(appid=self.appid, appsecret=self.appsecret)
@@ -134,13 +141,17 @@ class OfficialAccount(models.Model):
                                  access_token_expires_at=self.cache_access_token_expires_at)
         try:
             access_token_dict = wechat.get_access_token()
-        except OfficialAPIError:
-            raise OfficialAccountIncorrect('appid or appsecret is incorrect')
+        except OfficialAPIError, e:
+            logger_official_account.error('AppID or AppSecret is incorrect [Detail] %s [Model] %s' % (e, self.__dict__))
+            raise OfficialAccountIncorrect('AppID or AppSecret is incorrect')
 
         # 更新自身的access_token及access_token_expires_at
-        self.cache_access_token = access_token_dict['access_token']
-        self.cache_access_token_expires_at = access_token_dict['access_token_expires_at']
-        self.save()
+        if self.cache_access_token != access_token_dict['access_token'] or self.cache_access_token_expires_at != access_token_dict['access_token_expires_at']:
+            logger_official_account.debug('Ready to update the model [Model] %s' % self.__dict__)
+            self.cache_access_token = access_token_dict['access_token']
+            self.cache_access_token_expires_at = access_token_dict['access_token_expires_at']
+            self.save()
+            logger_official_account.debug('The model has been updated [Model] %s' % self.__dict__)
 
         return access_token_dict
 
@@ -154,6 +165,7 @@ class OfficialAccount(models.Model):
         :param access_token: Access Token
         :param access_token_expires_at: Access Token 过期日期
         """
+        logger_official_account.debug('Ready to update the model [Model] %s' % self.__dict__)
         if access_token_dict:
             self.cache_access_token = access_token_dict['access_token']
             self.cache_access_token_expires_at = access_token_dict['access_token_expires_at']
@@ -163,6 +175,7 @@ class OfficialAccount(models.Model):
         else:
             raise AttributeError('must provide one of the keyword argument groups')
         self.save()
+        logger_official_account.debug('The model has been updated [Model] %s' % self.__dict__)
 
     def get_cache_token_cookies(self):
         """
@@ -184,6 +197,7 @@ class OfficialAccount(models.Model):
         :param token: Token
         :param cookies: Cookie
         """
+        logger_official_account.debug('Ready to update the model [Model] %s' % self.__dict__)
         if token_cookies_dict:
             self.cache_token = token_cookies_dict['token']
             self.cache_cookies = token_cookies_dict['cookies']
@@ -193,3 +207,4 @@ class OfficialAccount(models.Model):
         else:
             raise AttributeError('must provide one of the keyword argument groups')
         self.save()
+        logger_official_account.debug('The model has been updated [Model] %s' % self.__dict__)

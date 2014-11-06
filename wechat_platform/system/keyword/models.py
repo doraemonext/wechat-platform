@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import logging
 from operator import attrgetter
 
 from django.db import models
 
 from system.official_account.models import OfficialAccount
 from system.rule.models import Rule
+
+logger_keyword = logging.getLogger(__name__)
 
 
 class KeywordManager(models.Manager):
@@ -21,13 +24,15 @@ class KeywordManager(models.Manager):
         :param type: 关键字类型
         :return: Keyword 实例
         """
-        return super(KeywordManager, self).create(
+        keyword = super(KeywordManager, self).create(
             official_account=rule.official_account,
             rule=rule,
             keyword=keyword,
             status=status,
             type=type
         )
+        logger_keyword.info('New keyword created [Detail] %s' % keyword.__dict__)
+        return keyword
 
     def search(self, official_account, keyword):
         """
@@ -94,8 +99,10 @@ class KeywordManager(models.Manager):
         sorted(result, key=attrgetter('rule.top', 'rule.order'), reverse=True)
 
         if result:
+            logger_keyword.debug('Search result with keyword %s: %s' % (keyword, result[0].__dict__))
             return result[0]
         else:
+            logger_keyword.debug('Search nothing with keyword %s' % keyword)
             return None
 
 
