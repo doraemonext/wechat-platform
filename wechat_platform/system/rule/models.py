@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from django.db import models
 
 from system.official_account.models import OfficialAccount
+
+logger_rule = logging.getLogger(__name__)
 
 
 class RuleManager(models.Manager):
@@ -17,7 +21,7 @@ class RuleManager(models.Manager):
         :param order: 优先级，默认为0
         :return: 规则 Rule 实例
         """
-        return super(RuleManager, self).create(
+        rule = super(RuleManager, self).create(
             official_account=official_account,
             name=name,
             reply_pattern=reply_pattern,
@@ -25,6 +29,8 @@ class RuleManager(models.Manager):
             top=top,
             order=order
         )
+        logger_rule.info('New rule created [Detail] %s' % rule.__dict__)
+        return rule
 
 
 class Rule(models.Model):
