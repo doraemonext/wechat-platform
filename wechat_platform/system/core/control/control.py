@@ -13,9 +13,10 @@ from system.rule.models import Rule
 from system.keyword.models import Keyword
 from system.rule_match.models import RuleMatch
 from system.request.models import RequestMessage, RequestEvent
-from system.plugin import PluginLoadError, PluginException
+from system.plugin import PluginLoadError, PluginException, PluginResponseError
 from system.plugin.models import Plugin
 from system.plugin.framework import load_plugin
+from system.setting.models import Setting
 
 logger_control = logging.getLogger(__name__)
 
@@ -156,6 +157,10 @@ class ControlCenter(object):
                 else:  # 说明该插件不需要返回XML数据, 已经自行处理完成, 返回空字符串即可
                     # TODO: write the result to response model
                     final_response = ''
+            except PluginResponseError, e:
+                logger_control.warning('The plugin \'%s\' doesn\'t know how to response [Exception: %s]' % (plugin['iden'], e))
+                final_response = self.wechat.response_text(Setting.manager.get('unknown_response'))
+                break
             except PluginException, e:
                 logger_control.error('The plugin \'%s\' response error [Exception: %s]' % (plugin['iden'], e))
                 pass

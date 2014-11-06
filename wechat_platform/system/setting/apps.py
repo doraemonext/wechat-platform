@@ -16,6 +16,7 @@ def init_setting_table(sender, **kwargs):
     # 下面两项为我(Doraemonext)在若快开发者账号中新建的ID和KEY, 可以在后台管理界面中更改
     Setting.manager.add('captcha_ruokuai_softid', '27197')
     Setting.manager.add('captcha_ruokuai_softkey', '564a64b2a62e49de9f492a43ae3cf8c5')
+    Setting.manager.add('unknown_response', u'无法匹配到您的用户身份，请重新发送您刚才的信息')
 
 
 class SettingAppConfig(AppConfig):
