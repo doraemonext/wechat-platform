@@ -72,18 +72,12 @@ class ControlCenter(object):
         """
         keyword = Keyword.manager.search(official_account=self.official_account, keyword=self.message.content)
         if not keyword:  # 当没有找到匹配关键字时返回默认回复插件
-            return [{
-                'iden': 'default',
-                'reply_id': 0
-            }, ]
+            return self._get_default_list()
 
         rule = keyword.rule
         rule_match = RuleMatch.manager.get(rule=rule)
         if not rule_match:  # 当该规则没有任何插件匹配可以使用时返回默认回复插件
-            return [{
-                'iden': 'default',
-                'reply_id': 0
-            }]
+            return self._get_default_list()
 
         # 将该规则所有的插件匹配按顺序写入列表
         plugin_list = []
@@ -94,6 +88,31 @@ class ControlCenter(object):
             })
 
         # 根据规则的返回模式返回相应的列表
+        if rule.reply_pattern == Rule.REPLY_PATTERN_ALL:  # 全部回复
+            return plugin_list
+        elif rule.reply_pattern == Rule.REPLY_PATTERN_RANDOM:  # 随机回复
+            return [random.choice(plugin_list), ]
+        elif rule.reply_pattern == Rule.REPLY_PATTERN_FORWARD:  # 顺序回复
+            # TODO: return the plugin list by means of response model
+            raise Exception('have not yet implemented')
+        elif rule.reply_pattern == Rule.REPLY_PATTERN_REVERSE:  # 逆序回复
+            # TODO: return the plugin list by means of response model
+            raise Exception('have not yet implemented')
+
+    def _get_default_list(self):
+        """
+        返回默认回复的插件 iden 及 reply_id 所组成的列表
+        :return: 列表
+        """
+        rule = Rule.objects.get(name='_system_default_' + self.official_account.iden)
+        rule_match = RuleMatch.manager.get(rule=rule)
+        plugin_list = []
+        for item in rule_match:
+            plugin_list.append({
+                'iden': item.plugin_iden,
+                'reply_id': item.reply_id
+            })
+
         if rule.reply_pattern == Rule.REPLY_PATTERN_ALL:  # 全部回复
             return plugin_list
         elif rule.reply_pattern == Rule.REPLY_PATTERN_RANDOM:  # 随机回复
