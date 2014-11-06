@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import os
 import sys
 from imp import find_module, load_module, acquire_lock, release_lock
@@ -12,6 +13,8 @@ from system.core.exceptions import PluginLoadError, PluginResponseError
 from system.core.simulation import Simulation
 from system.official_account.models import OfficialAccount
 from system.plugin.models import Plugin
+
+logger_plugin = logging.getLogger(__name__)
 
 
 class PluginProcessor(object):
@@ -75,7 +78,8 @@ class PluginProcessor(object):
             raise Exception('have not yet implemented')
         else:
             if not self.official_account.simulation_available:
-                raise PluginResponseError('simulation is not available in current settings')
+                logger_plugin.debug('Simulation is not available in current settings [OfficialAccount] %s' % self.official_account.__dict__)
+                raise PluginResponseError('Simulation is not available in current settings')
 
             if self.official_account.has_token_cookies:  # 当已经存在缓存的 token 和 cookies 时直接利用它们初始化
                 token_cookies_dict = self.official_account.get_cache_token_cookies()
@@ -98,15 +102,17 @@ class PluginProcessor(object):
                     password=self.official_account.password,
                 )
 
-            #print simulation.get_message_list()
             fakeid_list = simulation.find_latest_user()
             if len(fakeid_list) == 1:
+                logger_plugin.debug('A user matched [FakeidList] %s [OfficialAccount] %s' % (fakeid_list, self.official_account.__dict__))
                 simulation.send_message(fakeid=fakeid_list[0], content=text)
                 return None
             elif len(fakeid_list) == 0:
-                raise PluginResponseError('no user matched')
+                logger_plugin.debug('No user matched [OfficialAccount] %s' % self.official_account.__dict__)
+                raise PluginResponseError('No user matched')
             else:
-                raise PluginResponseError('multiple users matched')
+                logger_plugin.debug('Multiple users matched [FakeidList] %s [OfficialAccount] %s' % (fakeid_list, self.official_account.__dict__))
+                raise PluginResponseError('Multiple users matched')
 
     def response_image(self, mid):
         pass
@@ -158,20 +164,27 @@ class PluginProcessorSystem(PluginProcessor):
         self.reply_id = kwargs.get('reply_id')
 
 
-def load_plugin(official_account, wechat, context, message=None, in_context=False, is_exclusive=False, plugin=None, is_system=False, **kwargs):
+def load_plugin(official_account, wechat, context, plugin,  message=None, in_context=False, is_exclusive=False, is_system=False, **kwargs):
     """
     加载插件并做初始化工作，返回插件实例 (PluginProcess)
     :param official_account: 公众号实例 (OfficialAccount)
     :param wechat: 微信请求实例 (WechatBasic)
     :param context: 微信上下文对话实例 (DatabaseContextStore)
+    :param plugin: 插件信息实例 (Plugin)
     :param message: 微信请求信息实例 (WechatMessage)
     :param in_context: 当前是否在上下文对话过程中
     :param is_exclusive: 插件是否可以独享响应内容
-    :param plugin: 插件信息实例 (Plugin)
     :param is_system: 是否为系统插件
 
     :param reply_id: (hidden) 系统插件可选传入, 作为库ID使用
     """
+    logger_plugin.debug('Start loading plugin [OfficialAccount] %s [Wechat] %s [Context] %s [Plugin] %s' % (
+        official_account.__dict__,
+        wechat.__dict__,
+        context.__dict__,
+        plugin.__dict__,
+    ))
+
     if is_system:
         directory = os.path.join(settings.PROJECT_DIR, 'plugins/system')
     else:
@@ -180,11 +193,14 @@ def load_plugin(official_account, wechat, context, message=None, in_context=Fals
     try:
         full_path = os.path.join(directory, plugin.iden)
         if not os.path.isdir(full_path):
-            raise PluginLoadError('plugin folder does not exist')
+            logger_plugin.warning('Plugin folder does not exist')
+            raise PluginLoadError('Plugin folder does not exist')
         if not os.path.exists(os.path.join(full_path, 'process.py')):
-            raise PluginLoadError('the process.py file does not exist in the plugins folder')
+            logger_plugin.warning('The process.py file does not exist in the plugins folder')
+            raise PluginLoadError('The process.py file does not exist in the plugins folder')
     except OSError:
-        raise PluginLoadError('error when accessing plugin folder')
+        logger_plugin.warning('Error when accessing plugin folder')
+        raise PluginLoadError('Error when accessing plugin folder')
 
     fh = None
     mod = None
@@ -204,7 +220,7 @@ def load_plugin(official_account, wechat, context, message=None, in_context=Fals
         for plug in attrs:
             if is_system:
                 if issubclass(plug, PluginProcessorSystem):
-                    return plug(
+                    plugin_instance = plug(
                         official_account=official_account,
                         wechat=wechat,
                         context=context,
@@ -215,9 +231,11 @@ def load_plugin(official_account, wechat, context, message=None, in_context=Fals
                         is_system=is_system,
                         reply_id=kwargs.get('reply_id')
                     )
+                    logger_plugin.info('Finished loading plugin %s' % plug)
+                    return plugin_instance
             else:
                 if issubclass(plug, PluginProcessor):
-                    return plug(
+                    plugin_instance = plug(
                         official_account=official_account,
                         wechat=wechat,
                         context=context,
@@ -227,4 +245,7 @@ def load_plugin(official_account, wechat, context, message=None, in_context=Fals
                         plugin=plugin,
                         is_system=is_system
                     )
-    raise PluginLoadError('you should set __all__ variable in process.py')
+                    logger_plugin.info('Finished loading plugin %s' % plug)
+                    return plugin_instance
+    logger_plugin.warning('You should set __all__ variable in process.py')
+    raise PluginLoadError('You should set __all__ variable in process.py')
