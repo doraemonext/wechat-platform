@@ -160,6 +160,7 @@ class ControlCenter(object):
 
         # 对请求数据进行插件匹配
         self.match_plugin_list = self.match()
+        is_exclusive = False
         if len(self.match_plugin_list) == 0:  # 当该请求不需要插件响应时, 直接回复空字符串
             return HttpResponse('')
         elif len(self.match_plugin_list) == 1:  # 当只需要单个插件响应时, 可以独享操作
