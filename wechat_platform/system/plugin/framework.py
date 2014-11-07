@@ -45,6 +45,7 @@ class PluginProcessor(object):
         self.is_exclusive = is_exclusive
         self.plugin = plugin
         self.is_system = is_system
+        self.reply_id = 0
 
     def begin_context(self):
         """

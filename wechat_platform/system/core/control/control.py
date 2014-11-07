@@ -69,6 +69,33 @@ class ControlCenter(object):
             ))
             raise WechatCriticalException('No method matched')
 
+    def match_event(self):
+        """
+        对事件请求信息进行匹配, 并返回匹配的插件标识符列表
+        :return: 插件标识符列表, 格式描述参见 __init__ 函数
+        """
+        if self.message.type == 'subscribe':  # 当为关注事件时
+            rule = Rule.objects.get(name='_system_subscribe_' + self.official_account.iden)
+            rule_match = RuleMatch.manager.get(rule=rule)
+            plugin_list = []
+            for item in rule_match:
+                plugin_list.append({
+                    'iden': item.plugin_iden,
+                    'reply_id': item.reply_id
+                })
+            return self._arrange_plugin_list(rule, plugin_list)
+        elif self.message.type == 'unsubscribe':  # 当取消关注时, 什么也不做
+            return []
+        elif self.message.type == 'click':
+            self.message.content = self.message.key  # 将 key 值转换为 content 后直接使用文本信息的匹配
+            return self.match_text()
+        elif self.message.type == 'view':  # 当页面跳转事件发生时, 什么也不做
+            return []
+        elif self.message.type == 'location':  # 当地理位置上报时, 什么也不做
+            return []
+        else:
+            return self._get_default_list()
+
     def match_text(self):
         """
         对文本请求信息进行匹配, 并返回匹配的插件标识符列表
@@ -149,11 +176,14 @@ class ControlCenter(object):
             RequestMessage.manager.add(official_account=self.official_account, wechat_instance=self.wechat)
 
         self.match_plugin_list = self.match()
-        if len(self.match_plugin_list) == 1:
+        if len(self.match_plugin_list) == 0:  # 当该请求不需要插件响应时, 直接回复空字符串
+            return HttpResponse('')
+        elif len(self.match_plugin_list) == 1:  # 当只需要单个插件响应时, 可以独享操作
             is_exclusive = True
-        else:
+        elif len(self.match_plugin_list) > 1:  # 当需要多个插件响应时, 不可以独享
             is_exclusive = False
             Response.manager.add_waiting(official_account=self.official_account, wechat_instance=self.wechat)
+
         for plugin in self.match_plugin_list:
             try:
                 result = self.process(plugin_dict=plugin, is_exclusive=is_exclusive)
@@ -183,6 +213,8 @@ class ControlCenter(object):
         :param plugin_list: 插件列表
         :return: 组织好的插件列表
         """
+        plugin_list_len = len(plugin_list)
+
         if rule.reply_pattern == Rule.REPLY_PATTERN_ALL:  # 全部回复
             return plugin_list
         elif rule.reply_pattern == Rule.REPLY_PATTERN_RANDOM:  # 随机回复
@@ -195,7 +227,7 @@ class ControlCenter(object):
                         'iden': response_history[0].plugin_iden,
                         'reply_id': response_history[0].reply_id,
                     })
-                    if index == len(plugin_list) - 1:
+                    if index == plugin_list_len - 1:
                         return [plugin_list[0], ]
                     return [plugin_list[index+1], ]
                 except ValueError:
@@ -211,12 +243,12 @@ class ControlCenter(object):
                         'reply_id': response_history[0].reply_id,
                     })
                     if index == 0:
-                        return [plugin_list[len(plugin_list)-1], ]
+                        return [plugin_list[plugin_list_len-1], ]
                     return [plugin_list[index-1], ]
                 except ValueError:
-                    return [plugin_list[len(plugin_list)-1], ]
+                    return [plugin_list[plugin_list_len-1], ]
             else:
-                return [plugin_list[len(plugin_list)-1], ]
+                return [plugin_list[plugin_list_len-1], ]
 
     def _analyse_response_type(self, xml):
         """
