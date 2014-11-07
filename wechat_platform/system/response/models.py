@@ -24,7 +24,7 @@ class ResponseManager(models.Manager):
             type=Response.TYPE_WAITING
         )
 
-    def add(self, official_account, wechat_instance, type, pattern, raw):
+    def add(self, official_account, wechat_instance, type, pattern, raw, plugin_dict):
         """
         添加一条新的响应消息记录
         :param official_account: 微信公众号实例 (OfficialAccount)
@@ -32,6 +32,7 @@ class ResponseManager(models.Manager):
         :param type: 信息类型
         :param pattern: 响应方式
         :param raw: 原始信息内容
+        :param plugin_dict: 所使用的插件字典, exp: {'iden': 'text', 'reply_id': 54}
         """
         message = wechat_instance.get_message()
         if isinstance(message, EventMessage):
@@ -53,6 +54,8 @@ class ResponseManager(models.Manager):
             response.type = type
             response.pattern = pattern
             response.raw = raw
+            response.plugin_iden = plugin_dict['iden']
+            response.reply_id = plugin_dict['reply_id']
             response.save()
             logger_response.debug('Response has been updated [Detail: %s]' % response.__dict__)
         else:
@@ -64,7 +67,9 @@ class ResponseManager(models.Manager):
                 time=int(time()),
                 type=type,
                 pattern=pattern,
-                raw=raw
+                raw=raw,
+                plugin_iden=plugin_dict['iden'],
+                reply_id=plugin_dict['reply_id'],
             )
             logger_response.debug('New response created [Detail: %s]' % response.__dict__)
         return response
@@ -184,6 +189,8 @@ class Response(models.Model):
     type = models.CharField(u'信息类型', choices=TYPE, max_length=15)
     pattern = models.IntegerField(u'响应方式', choices=PATTERN)
     raw = models.TextField(u'响应信息原始内容')
+    plugin_iden = models.CharField(u'插件标识符', max_length=50, null=True, blank=True)
+    reply_id = models.IntegerField(u'插件回复ID', null=True, blank=True)
 
     objects = models.Manager()
     manager = ResponseManager()

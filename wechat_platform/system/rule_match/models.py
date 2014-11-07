@@ -42,9 +42,7 @@ class RuleMatchManager(models.Manager):
         ).filter(
             status=True
         ).order_by(
-            '-order'
-        ).order_by(
-            'id'
+            '-order', 'id'
         )
 
 

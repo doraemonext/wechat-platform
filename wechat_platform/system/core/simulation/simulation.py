@@ -10,7 +10,6 @@ from wechat_sdk.exceptions import UnOfficialAPIError, NeedLoginError, LoginError
 
 from system.core.simulation import SimulationException
 from system.core.captcha import Captcha, CaptchaException
-from system.response.models import Response
 
 logger_simulation = logging.getLogger(__name__)
 
@@ -161,13 +160,6 @@ class Simulation(object):
             try:
                 try:
                     self.wechat_ext.send_message(fakeid=fakeid, content=content)
-                    Response.manager.add(
-                        official_account=self.official_account,
-                        wechat_instance=self.wechat_basic,
-                        type=Response.TYPE_TEXT,
-                        pattern=Response.PATTERN_SIMULATION,
-                        raw=content
-                    )
                     return
                 except NeedLoginError:
                     self.login()

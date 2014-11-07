@@ -170,7 +170,7 @@ class ControlCenter(object):
                 if result and is_exclusive:  # 说明该插件需要返回XML数据
                     Response.manager.add(official_account=self.official_account, wechat_instance=self.wechat,
                                          type=self._analyse_response_type(result), pattern=Response.PATTERN_NORMAL,
-                                         raw=result)
+                                         raw=result, plugin_dict=plugin)
                     final_response = result
                 else:  # 说明该插件不需要返回XML数据, 已经自行处理完成, 返回空字符串即可
                     final_response = ''
