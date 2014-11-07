@@ -20,11 +20,11 @@ class LibraryNewsManager(models.Manager):
         if not now:
             return None
 
-        child = self.get_by_root(official_account, now[0])
+        child = self.get(official_account, now[0])
         if not child:
-            return [now]
+            return [now[0]]
         else:
-            return [now] + child
+            return [now[0]] + child
 
     def add(self, official_account, news):
         """
@@ -48,7 +48,7 @@ class LibraryNewsManager(models.Manager):
                 content=item.get('content'),
                 msgid=item.get('msgid'),
             )
-            if not tmp.parent:
+            if first_instance:
                 first_instance = tmp
             parent = tmp
         return first_instance
