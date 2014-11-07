@@ -147,8 +147,32 @@ class PluginProcessor(object):
     def response_video(self, video):
         pass
 
-    def response_music(self, music):
-        pass
+    def response_music(self, music_url, title=None, description=None, hq_music_url=None, thumb_media_id=None, pattern='auto'):
+        """
+        向用户发送音乐消息
+        :param music_url: 音乐URL
+        :param title: 音乐标题
+        :param description: 音乐描述
+        :param hq_music_url: 高清音乐URL (不传入则使用音乐URL)
+        :param thumb_media_id: 缩略图媒体ID
+        :param pattern: 发送模式, 可选字符串: 'auto'(自动选择), 'basic'(基本被动响应发送模式), 'service'(多客服发送模式)
+        """
+        if pattern == 'auto':
+            pattern = self._best_pattern(response_type='music')
+
+        if pattern == 'basic':
+            return self.wechat.response_music(
+                music_url=music_url,
+                title=title,
+                description=description,
+                hq_music_url=hq_music_url,
+                thumb_media_id=thumb_media_id
+            )
+        elif pattern == 'service':
+            raise Exception('have not yet implemented')
+        else:
+            logger_plugin.warning('Simulation is not available in music plugin')
+            raise PluginResponseError('Simulation is not available in music plugin')
 
     def response_news(self, news):
         pass
