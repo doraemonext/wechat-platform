@@ -21,7 +21,7 @@ class PluginSystemText(PluginProcessorSystem):
         try:
             content = LibraryText.objects.get(pk=self.reply_id)
         except ObjectDoesNotExist:
-            logger_plugins.warning('No reply id found when get content from text library [ReplyID] %s' % self.reply_id)
-            raise PluginRuntimeError('No reply id found when get content from text library')
+            logger_plugins.warning('No reply id %s found when get content from text library' % self.reply_id)
+            raise PluginRuntimeError('No reply id %s found when get content from text library' % self.reply_id)
 
         return self.response_text(text=content.content)

@@ -55,6 +55,7 @@ class Common(Configuration):
         'system.plugin',
         'system.simulation',
         'system.library.text',
+        'system.library.music',
 
         'admin.dashboard',
         'admin.user',

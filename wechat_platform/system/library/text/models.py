@@ -7,7 +7,7 @@ from system.official_account.models import OfficialAccount
 
 class LibraryTextManager(models.Manager):
     """
-    素材库 - 文字表 Manager
+    素材库 - 文字库 Manager
     """
     def add(self, official_account, content):
         """
@@ -20,7 +20,7 @@ class LibraryTextManager(models.Manager):
 
 class LibraryText(models.Model):
     """
-    素材库 - 文字表
+    素材库 - 文字库
     """
     official_account = models.ForeignKey(OfficialAccount, verbose_name=u'所属公众号')
     content = models.TextField(u'文字')
