@@ -174,8 +174,22 @@ class PluginProcessor(object):
             logger_plugin.warning('Simulation is not available in music plugin')
             raise PluginResponseError('Simulation is not available in music plugin')
 
-    def response_news(self, news):
-        pass
+    def response_news(self, news, pattern='auto'):
+        """
+        向用户发送新稳消息
+        :param news: list 对象, 每个元素为一个 dict 对象, key 包含 title, description, picurl, url
+        :param pattern: 发送模式, 可选字符串: 'auto'(自动选择), 'basic'(基本被动响应发送模式), 'service'(多客服发送模式),
+                        'simulation'(模拟登陆发送模式)
+        """
+        if pattern == 'auto':
+            pattern = self._best_pattern(response_type='news')
+
+        if pattern == 'basic':
+            return self.wechat.response_news(articles=news)
+        elif pattern == 'service':
+            raise Exception('have not yet implemented')
+        else:
+            raise PluginResponseError('have not yet implemented')
 
     def response(self):
         """
