@@ -153,7 +153,7 @@ class ControlCenter(object):
                         return HttpResponse(result)
                     else:
                         return HttpResponse('')
-                else:
+                else:  # 当数据库中不存在对于该请求的回复时
                     if Response.manager.is_waiting(official_account=self.official_account, wechat_instance=self.wechat):
                         return HttpResponse('')
             RequestMessage.manager.add(official_account=self.official_account, wechat_instance=self.wechat)

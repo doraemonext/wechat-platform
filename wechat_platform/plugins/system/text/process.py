@@ -24,4 +24,4 @@ class PluginSystemText(PluginProcessorSystem):
             logger_plugin.warning('No reply id found when get content from text library [ReplyID] %s' % self.reply_id)
             raise PluginRuntimeError('No reply id found when get content from text library')
 
-        return self.response_text(text=content)
+        return self.response_text(text=content.content)

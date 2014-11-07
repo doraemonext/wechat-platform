@@ -43,6 +43,8 @@ class RuleMatchManager(models.Manager):
             status=True
         ).order_by(
             '-order'
+        ).order_by(
+            'id'
         )
 
 
