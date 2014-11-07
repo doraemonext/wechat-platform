@@ -2,6 +2,8 @@
 
 import logging
 import random
+from xml.dom import minidom
+from xml.parsers.expat import ExpatError
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponse
@@ -13,6 +15,7 @@ from system.rule.models import Rule
 from system.keyword.models import Keyword
 from system.rule_match.models import RuleMatch
 from system.request.models import RequestMessage, RequestEvent
+from system.response.models import Response
 from system.plugin import PluginLoadError, PluginException, PluginResponseError
 from system.plugin.models import Plugin
 from system.plugin.framework import load_plugin
@@ -152,10 +155,15 @@ class ControlCenter(object):
             try:
                 result = self.process(plugin_dict=plugin, is_exclusive=is_exclusive)
                 if result and is_exclusive:  # 说明该插件需要返回XML数据
-                    # TODO: write the result to response model
+                    Response.manager.add(
+                        official_account=self.official_account,
+                        wechat_instance=self.wechat,
+                        type=self._analyse_response_type(result),
+                        pattern=Response.PATTERN_NORMAL,
+                        raw=result
+                    )
                     final_response = result
                 else:  # 说明该插件不需要返回XML数据, 已经自行处理完成, 返回空字符串即可
-                    # TODO: write the result to response model
                     final_response = ''
             except PluginResponseError, e:
                 logger_control.warning('The plugin \'%s\' doesn\'t know how to response [Exception: %s]' % (plugin['iden'], e))
@@ -167,6 +175,25 @@ class ControlCenter(object):
 
         self.context.save()  # 保存所有上下文对话到数据库中
         return HttpResponse(final_response)
+
+    def _analyse_response_type(self, xml):
+        """
+        分析返回XML的类型
+        :param xml: 返回数据的XML
+        :return: 类型
+        """
+        result = {}
+
+        try:
+            doc = minidom.parseString(xml.encode('utf-8'))
+        except ExpatError:
+            return {}
+        params = [ele for ele in doc.childNodes[0].childNodes if isinstance(ele, minidom.Element)]
+        for param in params:
+            if param.childNodes:
+                result[param.tagName] = param.childNodes[0].data
+
+        return result['MsgType']
 
     def _get_default_list(self):
         """
