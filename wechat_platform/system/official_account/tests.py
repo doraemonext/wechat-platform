@@ -40,17 +40,27 @@ class OfficialAccountTest(TestCase):
         self.assertIsInstance(account.iden, str)
         self.assertEqual(account.is_advanced, True)
 
+        # 测试默认回复内容
         rule = Rule.objects.get(name='_system_default_' + account.iden)
         self.assertEqual(rule.official_account, account)
         self.assertEqual(rule.reply_pattern, Rule.REPLY_PATTERN_RANDOM)
-
         rule_match = RuleMatch.objects.filter(rule=rule)
         self.assertEqual(rule_match.count(), 1)
         self.assertEqual(rule_match[0].plugin_iden, 'text')
-
         library_text = LibraryText.objects.get(pk=rule_match[0].reply_id)
         self.assertEqual(library_text.official_account, account)
         self.assertEqual(library_text.content, u'此处为默认回复内容，请在后台更改')
+
+        # 测试订阅回复内容
+        rule = Rule.objects.get(name='_system_subscribe_' + account.iden)
+        self.assertEqual(rule.official_account, account)
+        self.assertEqual(rule.reply_pattern, Rule.REPLY_PATTERN_RANDOM)
+        rule_match = RuleMatch.objects.filter(rule=rule)
+        self.assertEqual(rule_match.count(), 1)
+        self.assertEqual(rule_match[0].plugin_iden, 'text')
+        library_text = LibraryText.objects.get(pk=rule_match[0].reply_id)
+        self.assertEqual(library_text.official_account, account)
+        self.assertEqual(library_text.content, u'此处为订阅回复内容，请在后台更改')
 
     def test_add_normal_service(self):
         """
