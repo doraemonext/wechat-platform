@@ -108,7 +108,7 @@ class ResponseTest(WechatTestCase):
             pattern=Response.PATTERN_SIMULATION,
             raw='http://www.google.com/'
         )
-        result = Response.manager.get(official_account=official_account).order_by('time')
+        result = Response.manager.get(official_account=official_account, msgid=msgid).order_by('time')
         self.assertEqual(result.count(), 3)
         self.assertEqual(result[0], response_1)
         self.assertEqual(result[1], response_2)

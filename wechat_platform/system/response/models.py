@@ -15,8 +15,14 @@ class ResponseManager(models.Manager):
     """
     微信服务器响应消息记录表 Manager
     """
-    def get(self, official_account):
-        return super(ResponseManager, self).get_queryset().filter(official_account=official_account)
+    def get(self, official_account, msgid):
+        return super(ResponseManager, self).get_queryset().filter(
+            official_account=official_account
+        ).filter(
+            msgid=msgid
+        ).exclude(
+            type=Response.TYPE_WAITING
+        )
 
     def add(self, official_account, wechat_instance, type, pattern, raw):
         """
@@ -33,18 +39,109 @@ class ResponseManager(models.Manager):
         else:
             msgid = message.id
 
+        # 先在数据库中查找等待中的消息回复
+        response = super(ResponseManager, self).get_queryset().filter(
+            official_account=official_account
+        ).filter(
+            msgid=msgid
+        ).filter(
+            type=Response.TYPE_WAITING
+        )
+        if response:
+            response = response[0]
+            response.time = int(time())
+            response.type = type
+            response.pattern = pattern
+            response.raw = raw
+            response.save()
+            logger_response.debug('Response has been updated [Detail: %s]' % response.__dict__)
+        else:
+            response = super(ResponseManager, self).create(
+                official_account=official_account,
+                msgid=msgid,
+                target=message.source,
+                source=message.target,
+                time=int(time()),
+                type=type,
+                pattern=pattern,
+                raw=raw
+            )
+            logger_response.debug('New response created [Detail: %s]' % response.__dict__)
+        return response
+
+    def is_waiting(self, official_account, wechat_instance):
+        """
+        判断该回复是否正在等待中
+        :param official_account: 微信公众号实例 (OfficialAccount)
+        :param wechat_instance: 微信请求实例 (WechatBasic)
+        :return: 如果正在等待中, 返回 True
+        """
+        message = wechat_instance.get_message()
+        if isinstance(message, EventMessage):
+            msgid = message.target + str(message.time)
+        else:
+            msgid = message.id
+
+        # 在数据库中查找等待中的消息回复
+        response = super(ResponseManager, self).get_queryset().filter(
+            official_account=official_account
+        ).filter(
+            msgid=msgid
+        ).filter(
+            type=Response.TYPE_WAITING
+        )
+        if response:
+            return True
+        else:
+            return False
+
+    def add_waiting(self, official_account, wechat_instance):
+        """
+        添加一条新的响应消息记录 (说明该请求正在被执行中)
+        :param official_account: 微信公众号实例 (OfficialAccount)
+        :param wechat_instance: 微信请求实例 (WechatBasic)
+        """
+        message = wechat_instance.get_message()
+        if isinstance(message, EventMessage):
+            msgid = message.target + str(message.time)
+        else:
+            msgid = message.id
+
         response = super(ResponseManager, self).create(
             official_account=official_account,
             msgid=msgid,
             target=message.source,
             source=message.target,
             time=int(time()),
-            type=type,
-            pattern=pattern,
-            raw=raw
+            type=Response.TYPE_WAITING,
+            pattern=Response.PATTERN_WAITING,
+            raw=''
         )
-        logger_response.info('New response created [Detail: %s]' % response.__dict__)
+        logger_response.debug('New response created [Detail: %s]' % response.__dict__)
         return response
+
+    def end_waiting(self, official_account, wechat_instance):
+        """
+        结束一条正在等待的响应消息记录
+        :param official_account: 微信公众号实例 (OfficialAccount)
+        :param wechat_instance: 微信请求实例 (WechatBasic)
+        """
+        message = wechat_instance.get_message()
+        if isinstance(message, EventMessage):
+            msgid = message.target + str(message.time)
+        else:
+            msgid = message.id
+
+        # 在数据库中查找等待中的消息回复
+        response = super(ResponseManager, self).get_queryset().filter(
+            official_account=official_account
+        ).filter(
+            msgid=msgid
+        ).filter(
+            type=Response.TYPE_WAITING
+        )
+        if response:
+            response[0].delete()
 
 
 class Response(models.Model):
@@ -57,6 +154,7 @@ class Response(models.Model):
     TYPE_VOICE = 'voice'
     TYPE_NEWS = 'news'
     TYPE_MUSIC = 'music'
+    TYPE_WAITING = 'waiting'
     TYPE = (
         (TYPE_TEXT, u'文本消息'),
         (TYPE_IMAGE, u'图片消息'),
@@ -64,15 +162,18 @@ class Response(models.Model):
         (TYPE_VOICE, u'语音消息'),
         (TYPE_NEWS, u'图文消息'),
         (TYPE_MUSIC, u'音乐消息'),
+        (TYPE_WAITING, u'执行中消息'),
     )
 
     PATTERN_NORMAL = 0
     PATTERN_SERVICE = 1
     PATTERN_SIMULATION = 2
+    PATTERN_WAITING = 3
     PATTERN = (
         (PATTERN_NORMAL, u'正常XML返回模式'),
         (PATTERN_SERVICE, u'多客服返回模式'),
         (PATTERN_SIMULATION, u'模拟登陆返回模式'),
+        (PATTERN_WAITING, u'执行中消息'),
     )
 
     official_account = models.ForeignKey(OfficialAccount, verbose_name=u'所属公众号')
