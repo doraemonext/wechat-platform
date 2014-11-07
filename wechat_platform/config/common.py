@@ -47,6 +47,7 @@ class Common(Configuration):
         'system.official_account',
         'system.users',
         'system.request',
+        'system.response',
         'system.rule',
         'system.rule_match',
         'system.keyword',
@@ -301,6 +302,10 @@ class Common(Configuration):
                 'level': 'DEBUG',
             },
             'system.request': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+            'system.response': {
                 'handlers': ['console', 'development_logfile', 'production_logfile'],
                 'level': 'DEBUG',
             },

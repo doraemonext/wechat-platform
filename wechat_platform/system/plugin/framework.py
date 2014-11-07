@@ -13,6 +13,7 @@ from system.core.simulation import Simulation
 from system.official_account.models import OfficialAccount
 from system.plugin import PluginLoadError, PluginResponseError
 from system.plugin.models import Plugin
+from system.response.models import Response
 
 logger_plugin = logging.getLogger(__name__)
 
@@ -106,6 +107,17 @@ class PluginProcessor(object):
             if len(fakeid_list) == 1:
                 logger_plugin.debug('A user matched [FakeidList] %s [OfficialAccount] %s' % (fakeid_list, self.official_account.__dict__))
                 simulation.send_message(fakeid=fakeid_list[0], content=text)
+                Response.manager.add(
+                    official_account=self.official_account,
+                    wechat_instance=self.wechat,
+                    type=Response.TYPE_TEXT,
+                    pattern=Response.PATTERN_SIMULATION,
+                    raw=text,
+                    plugin_dict={
+                        'iden': 'text',
+                        'reply_id': self.reply_id,
+                    }
+                )
                 return None
             elif len(fakeid_list) == 0:
                 logger_plugin.debug('No user matched [OfficialAccount] %s' % self.official_account.__dict__)

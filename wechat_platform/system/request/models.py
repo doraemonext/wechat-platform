@@ -8,7 +8,7 @@ from django.db import IntegrityError
 
 from system.core.exceptions import WechatInstanceException
 from system.official_account.models import OfficialAccount
-from system.request import RequestRepeatException
+from system.request.utils import RequestRepeatException
 
 logger_request = logging.getLogger(__name__)
 

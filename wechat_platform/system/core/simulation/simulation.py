@@ -9,8 +9,7 @@ from wechat_sdk import WechatExt
 from wechat_sdk.exceptions import UnOfficialAPIError, NeedLoginError, LoginError, LoginVerifyCodeError
 
 from system.core.simulation import SimulationException
-from system.core.captcha import Captcha
-from system.core.captcha import CaptchaException
+from system.core.captcha import Captcha, CaptchaException
 
 logger_simulation = logging.getLogger(__name__)
 
@@ -98,7 +97,7 @@ class Simulation(object):
         fakeid_list = []
         for item in message_list['msg_item']:
             if self.message.type == 'text':
-                if abs(item.get('date_time') - self.message.time) <= 0 and item.get('type') == self.TYPE_TEXT and item.get('content') == self.message.content:
+                if abs(item.get('date_time') - self.message.time) <= 1 and item.get('type') == self.TYPE_TEXT and item.get('content') == self.message.content:
                     fakeid_list.append(item.get('fakeid'))
             elif self.message.type == 'location':
                 if item.get('date_time') == self.message.time and item.get('type') == self.TYPE_LOCATION:
