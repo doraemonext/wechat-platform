@@ -11,6 +11,7 @@ from wechat_sdk.context.framework.django import DatabaseContextStore
 from wechat_sdk.messages import EventMessage
 
 from system.core.exceptions import WechatCriticalException
+from system.core.control.utils import RepeatRequest
 from system.rule.models import Rule
 from system.keyword.models import Keyword
 from system.rule_match.models import RuleMatch
@@ -151,30 +152,13 @@ class ControlCenter(object):
     def response(self):
         final_response = None
 
-        # 判断请求是否重复, 如果重复则返回原响应内容, 否则保存当前请求
-        if isinstance(self.message, EventMessage):
-            if RequestEvent.manager.is_repeat(official_account=self.official_account, wechat_instance=self.wechat):
-                # TODO: return the response
-                raise Exception('have not yet implemented')
-            RequestEvent.manager.add(official_account=self.official_account, wechat_instance=self.wechat)
-        else:
-            if RequestMessage.manager.is_repeat(official_account=self.official_account, wechat_instance=self.wechat):
-                responses = Response.manager.get(official_account=self.official_account, msgid=self.message.id)
-                if responses:  # 当数据库中已经存在对于该请求的回复时
-                    result = None
-                    for response in responses:
-                        if response.pattern == Response.PATTERN_NORMAL:
-                            result = response.raw
-                            break
-                    if result:
-                        return HttpResponse(result)
-                    else:
-                        return HttpResponse('')
-                else:  # 当数据库中不存在对于该请求的回复时
-                    if Response.manager.is_waiting(official_account=self.official_account, wechat_instance=self.wechat):
-                        return HttpResponse('')
-            RequestMessage.manager.add(official_account=self.official_account, wechat_instance=self.wechat)
+        # 检查重复请求并检查是否有可用数据直接返回
+        try:
+            self._check_repeat_request()
+        except RepeatRequest, e:
+            return HttpResponse(e.response)
 
+        # 对请求数据进行插件匹配
         self.match_plugin_list = self.match()
         if len(self.match_plugin_list) == 0:  # 当该请求不需要插件响应时, 直接回复空字符串
             return HttpResponse('')
@@ -184,6 +168,7 @@ class ControlCenter(object):
             is_exclusive = False
             Response.manager.add_waiting(official_account=self.official_account, wechat_instance=self.wechat)
 
+        # 顺次执行插件列表中的插件并获得响应
         for plugin in self.match_plugin_list:
             try:
                 result = self.process(plugin_dict=plugin, is_exclusive=is_exclusive)
@@ -195,16 +180,56 @@ class ControlCenter(object):
                 else:  # 说明该插件不需要返回XML数据, 已经自行处理完成, 返回空字符串即可
                     final_response = ''
             except PluginResponseError, e:
-                logger_control.warning('The plugin \'%s\' doesn\'t know how to response [Exception: %s]' % (plugin['iden'], e))
+                logger_control.warning('The plugin %s does not know how to response [Exception: %s]' % (plugin['iden'], e))
                 final_response = self.wechat.response_text(Setting.manager.get('unknown_response'))
                 break
             except PluginException, e:
-                logger_control.error('The plugin \'%s\' response error [Exception: %s]' % (plugin['iden'], e))
+                logger_control.error('The plugin %s response error [Exception: %s]' % (plugin['iden'], e))
                 pass
         Response.manager.end_waiting(official_account=self.official_account, wechat_instance=self.wechat)
 
         self.context.save()  # 保存所有上下文对话到数据库中
         return HttpResponse(final_response)
+
+    def _check_repeat_request(self):
+        """
+        检查是否为重复请求, 如果已有正确数据返回, 直接抛出 RepeatRequest 异常
+        :raise RepeatRequest: 当重复请求已有正确数据时抛出
+        """
+        if isinstance(self.message, EventMessage):
+            if RequestEvent.manager.is_repeat(official_account=self.official_account, wechat_instance=self.wechat):
+                responses = Response.manager.get(official_account=self.official_account, msgid=self.message.source+str(self.message.time))
+                if responses:  # 当数据库中已经存在对于该请求的回复时
+                    result = None
+                    for response in responses:
+                        if response.pattern == Response.PATTERN_NORMAL:
+                            result = response.raw
+                            break
+                    if result:
+                        raise RepeatRequest(response=result)
+                    else:
+                        raise RepeatRequest(response='')
+                else:  # 当数据库中不存在对于该请求的回复时
+                    if Response.manager.is_waiting(official_account=self.official_account, wechat_instance=self.wechat):
+                        raise RepeatRequest(response='')
+            RequestEvent.manager.add(official_account=self.official_account, wechat_instance=self.wechat)
+        else:
+            if RequestMessage.manager.is_repeat(official_account=self.official_account, wechat_instance=self.wechat):
+                responses = Response.manager.get(official_account=self.official_account, msgid=self.message.id)
+                if responses:  # 当数据库中已经存在对于该请求的回复时
+                    result = None
+                    for response in responses:
+                        if response.pattern == Response.PATTERN_NORMAL:
+                            result = response.raw
+                            break
+                    if result:
+                        raise RepeatRequest(response=result)
+                    else:
+                        raise RepeatRequest(response='')
+                else:  # 当数据库中不存在对于该请求的回复时
+                    if Response.manager.is_waiting(official_account=self.official_account, wechat_instance=self.wechat):
+                        raise RepeatRequest(response='')
+            RequestMessage.manager.add(official_account=self.official_account, wechat_instance=self.wechat)
 
     def _arrange_plugin_list(self, rule, plugin_list):
         """

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-try:
-    from system.core.control.control import ControlCenter
-except ImportError:
-    pass
+from system.core.control.control import ControlCenter
+from system.core.control.utils import RepeatRequest
+
+__all__ = ['ControlCenter', 'RepeatRequest']

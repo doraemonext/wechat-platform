@@ -3,6 +3,7 @@
 from wechat_sdk import WechatBasic
 from wechat_sdk.context.framework.django import DatabaseContextStore, DatabaseContext
 
+from system.core.control import ControlCenter
 from system.core.test import WechatTestCase
 from system.official_account.models import OfficialAccount
 from system.rule.models import Rule
@@ -10,7 +11,6 @@ from system.keyword.models import Keyword
 from system.rule_match.models import RuleMatch
 from system.request.models import RequestMessage, RequestEvent
 from system.library.text.models import LibraryText
-from .control import ControlCenter
 
 
 class ControlCenterTest(WechatTestCase):
