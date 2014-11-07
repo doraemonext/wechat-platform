@@ -53,6 +53,7 @@ class Common(Configuration):
         'system.keyword',
         'system.setting',
         'system.plugin',
+        'system.simulation',
         'system.library.text',
 
         'admin.dashboard',
@@ -318,6 +319,10 @@ class Common(Configuration):
                 'level': 'DEBUG',
             },
             'system.setting': {
+                'handlers': ['console', 'development_logfile', 'production_logfile'],
+                'level': 'DEBUG',
+            },
+            'system.simulation': {
                 'handlers': ['console', 'development_logfile', 'production_logfile'],
                 'level': 'DEBUG',
             },

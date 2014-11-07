@@ -5,15 +5,15 @@ import os
 import sys
 from imp import find_module, load_module, acquire_lock, release_lock
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from wechat_sdk import WechatExt
 
-from system.core.simulation import Simulation
+from system.simulation import Simulation
+from system.simulation.models import SimulationMatch
 from system.official_account.models import OfficialAccount
 from system.plugin import PluginLoadError, PluginResponseError
-from system.plugin.models import Plugin
 from system.response.models import Response
+
 
 logger_plugin = logging.getLogger(__name__)
 
@@ -104,28 +104,39 @@ class PluginProcessor(object):
                     password=self.official_account.password,
                 )
 
-            fakeid_list = simulation.find_latest_user()
-            if len(fakeid_list) == 1:
-                logger_plugin.debug('A user matched [FakeidList] %s [OfficialAccount] %s' % (fakeid_list, self.official_account.__dict__))
-                simulation.send_message(fakeid=fakeid_list[0], content=text)
-                Response.manager.add(
-                    official_account=self.official_account,
-                    wechat_instance=self.wechat,
-                    type=Response.TYPE_TEXT,
-                    pattern=Response.PATTERN_SIMULATION,
-                    raw=text,
-                    plugin_dict={
-                        'iden': 'text',
-                        'reply_id': self.reply_id,
-                    }
-                )
-                return None
-            elif len(fakeid_list) == 0:
-                logger_plugin.debug('No user matched [OfficialAccount] %s' % self.official_account.__dict__)
-                raise PluginResponseError('No user matched')
+            simulation_match = SimulationMatch.manager.get(official_account=self.official_account, openid=self.message.source)
+            if simulation_match:
+                simulation.send_message(fakeid=simulation_match.fakeid, content=text)
             else:
-                logger_plugin.debug('Multiple users matched [FakeidList] %s [OfficialAccount] %s' % (fakeid_list, self.official_account.__dict__))
-                raise PluginResponseError('Multiple users matched')
+                fakeid_list = simulation.find_latest_user()
+                if len(fakeid_list) == 1:
+                    logger_plugin.debug('A user matched [FakeidList] %s [OfficialAccount] %s' % (fakeid_list, self.official_account.__dict__))
+                    # 添加模拟关系对应
+                    SimulationMatch.manager.add(
+                        official_account=self.official_account,
+                        openid=self.message.source,
+                        fakeid=fakeid_list[0],
+                    )
+                    simulation.send_message(fakeid=fakeid_list[0], content=text)
+                elif len(fakeid_list) == 0:
+                    logger_plugin.debug('No user matched [OfficialAccount] %s' % self.official_account.__dict__)
+                    raise PluginResponseError('No user matched')
+                else:
+                    logger_plugin.debug('Multiple users matched [FakeidList] %s [OfficialAccount] %s' % (fakeid_list, self.official_account.__dict__))
+                    raise PluginResponseError('Multiple users matched')
+
+            Response.manager.add(
+                official_account=self.official_account,
+                wechat_instance=self.wechat,
+                type=Response.TYPE_TEXT,
+                pattern=Response.PATTERN_SIMULATION,
+                raw=text,
+                plugin_dict={
+                    'iden': 'text',
+                    'reply_id': self.reply_id,
+                }
+            )
+            return None
 
     def response_image(self, mid):
         pass
