@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from wechat_sdk import WechatBasic, WechatExt
-
-from system.official_account.models import OfficialAccount
 from system.core.test import WechatTestCase
-from system.core.simulation import Simulation
 
 
 class SimulationTest(WechatTestCase):

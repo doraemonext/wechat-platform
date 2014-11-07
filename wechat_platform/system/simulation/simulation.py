@@ -6,10 +6,11 @@ import tempfile
 from collections import OrderedDict
 
 from wechat_sdk import WechatExt
-from wechat_sdk.exceptions import UnOfficialAPIError, NeedLoginError, LoginError, LoginVerifyCodeError
+from wechat_sdk.exceptions import NeedLoginError, LoginError, LoginVerifyCodeError
 
-from system.core.simulation import SimulationException
+from system.simulation import SimulationException
 from system.core.captcha import Captcha, CaptchaException
+
 
 logger_simulation = logging.getLogger(__name__)
 

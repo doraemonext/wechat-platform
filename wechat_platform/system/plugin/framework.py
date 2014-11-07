@@ -5,15 +5,14 @@ import os
 import sys
 from imp import find_module, load_module, acquire_lock, release_lock
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from wechat_sdk import WechatExt
 
-from system.core.simulation import Simulation
+from system.simulation import Simulation
 from system.official_account.models import OfficialAccount
 from system.plugin import PluginLoadError, PluginResponseError
-from system.plugin.models import Plugin
 from system.response.models import Response
+
 
 logger_plugin = logging.getLogger(__name__)
 
