@@ -91,17 +91,7 @@ class ControlCenter(object):
                 'reply_id': item.reply_id
             })
 
-        # 根据规则的返回模式返回相应的列表
-        if rule.reply_pattern == Rule.REPLY_PATTERN_ALL:  # 全部回复
-            return plugin_list
-        elif rule.reply_pattern == Rule.REPLY_PATTERN_RANDOM:  # 随机回复
-            return [random.choice(plugin_list), ]
-        elif rule.reply_pattern == Rule.REPLY_PATTERN_FORWARD:  # 顺序回复
-            # TODO: return the plugin list by means of response model
-            raise Exception('have not yet implemented')
-        elif rule.reply_pattern == Rule.REPLY_PATTERN_REVERSE:  # 逆序回复
-            # TODO: return the plugin list by means of response model
-            raise Exception('have not yet implemented')
+        return self._arrange_plugin_list(rule, plugin_list)
 
     def process(self, plugin_dict, is_exclusive=False):
         """
@@ -186,6 +176,48 @@ class ControlCenter(object):
         self.context.save()  # 保存所有上下文对话到数据库中
         return HttpResponse(final_response)
 
+    def _arrange_plugin_list(self, rule, plugin_list):
+        """
+        根据Rule中的返回模式重新组织插件列表
+        :param rule: 规则实例 (Rule)
+        :param plugin_list: 插件列表
+        :return: 组织好的插件列表
+        """
+        if rule.reply_pattern == Rule.REPLY_PATTERN_ALL:  # 全部回复
+            return plugin_list
+        elif rule.reply_pattern == Rule.REPLY_PATTERN_RANDOM:  # 随机回复
+            return [random.choice(plugin_list), ]
+        elif rule.reply_pattern == Rule.REPLY_PATTERN_FORWARD:  # 顺序回复
+            response_history = Response.manager.get_latest(official_account=self.official_account, wechat_instance=self.wechat)
+            if response_history:
+                try:
+                    index = plugin_list.index({
+                        'iden': response_history[0].plugin_iden,
+                        'reply_id': response_history[0].reply_id,
+                    })
+                    if index == len(plugin_list) - 1:
+                        return [plugin_list[0], ]
+                    return [plugin_list[index+1], ]
+                except ValueError:
+                    return [plugin_list[0], ]
+            else:
+                return [plugin_list[0], ]
+        elif rule.reply_pattern == Rule.REPLY_PATTERN_REVERSE:  # 逆序回复
+            response_history = Response.manager.get_latest(official_account=self.official_account, wechat_instance=self.wechat)
+            if response_history:
+                try:
+                    index = plugin_list.index({
+                        'iden': response_history[0].plugin_iden,
+                        'reply_id': response_history[0].reply_id,
+                    })
+                    if index == 0:
+                        return [plugin_list[len(plugin_list)-1], ]
+                    return [plugin_list[index-1], ]
+                except ValueError:
+                    return [plugin_list[len(plugin_list)-1], ]
+            else:
+                return [plugin_list[len(plugin_list)-1], ]
+
     def _analyse_response_type(self, xml):
         """
         分析返回XML的类型
@@ -219,16 +251,7 @@ class ControlCenter(object):
                 'reply_id': item.reply_id
             })
 
-        if rule.reply_pattern == Rule.REPLY_PATTERN_ALL:  # 全部回复
-            return plugin_list
-        elif rule.reply_pattern == Rule.REPLY_PATTERN_RANDOM:  # 随机回复
-            return [random.choice(plugin_list), ]
-        elif rule.reply_pattern == Rule.REPLY_PATTERN_FORWARD:  # 顺序回复
-            # TODO: return the plugin list by means of response model
-            raise Exception('have not yet implemented')
-        elif rule.reply_pattern == Rule.REPLY_PATTERN_REVERSE:  # 逆序回复
-            # TODO: return the plugin list by means of response model
-            raise Exception('have not yet implemented')
+        return self._arrange_plugin_list(rule, plugin_list)
 
     def _is_system_plugin(self, iden):
         """

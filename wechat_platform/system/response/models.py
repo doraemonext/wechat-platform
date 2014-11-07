@@ -24,6 +24,24 @@ class ResponseManager(models.Manager):
             type=Response.TYPE_WAITING
         )
 
+    def get_latest(self, official_account, wechat_instance):
+        """
+        获取指定公众号指定OpenID下最新一条回复
+        :param official_account: 微信公众号实例 (OfficialAccount)
+        :param wechat_instance: 微信请求实例 (WechatBasic)
+        :return: 响应实例 (Response)
+        """
+        message = wechat_instance.get_message()
+        return super(ResponseManager, self).get_queryset().filter(
+            official_account=official_account
+        ).filter(
+            target=message.source
+        ).exclude(
+            type=Response.TYPE_WAITING
+        ).order_by(
+            '-time'
+        )[:1]
+
     def add(self, official_account, wechat_instance, type, pattern, raw, plugin_dict):
         """
         添加一条新的响应消息记录
