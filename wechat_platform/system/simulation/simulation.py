@@ -126,7 +126,7 @@ class Simulation(object):
         :param count: 获取数目
         :param day: 最近几天消息 (0: 今天, 1: 昨天, 2: 前天, 3: 更早, 7: 全部), 这里的全部仅有5天
         :param star: 是否只获取星标消息
-        :return:
+        :raises SimulationException: 当模拟登陆登录失败时抛出
         """
         for i in range(0, 2):
             try:
@@ -156,11 +156,42 @@ class Simulation(object):
         :param fakeid: 用户的 UID (即 fakeid )
         :param content: 发送的内容
         :raises ValueError: 参数出错, 具体内容有 ``fake id not exist``
+        :raises SimulationException: 当模拟登陆登录失败时抛出
         """
         for i in range(0, 2):
             try:
                 try:
                     self.wechat_ext.send_message(fakeid=fakeid, content=content)
+                    return
+                except NeedLoginError:
+                    self.login()
+            except LoginError, e:
+                logger_simulation.error('Simulated login failed: %s [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+                    e,
+                    self.official_account.__dict__,
+                    self.wechat_basic.__dict__,
+                    self.wechat_ext.__dict__,
+                ))
+                raise SimulationException(e)
+        logger_simulation.error('Simulated login failed [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+            self.official_account.__dict__,
+            self.wechat_basic.__dict__,
+            self.wechat_ext.__dict__,
+        ))
+        raise SimulationException('login error')
+
+    def send_news(self, fakeid, msgid):
+        """
+        主动发送图文信息
+        :param fakeid: 用户的 UID (即 fakeid )
+        :param msgid: 图文
+        :raises ValueError: 参数出错, 具体内容有 'fake id not exist' 及 'message id not exist'
+        :raises SimulationException: 当模拟登陆登录失败时抛出
+        """
+        for i in range(0, 2):
+            try:
+                try:
+                    self.wechat_ext.send_news(fakeid=fakeid, msgid=msgid)
                     return
                 except NeedLoginError:
                     self.login()

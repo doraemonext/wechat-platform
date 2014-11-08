@@ -8,7 +8,7 @@ from imp import find_module, load_module, acquire_lock, release_lock
 from django.conf import settings
 from wechat_sdk import WechatExt
 
-from system.simulation import Simulation
+from system.simulation import Simulation, SimulationException
 from system.simulation.models import SimulationMatch
 from system.official_account.models import OfficialAccount
 from system.plugin import PluginLoadError, PluginResponseError, PluginSimulationError
@@ -72,7 +72,7 @@ class PluginProcessor(object):
                         'simulation'(模拟登陆发送模式)
         """
         if pattern == 'auto':
-            pattern = self._best_pattern(response_type='text')
+            pattern = self.best_pattern(response_type='text')
 
         if pattern == 'basic':
             return self.wechat.response_text(content=text)
@@ -85,7 +85,10 @@ class PluginProcessor(object):
             except PluginSimulationError, e:
                 raise PluginResponseError(e)
 
-            simulation.send_message(fakeid=fakeid, content=text)
+            try:
+                simulation.send_message(fakeid=fakeid, content=text)
+            except SimulationException, e:
+                raise PluginResponseError(e)
 
             Response.manager.add(
                 official_account=self.official_account,
@@ -120,7 +123,7 @@ class PluginProcessor(object):
         :param pattern: 发送模式, 可选字符串: 'auto'(自动选择), 'basic'(基本被动响应发送模式), 'service'(多客服发送模式)
         """
         if pattern == 'auto':
-            pattern = self._best_pattern(response_type='music')
+            pattern = self.best_pattern(response_type='music')
 
         if pattern == 'basic':
             return self.wechat.response_music(
@@ -158,10 +161,10 @@ class PluginProcessor(object):
         :param msgid: 图文在素材库中的 ID, 仅用于模拟登陆发送模式下
         :raises ValueError: 参数提供错误时抛出 (如 news 不符合要求)
         """
-        if not news:
-            raise ValueError('The news cannot be empty')
-
         if pattern == 'basic':
+            if not news:
+                raise ValueError('The news cannot be empty')
+
             news_dealt = []
             for item in news:
                 if 'title' not in item:
@@ -182,7 +185,24 @@ class PluginProcessor(object):
             except PluginSimulationError, e:
                 raise PluginResponseError(e)
 
-            # TODO
+            if msgid:
+                try:
+                    simulation.send_news(fakeid=fakeid, msgid=msgid)
+                except SimulationException, e:
+                    raise PluginResponseError(e)
+
+                Response.manager.add(
+                    official_account=self.official_account,
+                    wechat_instance=self.wechat,
+                    type=Response.TYPE_NEWS,
+                    pattern=Response.PATTERN_SIMULATION,
+                    raw=str(msgid),
+                    plugin_dict={
+                        'iden': 'news',
+                        'reply_id': self.reply_id,
+                    }
+                )
+                return None
         else:
             raise ValueError('Invalid pattern with response news')
 
@@ -191,6 +211,25 @@ class PluginProcessor(object):
         响应函数, 由继承的类进行扩展, 当对本插件初始化完成后, 调用此函数即可得到响应结果
         """
         raise NotImplementedError('subclasses of PluginProcess must provide an response() method')
+
+    def best_pattern(self, response_type):
+        """
+        根据返回类型选择最恰当的返回方法
+        :param response_type: 返回信息类型
+        :return: 返回方法字符串
+        """
+        if self.official_account.level in [OfficialAccount.LEVEL_1, OfficialAccount.LEVEL_2]:
+            if response_type in ['text', 'music', 'news'] and self.is_exclusive:
+                return 'basic'
+            elif self.official_account.is_advanced and self.official_account.username and self.official_account.password:
+                return 'simulation'
+            else:
+                raise PluginResponseError('no method available to response message')
+        else:
+            if response_type in ['text', 'music', 'news', 'image', 'voice', 'video'] and self.is_exclusive:
+                return 'basic'
+            else:
+                return 'service'
 
     def _get_simulation_instance(self):
         """
@@ -255,25 +294,6 @@ class PluginProcessor(object):
                 raise PluginSimulationError('Multiple users matched')
 
         return fakeid
-
-    def _best_pattern(self, response_type):
-        """
-        根据返回类型选择最恰当的返回方法
-        :param response_type: 返回信息类型
-        :return: 返回方法字符串
-        """
-        if self.official_account.level in [OfficialAccount.LEVEL_1, OfficialAccount.LEVEL_2]:
-            if response_type in ['text', 'music', 'news'] and self.is_exclusive:
-                return 'basic'
-            elif self.official_account.is_advanced and self.official_account.username and self.official_account.password:
-                return 'simulation'
-            else:
-                raise PluginResponseError('no method available to response message')
-        else:
-            if response_type in ['text', 'music', 'news', 'image', 'voice', 'video'] and self.is_exclusive:
-                return 'basic'
-            else:
-                return 'service'
 
 
 class PluginProcessorSystem(PluginProcessor):
