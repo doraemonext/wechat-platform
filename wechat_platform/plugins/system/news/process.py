@@ -20,7 +20,7 @@ class PluginSystemNews(PluginProcessorSystem):
     def process(self):
         try:
             root = LibraryNews.objects.get(pk=self.reply_id)
-            news_instances = [root] + LibraryNews.manager.get(official_account=root.official_account, root=root)
+            news_instances = LibraryNews.manager.get(official_account=root.official_account, root=root)
             news_list = []
             for news in news_instances:
                 news_list.append({
@@ -34,4 +34,4 @@ class PluginSystemNews(PluginProcessorSystem):
             logger_plugins.warning('No reply id %s found when get content from news library' % self.reply_id)
             raise PluginRuntimeError('No reply id %s found when get content from news library' % self.reply_id)
 
-        return self.response_news(news=news_list)
+        return self.response_news(news=news_list, pattern='basic')

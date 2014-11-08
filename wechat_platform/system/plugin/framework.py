@@ -11,7 +11,7 @@ from wechat_sdk import WechatExt
 from system.simulation import Simulation
 from system.simulation.models import SimulationMatch
 from system.official_account.models import OfficialAccount
-from system.plugin import PluginLoadError, PluginResponseError
+from system.plugin import PluginLoadError, PluginResponseError, PluginSimulationError
 from system.response.models import Response
 
 
@@ -79,51 +79,13 @@ class PluginProcessor(object):
         elif pattern == 'service':
             raise Exception('have not yet implemented')
         else:
-            if not self.official_account.simulation_available:
-                logger_plugin.debug('Simulation is not available in current settings [OfficialAccount] %s' % self.official_account.__dict__)
-                raise PluginResponseError('Simulation is not available in current settings')
+            try:
+                simulation = self._get_simulation_instance()
+                fakeid = self._get_simulation_match_fakeid(simulation=simulation)
+            except PluginSimulationError, e:
+                raise PluginResponseError(e)
 
-            if self.official_account.has_token_cookies:  # 当已经存在缓存的 token 和 cookies 时直接利用它们初始化
-                token_cookies_dict = self.official_account.get_cache_token_cookies()
-                wechat_ext = WechatExt(
-                    username=self.official_account.username,
-                    password=self.official_account.password,
-                    token=token_cookies_dict['token'],
-                    cookies=token_cookies_dict['cookies'],
-                )
-                simulation = Simulation(
-                    official_account=self.official_account,
-                    wechat_basic=self.wechat,
-                    wechat_ext=wechat_ext
-                )
-            else:  # 当不存在缓存的 token 和 cookies 时利用用户名密码初始化
-                simulation = Simulation(
-                    official_account=self.official_account,
-                    wechat_basic=self.wechat,
-                    username=self.official_account.username,
-                    password=self.official_account.password,
-                )
-
-            simulation_match = SimulationMatch.manager.get(official_account=self.official_account, openid=self.message.source)
-            if simulation_match:
-                simulation.send_message(fakeid=simulation_match.fakeid, content=text)
-            else:
-                fakeid_list = simulation.find_latest_user()
-                if len(fakeid_list) == 1:
-                    logger_plugin.debug('A user matched [FakeidList] %s [OfficialAccount] %s' % (fakeid_list, self.official_account.__dict__))
-                    # 添加模拟关系对应
-                    SimulationMatch.manager.add(
-                        official_account=self.official_account,
-                        openid=self.message.source,
-                        fakeid=fakeid_list[0],
-                    )
-                    simulation.send_message(fakeid=fakeid_list[0], content=text)
-                elif len(fakeid_list) == 0:
-                    logger_plugin.debug('No user matched [OfficialAccount] %s' % self.official_account.__dict__)
-                    raise PluginResponseError('No user matched')
-                else:
-                    logger_plugin.debug('Multiple users matched [FakeidList] %s [OfficialAccount] %s' % (fakeid_list, self.official_account.__dict__))
-                    raise PluginResponseError('Multiple users matched')
+            simulation.send_message(fakeid=fakeid, content=text)
 
             Response.manager.add(
                 official_account=self.official_account,
@@ -174,28 +136,125 @@ class PluginProcessor(object):
             logger_plugin.warning('Simulation is not available in music plugin')
             raise PluginResponseError('Simulation is not available in music plugin')
 
-    def response_news(self, news, pattern='auto'):
+    def response_news(self, pattern, news=None, msgid=None):
         """
-        向用户发送新稳消息
-        :param news: list 对象, 每个元素为一个 dict 对象, key 包含 title, description, picurl, url
-        :param pattern: 发送模式, 可选字符串: 'auto'(自动选择), 'basic'(基本被动响应发送模式), 'service'(多客服发送模式),
+        向用户发送图文消息
+
+        * 当 pattern 为 'basic' 或 'service' 时, news 中每个 dict 的 key 可选项为 'title', 'description', 'picurl', 'url',
+          其中 'title' 必须提供
+        * 当 pattern 为 'simulation' 时, news 中每个 dict 的 key 可选项为 'title', 'description', 'picurl', 'author',
+          'content', 'picture', 'picture_id', 下面解释各情况下如何提供参数:
+        ** 如果提供了 'msgid', 则不需提供 news 参数, 本条规则优先级最高
+        ** 如果没有提供 'msgid', 则必须提供 news 参数且 news 列表中每个元素至少提供 'title', 'content' 两个参数,
+           'description', 'author', 'picture_id', 'picture', 'picurl' 均为可选项
+        ** 如果没有提供 'msgid', 则在 news 列表中每个元素里提供图文的封面图片可以有三种方式, 提供 'picture_id' 或提供 'picture'
+           或提供 'picurl', 如果同时提供这三个中的多个, 将按前面提到的顺序进行判断, 以搜索到的第一个参数为准
+
+        :param pattern: 发送模式, 可选字符串: 'basic'(基本被动响应发送模式), 'service'(多客服发送模式),
                         'simulation'(模拟登陆发送模式)
+        :param news: list 对象, 每个元素为一个 dict 对象, key 可包含 title, description, picurl, url, author, content,
+                     picture, picture_id, 分别对应的含义为图文标题, 图文摘要描述, 封面图片URL, 跳转地址, 作者, 图文内容,
+                     封面图片File, 封面图片在素材库中的ID, 该图文在素材库中的ID
+        :param msgid: 图文在素材库中的 ID, 仅用于模拟登陆发送模式下
+        :raises ValueError: 参数提供错误时抛出 (如 news 不符合要求)
         """
-        if pattern == 'auto':
-            pattern = self._best_pattern(response_type='news')
+        if not news:
+            raise ValueError('The news cannot be empty')
 
         if pattern == 'basic':
-            return self.wechat.response_news(articles=news)
+            news_dealt = []
+            for item in news:
+                if 'title' not in item:
+                    raise ValueError('The news item needs to provide at least one argument: title')
+                news_dealt.append({
+                    'title': item.get('title'),
+                    'description': item.get('description'),
+                    'picurl': item.get('picurl'),
+                    'url': item.get('url'),
+                })
+            return self.wechat.response_news(articles=news_dealt)
         elif pattern == 'service':
             raise Exception('have not yet implemented')
+        elif pattern == 'simulation':
+            try:
+                simulation = self._get_simulation_instance()
+                fakeid = self._get_simulation_match_fakeid(simulation=simulation)
+            except PluginSimulationError, e:
+                raise PluginResponseError(e)
+
+            # TODO
         else:
-            raise PluginResponseError('have not yet implemented')
+            raise ValueError('Invalid pattern with response news')
 
     def response(self):
         """
         响应函数, 由继承的类进行扩展, 当对本插件初始化完成后, 调用此函数即可得到响应结果
         """
         raise NotImplementedError('subclasses of PluginProcess must provide an response() method')
+
+    def _get_simulation_instance(self):
+        """
+        检查当前公众号的模拟登陆设置及初始化模拟登陆类
+        :return: 模拟登陆实例 (Simulation)
+        :raises PluginSimulationError: 当模拟登陆不可用时抛出
+        """
+        if not self.official_account.simulation_available:
+            logger_plugin.debug('Simulation is not available in current settings [OfficialAccount] %s' % self.official_account.__dict__)
+            raise PluginSimulationError('Simulation is not available in current settings')
+
+        if self.official_account.has_token_cookies:  # 当已经存在缓存的 token 和 cookies 时直接利用它们初始化
+            token_cookies_dict = self.official_account.get_cache_token_cookies()
+            wechat_ext = WechatExt(
+                username=self.official_account.username,
+                password=self.official_account.password,
+                token=token_cookies_dict['token'],
+                cookies=token_cookies_dict['cookies'],
+            )
+            simulation = Simulation(
+                official_account=self.official_account,
+                wechat_basic=self.wechat,
+                wechat_ext=wechat_ext
+            )
+        else:  # 当不存在缓存的 token 和 cookies 时利用用户名密码初始化
+            simulation = Simulation(
+                official_account=self.official_account,
+                wechat_basic=self.wechat,
+                username=self.official_account.username,
+                password=self.official_account.password,
+            )
+
+        return simulation
+
+    def _get_simulation_match_fakeid(self, simulation):
+        """
+        获取模拟登陆关系匹配 (OpenID和Fakeid的对应)
+        :param simulation: 模拟登陆实例 (Simulation)
+        :return: 匹配到的 fakeid 值
+        :raises PluginSimulationError: 当模拟登陆匹配失败时抛出
+        """
+        simulation_match = SimulationMatch.manager.get(official_account=self.official_account, openid=self.message.source)
+        fakeid = None
+        if simulation_match:
+            fakeid = simulation_match.fakeid
+        else:
+            fakeid_list = simulation.find_latest_user()
+            if len(fakeid_list) == 1:
+                logger_plugin.debug('A user matched [FakeidList] %s [OfficialAccount] %s' % (fakeid_list, self.official_account.__dict__))
+                # 添加模拟关系对应
+                SimulationMatch.manager.add(
+                    official_account=self.official_account,
+                    openid=self.message.source,
+                    fakeid=fakeid_list[0],
+                )
+                fakeid = fakeid_list[0]
+            elif len(fakeid_list) == 0:
+                logger_plugin.debug('No user matched [OfficialAccount] %s' % self.official_account.__dict__)
+                raise PluginSimulationError('No user matched')
+            else:
+                logger_plugin.debug('Multiple users matched [FakeidList] %s [OfficialAccount] %s' % (fakeid_list, self.official_account.__dict__))
+                raise PluginSimulationError('Multiple users matched')
+
+        return fakeid
 
     def _best_pattern(self, response_type):
         """
