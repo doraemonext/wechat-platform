@@ -41,3 +41,16 @@ class PluginSystemNews(PluginProcessorSystem):
         else:
             if news_instances[0].msgid:
                 return self.response_news(pattern=pattern, msgid=news_instances[0].msgid)
+            else:
+                for news in news_instances:
+                    news_dealt.append({
+                        'title': news.title,
+                        'author': news.author,
+                        'summary': news.description,
+                        'content': news.content,
+                        'picture_id': news.picture_id,
+                        'picture': news.picture,
+                        'picurl': news.picurl,
+                        'from_url': news.from_url,
+                    })
+                return self.response_news(pattern=pattern, news=news_dealt)

@@ -23,8 +23,8 @@ class LibraryNewsManager(models.Manager):
         新建一个完整的图文信息
         :param official_account: 所属公众号 (OfficialAccount)
         :param news: 一个 list 对象, 每个元素为一个 dict 对象, key 包括 'title', 'description', 'picurl',
-                     'url', 'author', 'content', 'picture', 'picture_id', 'msgid', 对应 value 解释见 LibraryNews Model,
-                     除 'title' 外所有 key 值均为可选
+                     'url', 'author', 'content', 'picture', 'picture_id', 'from_url', 'msgid', 对应 value 解释见
+                     LibraryNews Model, 除 'title' 外所有 key 值均为可选
         :return: 第一条图文的实例 (LibraryNews)
         """
         parent = None
@@ -40,7 +40,8 @@ class LibraryNewsManager(models.Manager):
                 author=item.get('author'),
                 content=item.get('content'),
                 picture=item.get('picture'),
-                picture_id=item.get('picture_id'),
+                picture_id=item.get('picture_id', 0),
+                from_url=item.get('from_url'),
                 msgid=item.get('msgid'),
             )
             if not first_instance:
@@ -79,7 +80,8 @@ class LibraryNews(models.Model):
     author = models.CharField(u'图文作者', max_length=100, blank=True, null=True)
     content = models.TextField(u'图文内容', blank=True, null=True)
     picture = models.ImageField(u'图片存储地址', blank=True, null=True)
-    picture_id = models.CharField(u'素材库中的图片ID', max_length=50, blank=True, null=True)
+    picture_id = models.IntegerField(u'素材库中的图片ID', default=0)
+    from_url = models.CharField(u'来源URL', max_length=1024, blank=True, null=True)
     msgid = models.BigIntegerField(u'公众平台图文ID号', blank=True, null=True)
 
     objects = models.Manager()

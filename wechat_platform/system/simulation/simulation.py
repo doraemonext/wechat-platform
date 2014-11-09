@@ -126,6 +126,7 @@ class Simulation(object):
         :param count: 获取数目
         :param day: 最近几天消息 (0: 今天, 1: 昨天, 2: 前天, 3: 更早, 7: 全部), 这里的全部仅有5天
         :param star: 是否只获取星标消息
+        :return: 返回的数据, dict形式
         :raises SimulationException: 当模拟登陆登录失败时抛出
         """
         for i in range(0, 2):
@@ -133,6 +134,125 @@ class Simulation(object):
                 try:
                     message_list_json = self.wechat_ext.get_message_list(lastid=lastid, offset=offset, count=count, day=day, star=star)
                     return json.loads(message_list_json)
+                except NeedLoginError, e:
+                    self.login()
+            except LoginError, e:
+                logger_simulation.error('Simulated login failed: %s [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+                    e,
+                    self.official_account.__dict__,
+                    self.wechat_basic.__dict__,
+                    self.wechat_ext.__dict__,
+                ))
+                raise SimulationException(e)
+        logger_simulation.error('Simulated login failed [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+            self.official_account.__dict__,
+            self.wechat_basic.__dict__,
+            self.wechat_ext.__dict__,
+        ))
+        raise SimulationException('login error')
+
+    def get_news_list(self, page, pagesize=10):
+        """
+        获取图文信息列表
+
+        返回JSON示例::
+
+            [
+                {
+                    "multi_item": [
+                        {
+                            "seq": 0,
+                            "title": "98路公交线路",
+                            "show_cover_pic": 1,
+                            "author": "",
+                            "cover": "https://mmbiz.qlogo.cn/mmbiz/D2pflbZwStFibz2Sb1kWOuHrxtDMPKJic3GQgcgkDSoEm668gClFVDt3BR8GGQ5eB8HoL4vDezzKtSblIjckOf7A/0",
+                            "content_url": "http://mp.weixin.qq.com/s?__biz=MjM5MTA2ODcwOA==&mid=204884970&idx=1&sn=bf25c51f07260d4ed38305a1cbc0ce0f#rd",
+                            "source_url": "",
+                            "file_id": 204884939,
+                            "digest": "98路线路1.农大- 2.金阳小区- 3.市客运司- 4.市制药厂- 5.新农大- 6.独山子酒店- 7.三"
+                        }
+                    ],
+                    "seq": 0,
+                    "title": "98路公交线路",
+                    "show_cover_pic": 1,
+                    "author": "",
+                    "app_id": 204884970,
+                    "content_url": "http://mp.weixin.qq.com/s?__biz=MjM5MTA2ODcwOA==&mid=204884970&idx=1&sn=bf25c51f07260d4ed38305a1cbc0ce0f#rd",
+                    "create_time": "1405237966",
+                    "file_id": 204884939,
+                    "img_url": "https://mmbiz.qlogo.cn/mmbiz/D2pflbZwStFibz2Sb1kWOuHrxtDMPKJic3GQgcgkDSoEm668gClFVDt3BR8GGQ5eB8HoL4vDezzKtSblIjckOf7A/0",
+                    "digest": "98路线路1.农大- 2.金阳小区- 3.市客运司- 4.市制药厂- 5.新农大- 6.独山子酒店- 7.三"
+                },
+                {
+                    "multi_item": [
+                        {
+                            "seq": 0,
+                            "title": "2013年新疆软件园大事记",
+                            "show_cover_pic": 0,
+                            "author": "",
+                            "cover": "https://mmbiz.qlogo.cn/mmbiz/D2pflbZwStFibz2Sb1kWOuHrxtDMPKJic3icvFgkxZRyIrkLbic9I5ZKLa3XB8UqNlkT8CYibByHuraSvVoeSzdTRLQ/0",
+                            "content_url": "http://mp.weixin.qq.com/s?__biz=MjM5MTA2ODcwOA==&mid=204883415&idx=1&sn=68d62215052d29ece3f2664e9c4e8cab#rd",
+                            "source_url": "",
+                            "file_id": 204883412,
+                            "digest": "1月1．新疆软件园展厅设计方案汇报会2013年1月15日在维泰大厦4楼9号会议室召开新疆软件园展厅设计工作完"
+                        },
+                        {
+                            "seq": 1,
+                            "title": "2012年新疆软件园大事记",
+                            "show_cover_pic": 0,
+                            "author": "",
+                            "cover": "https://mmbiz.qlogo.cn/mmbiz/D2pflbZwStFibz2Sb1kWOuHrxtDMPKJic3oErGEhSicRQc82icibxZOZ2YAGNgiaGYfOFYppmPzOOS0v1xfZ1nvyT58g/0",
+                            "content_url": "http://mp.weixin.qq.com/s?__biz=MjM5MTA2ODcwOA==&mid=204883415&idx=2&sn=e7db9b30d770c85c61008d2f523b8610#rd",
+                            "source_url": "",
+                            "file_id": 204883398,
+                            "digest": "1月1．新疆软件园环评顺利通过专家会评审2012年1月30日，新疆软件园环境影响评价顺利通过专家会评审，与会"
+                        },
+                        {
+                            "seq": 2,
+                            "title": "2011年新疆软件园大事记",
+                            "show_cover_pic": 0,
+                            "author": "",
+                            "cover": "https://mmbiz.qlogo.cn/mmbiz/D2pflbZwStFibz2Sb1kWOuHrxtDMPKJic3qA7tEN8GvkgDwnOfKsGsicJeQ6PxQSgWuJXfQaXkpM4VNlQicOWJM4Tg/0",
+                            "content_url": "http://mp.weixin.qq.com/s?__biz=MjM5MTA2ODcwOA==&mid=204883415&idx=3&sn=4cb1c6d25cbe6dfeff37f52a62532bd0#rd",
+                            "source_url": "",
+                            "file_id": 204883393,
+                            "digest": "6月1．软件园召开第一次建设领导小组会议2011年6月7日，第一次软件园建设领导小组会议召开，会议认为，新疆"
+                        },
+                        {
+                            "seq": 3,
+                            "title": "2010年新疆软件园大事记",
+                            "show_cover_pic": 0,
+                            "author": "",
+                            "cover": "https://mmbiz.qlogo.cn/mmbiz/D2pflbZwStFibz2Sb1kWOuHrxtDMPKJic3YG4sSuf9X9ecMPjDRju842IbIvpFWK7tuZs0Po4kZCz4URzOBj5rnQ/0",
+                            "content_url": "http://mp.weixin.qq.com/s?__biz=MjM5MTA2ODcwOA==&mid=204883415&idx=4&sn=4319f7f051f36ed972e2f05a221738ec#rd",
+                            "source_url": "",
+                            "file_id": 204884043,
+                            "digest": "5月1．新疆软件园与开发区（头屯河区）管委会、经信委签署《新疆软件园建设战略合作协议》2010年5月12日，"
+                        }
+                    ],
+                    "seq": 1,
+                    "title": "2013年新疆软件园大事记",
+                    "show_cover_pic": 0,
+                    "author": "",
+                    "app_id": 204883415,
+                    "content_url": "http://mp.weixin.qq.com/s?__biz=MjM5MTA2ODcwOA==&mid=204883415&idx=1&sn=68d62215052d29ece3f2664e9c4e8cab#rd",
+                    "create_time": "1405232974",
+                    "file_id": 204883412,
+                    "img_url": "https://mmbiz.qlogo.cn/mmbiz/D2pflbZwStFibz2Sb1kWOuHrxtDMPKJic3icvFgkxZRyIrkLbic9I5ZKLa3XB8UqNlkT8CYibByHuraSvVoeSzdTRLQ/0",
+                    "digest": "1月1．新疆软件园展厅设计方案汇报会2013年1月15日在维泰大厦4楼9号会议室召开新疆软件园展厅设计工作完"
+                }
+            ]
+
+        :param page: 页码 (从 0 开始)
+        :param pagesize: 每页数目
+        :return: 返回的数据, dict形式
+        :raises SimulationException: 当模拟登陆登录失败时抛出
+        """
+        for i in range(0, 2):
+            try:
+                try:
+                    news_list_json = self.wechat_ext.get_news_list(page=page, pagesize=pagesize)
+                    return json.loads(news_list_json)
                 except NeedLoginError, e:
                     self.login()
             except LoginError, e:
@@ -192,6 +312,57 @@ class Simulation(object):
             try:
                 try:
                     self.wechat_ext.send_news(fakeid=fakeid, msgid=msgid)
+                    return
+                except NeedLoginError:
+                    self.login()
+            except LoginError, e:
+                logger_simulation.error('Simulated login failed: %s [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+                    e,
+                    self.official_account.__dict__,
+                    self.wechat_basic.__dict__,
+                    self.wechat_ext.__dict__,
+                ))
+                raise SimulationException(e)
+        logger_simulation.error('Simulated login failed [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+            self.official_account.__dict__,
+            self.wechat_basic.__dict__,
+            self.wechat_ext.__dict__,
+        ))
+        raise SimulationException('login error')
+
+    def add_news(self, news):
+        """
+        在素材库中创建图文消息
+
+        :param news: list 对象, 其中的每个元素为一个 dict 对象, 代表一条图文, key 值分别为 ``title``, ``author``, ``summary``,
+                     ``content``, ``picture_id``, ``from_url``, 对应内容为标题, 作者, 摘要, 内容, 素材库里的
+                     图片ID(可通过 ``upload_file`` 函数上传获取), 来源链接。
+
+                     其中必须提供的 key 值为 ``title`` 和 ``content``
+
+                     示例::
+
+                         [
+                             {
+                                 'title': '图文标题',
+                                 'author': '图文作者',
+                                 'summary': '图文摘要',
+                                 'content': '图文内容',
+                                 'picture_id': '23412341',
+                                 'from_url': 'http://www.baidu.com',
+                             },
+                             {
+                                 'title': '最少图文标题',
+                                 'content': '图文内容',
+                             }
+                         ]
+        :raises ValueError: 参数提供错误时抛出
+        :raises SimulationException: 当模拟登陆登录失败时抛出
+        """
+        for i in range(0, 2):
+            try:
+                try:
+                    self.wechat_ext.add_news(news=news)
                     return
                 except NeedLoginError:
                     self.login()

@@ -13,6 +13,7 @@ from system.simulation.models import SimulationMatch
 from system.official_account.models import OfficialAccount
 from system.plugin import PluginLoadError, PluginResponseError, PluginSimulationError
 from system.response.models import Response
+from system.library.news.models import LibraryNews
 
 
 logger_plugin = logging.getLogger(__name__)
@@ -203,6 +204,68 @@ class PluginProcessor(object):
                     }
                 )
                 return None
+            else:
+                if not news:
+                    raise ValueError('The news cannot be empty')
+
+                msgid = None
+                # 向微信公众平台素材库中添加该图文信息
+                news_dealt = []
+                for item in news:
+                    if 'title' not in item or 'content' not in item:
+                        raise ValueError('The news item needs to provide at least two arguments: title, content')
+                    for x in item:  # 将除 picture_id 的所有空字段置为空字符串
+                        if x != 'picture_id' and not item[x]:
+                            item[x] = ''
+                    news_dealt.append({
+                        'title': item.get('title'),
+                        'author': item.get('author', ''),
+                        'summary': item.get('description', ''),
+                        'content': item.get('content'),
+                        'picture_id': self._get_news_picture_id(item),
+                        'from_url': item.get('from_url', ''),
+                    })
+                try:
+                    simulation.add_news(news=news_dealt)
+                    # 获取素材库中的图文列表并得到刚才添加的图文的 msgid
+                    news_list = simulation.get_news_list(page=0)
+                    for news in news_list:
+                        is_match = True
+                        for item in news['multi_item']:
+                            index = item['seq']
+                            if item['title'] != news_dealt[index]['title'] or item['author'] != news_dealt[index]['author'] or \
+                                item['digest'] != news_dealt[index]['summary'] or item['file_id'] != news_dealt[index]['picture_id'] or \
+                                item['source_url'] != news_dealt[index]['from_url']:
+                                is_match = False
+                                break
+                        if is_match:
+                            msgid = news['app_id']
+                            break
+                    # 将得到的 msgid 存储到数据库中
+                    library_news = LibraryNews.objects.get(pk=self.reply_id)
+                    library_news.msgid = msgid
+                    library_news.save()
+                except SimulationException, e:
+                    raise PluginResponseError(e)
+
+                # 向用户发送图文
+                try:
+                    simulation.send_news(fakeid=fakeid, msgid=msgid)
+                except SimulationException, e:
+                    raise PluginResponseError(e)
+
+                Response.manager.add(
+                    official_account=self.official_account,
+                    wechat_instance=self.wechat,
+                    type=Response.TYPE_NEWS,
+                    pattern=Response.PATTERN_SIMULATION,
+                    raw=str(msgid),
+                    plugin_dict={
+                        'iden': 'news',
+                        'reply_id': self.reply_id,
+                    }
+                )
+                return None
         else:
             raise ValueError('Invalid pattern with response news')
 
@@ -263,6 +326,25 @@ class PluginProcessor(object):
             )
 
         return simulation
+
+    def _get_news_picture_id(self, news_item):
+        """
+        获取单条图文的 picture_id
+        :param news_item: 单条图文 dict
+        :return: picture_id
+        """
+        picture_id = news_item.get('picture_id')
+        picture = news_item.get('picture')
+        picurl = news_item.get('picurl')
+
+        if picture_id:
+            return picture_id
+        elif picture:
+            pass
+        elif picurl:
+            pass
+        else:
+            return 0
 
     def _get_simulation_match_fakeid(self, simulation):
         """
