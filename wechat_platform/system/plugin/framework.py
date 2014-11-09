@@ -186,29 +186,10 @@ class PluginProcessor(object):
             except PluginSimulationError, e:
                 raise PluginResponseError(e)
 
-            if msgid:
-                try:
-                    simulation.send_news(fakeid=fakeid, msgid=msgid)
-                except SimulationException, e:
-                    raise PluginResponseError(e)
-
-                Response.manager.add(
-                    official_account=self.official_account,
-                    wechat_instance=self.wechat,
-                    type=Response.TYPE_NEWS,
-                    pattern=Response.PATTERN_SIMULATION,
-                    raw=str(msgid),
-                    plugin_dict={
-                        'iden': 'news',
-                        'reply_id': self.reply_id,
-                    }
-                )
-                return None
-            else:
+            if not msgid:  # 当该图文尚未被上传到素材库中时, 执行上传操作
                 if not news:
                     raise ValueError('The news cannot be empty')
 
-                msgid = None
                 # 向微信公众平台素材库中添加该图文信息
                 news_dealt = []
                 for item in news:
@@ -241,6 +222,7 @@ class PluginProcessor(object):
                         if is_match:
                             msgid = news['app_id']
                             break
+
                     # 将得到的 msgid 存储到数据库中
                     library_news = LibraryNews.objects.get(pk=self.reply_id)
                     library_news.msgid = msgid
@@ -248,24 +230,24 @@ class PluginProcessor(object):
                 except SimulationException, e:
                     raise PluginResponseError(e)
 
-                # 向用户发送图文
-                try:
-                    simulation.send_news(fakeid=fakeid, msgid=msgid)
-                except SimulationException, e:
-                    raise PluginResponseError(e)
+            # 向用户 fakeid 发送素材库中的图文 msgid
+            try:
+                simulation.send_news(fakeid=fakeid, msgid=msgid)
+            except SimulationException, e:
+                raise PluginResponseError(e)
 
-                Response.manager.add(
-                    official_account=self.official_account,
-                    wechat_instance=self.wechat,
-                    type=Response.TYPE_NEWS,
-                    pattern=Response.PATTERN_SIMULATION,
-                    raw=str(msgid),
-                    plugin_dict={
-                        'iden': 'news',
-                        'reply_id': self.reply_id,
-                    }
-                )
-                return None
+            Response.manager.add(
+                official_account=self.official_account,
+                wechat_instance=self.wechat,
+                type=Response.TYPE_NEWS,
+                pattern=Response.PATTERN_SIMULATION,
+                raw=str(msgid),
+                plugin_dict={
+                    'iden': 'news',
+                    'reply_id': self.reply_id,
+                }
+            )
+            return None
         else:
             raise ValueError('Invalid pattern with response news')
 
