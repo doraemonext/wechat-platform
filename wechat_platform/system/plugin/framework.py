@@ -157,7 +157,7 @@ class PluginProcessor(object):
         :param pattern: 发送模式, 可选字符串: 'basic'(基本被动响应发送模式), 'service'(多客服发送模式),
                         'simulation'(模拟登陆发送模式)
         :param news: list 对象, 每个元素为一个 dict 对象, key 可包含 title, description, picurl, url, author, content,
-                     picture, picture_id, 分别对应的含义为图文标题, 图文摘要描述, 封面图片URL, 跳转地址, 作者, 图文内容,
+                     picture, picture_id, msgid, 分别对应的含义为图文标题, 图文摘要描述, 封面图片URL, 跳转地址, 作者, 图文内容,
                      封面图片File, 封面图片在素材库中的ID, 该图文在素材库中的ID
         :param msgid: 图文在素材库中的 ID, 仅用于模拟登陆发送模式下
         :raises ValueError: 参数提供错误时抛出 (如 news 不符合要求)
@@ -187,52 +187,10 @@ class PluginProcessor(object):
                 raise PluginResponseError(e)
 
             if not msgid:  # 当该图文尚未被上传到素材库中时, 执行上传操作
-                if not news:
-                    raise ValueError('The news cannot be empty')
+                msgid = self._get_news_msgid(news=news, simulation=simulation)
 
-                # 向微信公众平台素材库中添加该图文信息
-                news_dealt = []
-                for item in news:
-                    if 'title' not in item or 'content' not in item:
-                        raise ValueError('The news item needs to provide at least two arguments: title, content')
-                    for x in item:  # 将除 picture_id 的所有空字段置为空字符串
-                        if x != 'picture_id' and not item[x]:
-                            item[x] = ''
-                    news_dealt.append({
-                        'title': item.get('title'),
-                        'author': item.get('author', ''),
-                        'summary': item.get('description', ''),
-                        'content': item.get('content'),
-                        'picture_id': self._get_news_picture_id(item),
-                        'from_url': item.get('from_url', ''),
-                    })
-                try:
-                    simulation.add_news(news=news_dealt)
-                    # 获取素材库中的图文列表并得到刚才添加的图文的 msgid
-                    news_list = simulation.get_news_list(page=0)
-                    for news in news_list:
-                        is_match = True
-                        for item in news['multi_item']:
-                            index = item['seq']
-                            if item['title'] != news_dealt[index]['title'] or item['author'] != news_dealt[index]['author'] or \
-                                item['digest'] != news_dealt[index]['summary'] or item['file_id'] != news_dealt[index]['picture_id'] or \
-                                item['source_url'] != news_dealt[index]['from_url']:
-                                is_match = False
-                                break
-                        if is_match:
-                            msgid = news['app_id']
-                            break
-
-                    # 将得到的 msgid 存储到数据库中
-                    library_news = LibraryNews.objects.get(pk=self.reply_id)
-                    library_news.msgid = msgid
-                    library_news.save()
-                except SimulationException, e:
-                    raise PluginResponseError(e)
-
-            # 向用户 fakeid 发送素材库中的图文 msgid
             try:
-                simulation.send_news(fakeid=fakeid, msgid=msgid)
+                simulation.send_news(fakeid=fakeid, msgid=msgid)  # 向用户 fakeid 发送素材库中的图文 msgid
             except SimulationException, e:
                 raise PluginResponseError(e)
 
@@ -308,6 +266,61 @@ class PluginProcessor(object):
             )
 
         return simulation
+
+    def _get_news_msgid(self, news, simulation):
+        """
+        将 news 中的图文上传到微信素材库中并返回该整套图文的 msgid
+        :param news: list 对象, 每个元素为一个 dict 对象, key 可包含 title, description, picurl, url, author, content,
+                     picture, picture_id, 分别对应的含义为图文标题, 图文摘要描述, 封面图片URL, 跳转地址, 作者, 图文内容,
+                     封面图片File, 封面图片在素材库中的ID
+        :param simulation:
+        :return:
+        """
+        if not news:
+            raise ValueError('The news cannot be empty')
+
+        msgid = None
+        # 向微信公众平台素材库中添加该图文信息
+        news_dealt = []
+        for item in news:
+            if 'title' not in item or 'content' not in item:
+                raise ValueError('The news item needs to provide at least two arguments: title, content')
+            for x in item:  # 将除 picture_id 的所有空字段置为空字符串
+                if x != 'picture_id' and not item[x]:
+                    item[x] = ''
+            news_dealt.append({
+                'title': item.get('title'),
+                'author': item.get('author', ''),
+                'summary': item.get('description', ''),
+                'content': item.get('content'),
+                'picture_id': self._get_news_picture_id(item),
+                'from_url': item.get('from_url', ''),
+            })
+        try:
+            simulation.add_news(news=news_dealt)
+            # 获取素材库中的图文列表并得到刚才添加的图文的 msgid
+            news_list = simulation.get_news_list(page=0)
+            for news in news_list:
+                is_match = True
+                for item in news['multi_item']:
+                    index = item['seq']
+                    if item['title'] != news_dealt[index]['title'] or item['author'] != news_dealt[index]['author'] or \
+                        item['digest'] != news_dealt[index]['summary'] or item['file_id'] != news_dealt[index]['picture_id'] or \
+                        item['source_url'] != news_dealt[index]['from_url']:
+                        is_match = False
+                        break
+                if is_match:
+                    msgid = news['app_id']
+                    break
+
+            # 将得到的 msgid 存储到数据库中
+            library_news = LibraryNews.objects.get(pk=self.reply_id)
+            library_news.msgid = msgid
+            library_news.save()
+        except SimulationException, e:
+            raise PluginResponseError(e)
+
+        return msgid
 
     def _get_news_picture_id(self, news_item):
         """
