@@ -20,18 +20,37 @@ class PluginSystemNews(PluginProcessorSystem):
     def process(self):
         try:
             root = LibraryNews.objects.get(pk=self.reply_id)
-            news_instances = [root] + LibraryNews.manager.get(official_account=root.official_account, root=root)
-            news_list = []
+        except ObjectDoesNotExist:
+            logger_plugins.warning('No reply id %s found when get content from news library' % self.reply_id)
+            raise PluginRuntimeError('No reply id %s found when get content from news library' % self.reply_id)
+
+        pattern = self.best_pattern(response_type='news')
+        news_dealt = []
+        news_instances = LibraryNews.manager.get(official_account=root.official_account, root=root)
+        if pattern == 'basic':
             for news in news_instances:
-                news_list.append({
+                news_dealt.append({
                     'title': news.title,
                     'description': news.description,
                     'picurl': news.picurl,
                     'url': news.url,
                 })
-            logger_plugins.debug(news_instances)
-        except ObjectDoesNotExist:
-            logger_plugins.warning('No reply id %s found when get content from news library' % self.reply_id)
-            raise PluginRuntimeError('No reply id %s found when get content from news library' % self.reply_id)
-
-        return self.response_news(news=news_list)
+            return self.response_news(pattern=pattern, news=news_dealt)
+        elif pattern == 'service':
+            pass
+        else:
+            if news_instances[0].msgid:
+                return self.response_news(pattern=pattern, msgid=news_instances[0].msgid)
+            else:
+                for news in news_instances:
+                    news_dealt.append({
+                        'title': news.title,
+                        'author': news.author,
+                        'summary': news.description,
+                        'content': news.content,
+                        'picture_id': news.picture_id,
+                        'picture': news.picture,
+                        'picurl': news.picurl,
+                        'from_url': news.from_url,
+                    })
+                return self.response_news(pattern=pattern, news=news_dealt)

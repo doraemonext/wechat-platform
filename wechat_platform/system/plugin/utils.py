@@ -21,3 +21,10 @@ class PluginRuntimeError(PluginException):
 
 class PluginResponseError(PluginException):
     pass
+
+
+class PluginSimulationError(PluginException):
+    """
+    插件模拟登陆出错
+    """
+    pass
