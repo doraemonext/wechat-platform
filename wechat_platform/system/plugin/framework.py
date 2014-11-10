@@ -16,6 +16,7 @@ from system.simulation.models import SimulationMatch
 from system.official_account.models import OfficialAccount
 from system.plugin import PluginLoadError, PluginResponseError, PluginSimulationError
 from system.response.models import Response
+from system.library.music.models import LibraryMusic
 from system.library.news.models import LibraryNews
 from system.library.voice.models import LibraryVoice
 from system.library.image.models import LibraryImage
@@ -220,32 +221,54 @@ class PluginProcessor(object):
     def response_video(self, video):
         pass
 
-    def response_music(self, music_url, title=None, description=None, hq_music_url=None, thumb_media_id=None, pattern='auto'):
+    def response_music_basic(self, music_url, title=None, description=None, hq_music_url=None, thumb_media_id=None):
         """
-        向用户发送音乐消息
+        返回用于插件返回值的音乐XML数据 (基本模式)
         :param music_url: 音乐URL
         :param title: 音乐标题
         :param description: 音乐描述
         :param hq_music_url: 高清音乐URL (不传入则使用音乐URL)
         :param thumb_media_id: 缩略图媒体ID
-        :param pattern: 发送模式, 可选字符串: 'auto'(自动选择), 'basic'(基本被动响应发送模式), 'service'(多客服发送模式)
+        :return: 生成音乐XML数据
+        """
+        return self.wechat.response_music(
+            music_url=music_url,
+            title=title,
+            description=description,
+            hq_music_url=hq_music_url,
+            thumb_media_id=thumb_media_id
+        )
+
+    def response_music_library(self, library_id, pattern='auto'):
+        """
+        向用户发送本地音乐库中已有的音乐
+        :param library_id: 音乐在本地素材库中的ID
+        :param pattern: 发送模式, 可选字符串: 'auto'(自动选择), 'basic'(基本被动响应发送模式), 'service'(多客服发送模式),
+        :return: 当 pattern 为 'basic' 时, 返回值为该图文的XML数据, 需要作为插件返回值返回方可生效;
+                 当 pattern 为 'service' 时, 返回值为 None
         """
         if pattern == 'auto':
             pattern = self.best_pattern(response_type='music')
 
+        try:
+            music = LibraryMusic.manager.get(
+                official_account=self.official_account,
+                plugin_iden=self.plugin.iden,
+                music_id=library_id
+            )
+        except ObjectDoesNotExist, e:
+            raise PluginResponseError(e)
+
         if pattern == 'basic':
             return self.wechat.response_music(
-                music_url=music_url,
-                title=title,
-                description=description,
-                hq_music_url=hq_music_url,
-                thumb_media_id=thumb_media_id
+                music_url=music.music_url,
+                title=music.title,
+                description=music.description,
+                hq_music_url=music.hq_music_url,
+                thumb_media_id=music.thumb_media_id
             )
-        elif pattern == 'service':
-            raise Exception('have not yet implemented')
         else:
-            logger_plugin.warning('Simulation is not available in music plugin')
-            raise PluginResponseError('Simulation is not available in music plugin')
+            raise Exception('have not yet implemented')
 
     def response_news_basic(self, news=None):
         """

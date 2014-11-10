@@ -10,15 +10,17 @@ class LibraryMusicTest(WechatTestCase):
         """
         测试添加新的音乐素材
         """
-        official_account = OfficialAccount.manager.add(level=OfficialAccount.LEVEL_1, name='Ace Kwok', email='doraemonext@gmail.com', original='original', wechat='wechat')
+        official_account = self.make_official_account(level=OfficialAccount.LEVEL_2)
         music = LibraryMusic.manager.add(
             official_account=official_account,
+            plugin_iden='music',
             title='music',
             description='description',
             music_url='http://www.google.com',
             hq_music_url='http://www.music.com',
         )
         self.assertEqual(music.official_account, official_account)
+        self.assertEqual(music.plugin_iden, 'music')
         self.assertEqual(music.title, 'music')
         self.assertEqual(music.description, 'description')
         self.assertEqual(music.music_url, 'http://www.google.com')

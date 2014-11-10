@@ -9,13 +9,30 @@ class LibraryMusicManager(models.Manager):
     """
     素材库 - 音乐库 Manager
     """
-    def add(self, official_account, title=None, description=None, music_url=None, hq_music_url=None,
+    def get(self, official_account, plugin_iden, music_id):
+        """
+        获取一首音乐
+        :param official_account: 所属公众号 (OfficialAccount)
+        :param plugin_iden: 所属插件标识符
+        :param music_id: 音乐在库中的ID
+        :return: 音乐实例 (LibraryMusic)
+        """
+        return super(LibraryMusicManager, self).get_queryset().filter(
+            official_account=official_account
+        ).filter(
+            plugin_iden=plugin_iden
+        ).get(
+            pk=music_id
+        )
+
+    def add(self, official_account, plugin_iden, title=None, description=None, music_url=None, hq_music_url=None,
             thumb_media_id=None, music=None, hq_music=None, thumb_media=None):
         """
         添加一条新的音乐素材
         """
         return super(LibraryMusicManager, self).create(
             official_account=official_account,
+            plugin_iden=plugin_iden,
             title=title,
             description=description,
             music_url=music_url,
@@ -32,6 +49,7 @@ class LibraryMusic(models.Model):
     素材库 - 音乐库
     """
     official_account = models.ForeignKey(OfficialAccount, verbose_name=u'所属公众号')
+    plugin_iden = models.CharField(u'所属插件标识符', max_length=50)
     title = models.CharField(u'音乐标题', max_length=255, blank=True, null=True)
     description = models.TextField(u'音乐描述', blank=True, null=True)
     music_url = models.CharField(u'音乐URL', max_length=1024, blank=True, null=True)
