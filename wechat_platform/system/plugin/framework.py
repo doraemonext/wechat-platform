@@ -3,7 +3,9 @@
 import logging
 import os
 import sys
+import requests
 from imp import find_module, load_module, acquire_lock, release_lock
+from tempfile import mkstemp
 
 from django.conf import settings
 from wechat_sdk import WechatExt
@@ -171,6 +173,7 @@ class PluginProcessor(object):
                 if 'title' not in item:
                     raise ValueError('The news item needs to provide at least one argument: title')
                 news_dealt.append({
+                    'id': item.get('id'),
                     'title': item.get('title'),
                     'description': item.get('description'),
                     'picurl': item.get('picurl'),
@@ -289,11 +292,12 @@ class PluginProcessor(object):
                 if x != 'picture_id' and not item[x]:
                     item[x] = ''
             news_dealt.append({
+                'id': item.get('id'),
                 'title': item.get('title'),
                 'author': item.get('author', ''),
                 'summary': item.get('description', ''),
                 'content': item.get('content'),
-                'picture_id': self._get_news_picture_id(item),
+                'picture_id': self._get_news_picture_id(simulation=simulation, item=item),
                 'from_url': item.get('from_url', ''),
             })
         try:
@@ -322,24 +326,50 @@ class PluginProcessor(object):
 
         return msgid
 
-    def _get_news_picture_id(self, news_item):
+    def _get_news_picture_id(self, simulation, item):
         """
         获取单条图文的 picture_id
-        :param news_item: 单条图文 dict
+        :param simulation: 模拟登陆实例 (Simulation)
+        :param item: 单条图文 dict
         :return: picture_id
         """
-        picture_id = news_item.get('picture_id')
-        picture = news_item.get('picture')
-        picurl = news_item.get('picurl')
+        picture_id = item.get('picture_id')
+        picture = item.get('picture')
+        picurl = item.get('picurl')
 
         if picture_id:
             return picture_id
-        elif picture:
-            pass
-        elif picurl:
-            pass
-        else:
-            return 0
+        if picture:
+            try:
+                fid = simulation.upload_file(filepath=picture.path)
+
+                # 将取得的文件ID作为该图文的图片ID存入数据库
+                library_news = LibraryNews.objects.get(pk=item.get('id'))
+                library_news.picture_id = fid
+                library_news.save()
+
+                return int(fid)  # 需要将文件ID转为int型
+            except SimulationException:  # 出现模拟登录错误时放弃上传, 继续向下尝试
+                pass
+        if picurl:
+            try:
+                r = requests.get(picurl, stream=True)
+                tmpfile_path = mkstemp(suffix='.png')[1]
+                with open(tmpfile_path, 'wb') as fd:
+                    for chunk in r.iter_content(1024):
+                        fd.write(chunk)
+
+                fid = simulation.upload_file(filepath=tmpfile_path)
+                # 将取得的文件ID作为该图文的图片ID存入数据库
+                library_news = LibraryNews.objects.get(pk=item.get('id'))
+                library_news.picture_id = fid
+                library_news.save()
+                return int(fid)  # 需要将文件ID转为int型
+            except Exception, e:  # 出现任何问题直接放弃添加图片
+                logger_plugin.warning('Failed to download image from url: %s [Detail: %s]' % (picurl, e))
+                pass
+
+        return 0  # 当图片不存在时返回 0 表示图文中不会添加图片
 
     def _get_simulation_match_fakeid(self, simulation):
         """
