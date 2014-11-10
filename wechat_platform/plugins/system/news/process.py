@@ -30,6 +30,7 @@ class PluginSystemNews(PluginProcessorSystem):
         if pattern == 'basic':
             for news in news_instances:
                 news_dealt.append({
+                    'id': news.pk,
                     'title': news.title,
                     'description': news.description,
                     'picurl': news.picurl,
@@ -44,6 +45,7 @@ class PluginSystemNews(PluginProcessorSystem):
             else:
                 for news in news_instances:
                     news_dealt.append({
+                        'id': news.pk,
                         'title': news.title,
                         'author': news.author,
                         'summary': news.description,

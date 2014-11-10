@@ -380,3 +380,32 @@ class Simulation(object):
             self.wechat_ext.__dict__,
         ))
         raise SimulationException('login error')
+
+    def upload_file(self, filepath):
+        """
+        上传素材 (图片/音频/视频)
+        :param filepath: 本地文件路径
+        :return: 直接返回上传后的文件 ID (fid)
+        :raises ValueError: 参数出错, 错误原因直接打印异常即可 (常见错误内容: ``file not exist``: 找不到本地文件, ``audio too long``: 音频文件过长, ``file invalid type``: 文件格式不正确, 还有其他错误请自行检查)
+        :raises SimulationException: 当模拟登陆登录失败时抛出
+        """
+        for i in range(0, 2):
+            try:
+                try:
+                    return self.wechat_ext.upload_file(filepath=filepath)
+                except NeedLoginError:
+                    self.login()
+            except LoginError, e:
+                logger_simulation.error('Simulated login failed: %s [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+                    e,
+                    self.official_account.__dict__,
+                    self.wechat_basic.__dict__,
+                    self.wechat_ext.__dict__,
+                ))
+                raise SimulationException(e)
+        logger_simulation.error('Simulated login failed [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+            self.official_account.__dict__,
+            self.wechat_basic.__dict__,
+            self.wechat_ext.__dict__,
+        ))
+        raise SimulationException('login error')
