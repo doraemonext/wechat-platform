@@ -409,3 +409,63 @@ class Simulation(object):
             self.wechat_ext.__dict__,
         ))
         raise SimulationException('login error')
+
+    def send_file(self, fakeid, fid, type):
+        """
+        向特定用户发送媒体文件
+        :param fakeid: 用户 UID (即 fakeid)
+        :param fid: 文件 ID
+        :param type: 文件类型 (2: 图片, 3: 音频, 4: 视频)
+        :raises ValueError: 参数出错, 错误原因直接打印异常即可 (常见错误内容: ``system error`` 或 ``can not send this type of msg``: 文件类型不匹配, ``user not exist``: 用户 fakeid 不存在, ``file not exist``: 文件 fid 不存在, 还有其他错误请自行检查)
+        :raises SimulationException: 当模拟登陆登录失败时抛出
+        """
+        for i in range(0, 2):
+            try:
+                try:
+                    return self.wechat_ext.send_file(fakeid=fakeid, fid=fid, type=type)
+                except NeedLoginError:
+                    self.login()
+            except LoginError, e:
+                logger_simulation.error('Simulated login failed: %s [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+                    e,
+                    self.official_account.__dict__,
+                    self.wechat_basic.__dict__,
+                    self.wechat_ext.__dict__,
+                ))
+                raise SimulationException(e)
+        logger_simulation.error('Simulated login failed [OfficialAccount] %s [WechatBasic] %s [WechatExt] %s' % (
+            self.official_account.__dict__,
+            self.wechat_basic.__dict__,
+            self.wechat_ext.__dict__,
+        ))
+        raise SimulationException('login error')
+
+    def send_image(self, fakeid, fid):
+        """
+        给指定用户 fakeid 发送图片信息
+        :param fakeid: 用户的 UID (即 fakeid)
+        :param fid: 文件 ID
+        :raises ValueError: 参数出错, 错误原因直接打印异常即可 (常见错误内容: ``system error`` 或 ``can not send this type of msg``: 文件类型不匹配, ``user not exist``: 用户 fakeid 不存在, ``file not exist``: 文件 fid 不存在, 还有其他错误请自行检查)
+        :raises SimulationException: 当模拟登陆登录失败时抛出
+        """
+        return self.send_file(fakeid, fid, 2)
+
+    def send_audio(self, fakeid, fid):
+        """
+        给指定用户 fakeid 发送语音信息
+        :param fakeid: 用户的 UID (即 fakeid)
+        :param fid: 文件 ID
+        :raises ValueError: 参数出错, 错误原因直接打印异常即可 (常见错误内容: ``system error`` 或 ``can not send this type of msg``: 文件类型不匹配, ``user not exist``: 用户 fakeid 不存在, ``file not exist``: 文件 fid 不存在, 还有其他错误请自行检查)
+        :raises SimulationException: 当模拟登陆登录失败时抛出
+        """
+        return self.send_file(fakeid, fid, 3)
+
+    def send_video(self, fakeid, fid):
+        """
+        给指定用户 fakeid 发送视频消息
+        :param fakeid: 用户的 UID (即 fakeid)
+        :param fid: 文件 ID
+        :raises ValueError: 参数出错, 错误原因直接打印异常即可 (常见错误内容: ``system error`` 或 ``can not send this type of msg``: 文件类型不匹配, ``user not exist``: 用户 fakeid 不存在, ``file not exist``: 文件 fid 不存在, 还有其他错误请自行检查)
+        :raises SimulationException: 当模拟登陆登录失败时抛出
+        """
+        return self.send_file(fakeid, fid, 4)

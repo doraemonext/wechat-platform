@@ -57,6 +57,7 @@ class Common(Configuration):
         'system.library.text',
         'system.library.music',
         'system.library.news',
+        'system.library.voice',
 
         'admin.dashboard',
         'admin.user',

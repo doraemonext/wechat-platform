@@ -17,6 +17,7 @@ from system.official_account.models import OfficialAccount
 from system.plugin import PluginLoadError, PluginResponseError, PluginSimulationError
 from system.response.models import Response
 from system.library.news.models import LibraryNews
+from system.library.voice.models import LibraryVoice
 
 
 logger_plugin = logging.getLogger(__name__)
@@ -110,8 +111,56 @@ class PluginProcessor(object):
     def response_image(self, mid):
         pass
 
-    def response_voice(self, mid):
-        pass
+    def response_voice(self, library_id, pattern='auto'):
+        """
+        向用户发送本地图文库中已有的图文
+        :param library_id: 语音在素材库中的 ID
+        :param pattern: 发送模式, 可选字符串: 'auto'(自动选择), 'service'(多客服发送模式), 'simulation'(模拟登陆发送模式)
+        :return: None
+        """
+        if pattern == 'auto':
+            pattern = self.best_pattern(response_type='voice')
+
+        try:
+            voice = LibraryVoice.manager.get(
+                official_account=self.official_account,
+                plugin_iden=self.plugin.iden,
+                voice_id=library_id,
+            )
+        except ObjectDoesNotExist, e:
+            raise PluginResponseError(e)
+
+        if pattern == 'service':  # 当多客服发送模式时
+            raise Exception('have not yet implemented')
+        elif pattern == 'simulation':  # 当模拟登陆发送模式时
+            try:
+                simulation = self._get_simulation_instance()
+                fakeid = self._get_simulation_match_fakeid(simulation=simulation)
+            except PluginSimulationError, e:
+                raise PluginResponseError(e)
+
+            if not voice.fid:  # 当该图文尚未被上传到素材库中时, 执行上传操作
+                voice.update_fid(simulation=simulation)
+
+            try:
+                simulation.send_audio(fakeid=fakeid, fid=voice.fid)
+            except SimulationException, e:
+                raise PluginResponseError(e)
+
+            Response.manager.add(
+                official_account=self.official_account,
+                wechat_instance=self.wechat,
+                type=Response.TYPE_VOICE,
+                pattern=Response.PATTERN_SIMULATION,
+                raw=str(voice.fid),
+                plugin_dict={
+                    'iden': self.plugin.iden,
+                    'reply_id': self.reply_id,
+                }
+            )
+            return None
+        else:
+            raise ValueError('Invalid pattern with response voice')
 
     def response_video(self, video):
         pass
