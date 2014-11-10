@@ -12,5 +12,6 @@ urlpatterns = patterns('',
     url(r'^admin/', include('admin.urls', namespace='admin')),
     url(r'^api/', include('api.urls', namespace='api')),
     url(r'^listen/', include('system.listen.urls', namespace='listen')),
+    url(r'^news/', include('system.library.news.urls', namespace='news')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
