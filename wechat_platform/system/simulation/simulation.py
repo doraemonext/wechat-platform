@@ -415,7 +415,7 @@ class Simulation(object):
         向特定用户发送媒体文件
         :param fakeid: 用户 UID (即 fakeid)
         :param fid: 文件 ID
-        :param type: 文件类型 (2: 图片, 3: 音频, 4: 视频)
+        :param type: 文件类型 (2: 图片, 3: 音频)
         :raises ValueError: 参数出错, 错误原因直接打印异常即可 (常见错误内容: ``system error`` 或 ``can not send this type of msg``: 文件类型不匹配, ``user not exist``: 用户 fakeid 不存在, ``file not exist``: 文件 fid 不存在, 还有其他错误请自行检查)
         :raises SimulationException: 当模拟登陆登录失败时抛出
         """
@@ -459,13 +459,3 @@ class Simulation(object):
         :raises SimulationException: 当模拟登陆登录失败时抛出
         """
         return self.send_file(fakeid, fid, 3)
-
-    def send_video(self, fakeid, fid):
-        """
-        给指定用户 fakeid 发送视频消息
-        :param fakeid: 用户的 UID (即 fakeid)
-        :param fid: 文件 ID
-        :raises ValueError: 参数出错, 错误原因直接打印异常即可 (常见错误内容: ``system error`` 或 ``can not send this type of msg``: 文件类型不匹配, ``user not exist``: 用户 fakeid 不存在, ``file not exist``: 文件 fid 不存在, 还有其他错误请自行检查)
-        :raises SimulationException: 当模拟登陆登录失败时抛出
-        """
-        return self.send_file(fakeid, fid, 4)
