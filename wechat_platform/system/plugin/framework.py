@@ -3,7 +3,9 @@
 import logging
 import os
 import sys
+import requests
 from imp import find_module, load_module, acquire_lock, release_lock
+from tempfile import mkstemp
 
 from django.conf import settings
 from wechat_sdk import WechatExt
@@ -347,10 +349,25 @@ class PluginProcessor(object):
                 library_news.save()
 
                 return int(fid)  # 需要将文件ID转为int型
-            except SimulationException:
+            except SimulationException:  # 出现模拟登录错误时放弃上传, 继续向下尝试
                 pass
         if picurl:
-            raise Exception('not yet implemented')
+            try:
+                r = requests.get(picurl, stream=True)
+                tmpfile_path = mkstemp(suffix='.png')[1]
+                with open(tmpfile_path, 'wb') as fd:
+                    for chunk in r.iter_content(1024):
+                        fd.write(chunk)
+
+                fid = simulation.upload_file(filepath=tmpfile_path)
+                # 将取得的文件ID作为该图文的图片ID存入数据库
+                library_news = LibraryNews.objects.get(pk=item.get('id'))
+                library_news.picture_id = fid
+                library_news.save()
+                return int(fid)  # 需要将文件ID转为int型
+            except Exception, e:  # 出现任何问题直接放弃添加图片
+                logger_plugin.warning('Failed to download image from url: %s [Detail: %s]' % (picurl, e))
+                pass
 
         return 0  # 当图片不存在时返回 0 表示图文中不会添加图片
 
