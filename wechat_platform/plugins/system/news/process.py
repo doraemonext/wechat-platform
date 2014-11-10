@@ -18,5 +18,4 @@ class PluginSystemNews(PluginProcessorSystem):
     系统插件 - 图文消息
     """
     def process(self):
-        pattern = self.best_pattern(response_type='news')
-        return self.response_news_library(pattern=pattern, library_id=self.reply_id)
+        return self.response_news_library(library_id=self.reply_id)

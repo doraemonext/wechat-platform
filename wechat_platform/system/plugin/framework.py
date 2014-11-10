@@ -272,16 +272,19 @@ class PluginProcessor(object):
             })
         return self.wechat.response_news(articles=news_dealt)
 
-    def response_news_library(self, pattern, library_id):
+    def response_news_library(self, library_id, pattern='auto'):
         """
         向用户发送本地图文库中已有的图文
 
-        :param pattern: 发送模式, 可选字符串: 'basic'(基本被动响应发送模式), 'service'(多客服发送模式),
-                        'simulation'(模拟登陆发送模式)
         :param library_id: 第一条图文在素材库中的 ID
+        :param pattern: 发送模式, 可选字符串: 'auto'(自动选择), 'basic'(基本被动响应发送模式), 'service'(多客服发送模式),
+                        'simulation'(模拟登陆发送模式)
         :return: 当 pattern 为 'basic' 时, 返回值为该图文的XML数据, 需要作为插件返回值返回方可生效;
                  当 pattern 为 'service' 或 'simulation' 时, 返回值为 None
         """
+        if pattern == 'auto':
+            pattern = self.best_pattern(response_type='news')
+
         try:
             news = LibraryNews.manager.get(
                 official_account=self.official_account,
