@@ -115,7 +115,7 @@ class LibraryNews(models.Model):
     parent = models.ForeignKey('self', verbose_name=u'本地/远程-父ID', blank=True, null=True)
     title = models.CharField(u'本地/远程-图文标题', max_length=100)
     description = models.TextField(u'本地/远程-图文描述', blank=True, null=True)
-    picture = models.ImageField(u'本地/远程-图片存储地址', blank=True, null=True)
+    picture = models.ImageField(u'本地/远程-图片存储地址', upload_to='library/news/picture', blank=True, null=True)
 
     picurl = models.CharField(u'远程-缩略图图片地址', max_length=1024, blank=True, null=True)
     url = models.CharField(u'远程-跳转地址', max_length=1024, blank=True, null=True)
@@ -165,6 +165,7 @@ class LibraryNews(models.Model):
         """
         self.view_count += count
         self.save()
+        return self.view_count
 
     def add_vote_count(self, count=1):
         """
@@ -173,6 +174,7 @@ class LibraryNews(models.Model):
         """
         self.vote_count += count
         self.save()
+        return self.vote_count
 
     def update_picture_id(self, simulation):
         """
@@ -182,7 +184,7 @@ class LibraryNews(models.Model):
         if not self.picture:  # 当本地没有存储图片时, 清空 picture_id
             self.picture_id = 0
             self.save()
-            return
+            return self.picture_id
 
         try:
             fid = simulation.upload_file(filepath=self.picture.path)
@@ -190,6 +192,7 @@ class LibraryNews(models.Model):
         except SimulationException:  # 出现模拟登录错误时放弃上传
             self.picture_id = 0
         self.save()
+        return self.picture_id
 
     def update_picurl(self):
         """
@@ -200,3 +203,4 @@ class LibraryNews(models.Model):
         else:
             self.picurl = self.picture.url
         self.save()
+        return self.picurl
