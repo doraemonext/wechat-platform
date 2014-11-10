@@ -58,7 +58,7 @@ class Common(Configuration):
         'system.library.music',
         'system.library.news',
         'system.library.voice',
-        'system.library.picture',
+        'system.library.image',
 
         'admin.dashboard',
         'admin.user',

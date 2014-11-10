@@ -6,10 +6,10 @@ from system.plugin.framework import PluginProcessorSystem
 
 logger_plugins = logging.getLogger('plugins')
 
-__all__ = ['PluginSystemPicture']
+__all__ = ['PluginSystemImage']
 
 
-class PluginSystemPicture(PluginProcessorSystem):
+class PluginSystemImage(PluginProcessorSystem):
     """
     系统插件 - 图片消息
     """

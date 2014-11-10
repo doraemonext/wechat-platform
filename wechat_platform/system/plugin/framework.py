@@ -18,7 +18,7 @@ from system.plugin import PluginLoadError, PluginResponseError, PluginSimulation
 from system.response.models import Response
 from system.library.news.models import LibraryNews
 from system.library.voice.models import LibraryVoice
-from system.library.picture.models import LibraryPicture
+from system.library.image.models import LibraryImage
 
 
 logger_plugin = logging.getLogger(__name__)
@@ -121,10 +121,10 @@ class PluginProcessor(object):
             pattern = self.best_pattern(response_type='image')
 
         try:
-            image = LibraryPicture.manager.get(
+            image = LibraryImage.manager.get(
                 official_account=self.official_account,
                 plugin_iden=self.plugin.iden,
-                picture_id=library_id,
+                image_id=library_id,
             )
         except ObjectDoesNotExist, e:
             raise PluginResponseError(e)

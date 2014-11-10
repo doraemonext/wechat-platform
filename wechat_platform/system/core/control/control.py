@@ -321,7 +321,7 @@ class ControlCenter(object):
             'text',
             'news',
             'music',
-            'picture',
+            'image',
             'video',
             'voice',
             'location',
