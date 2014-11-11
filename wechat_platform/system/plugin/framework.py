@@ -16,6 +16,7 @@ from system.simulation.models import SimulationMatch
 from system.official_account.models import OfficialAccount
 from system.plugin import PluginLoadError, PluginResponseError, PluginSimulationError
 from system.response.models import Response
+from system.library.text.models import LibraryText
 from system.library.music.models import LibraryMusic
 from system.library.news.models import LibraryNews
 from system.library.voice.models import LibraryVoice
@@ -71,18 +72,35 @@ class PluginProcessor(object):
             pass
         self.in_context = False
 
-    def response_text(self, text, pattern='auto'):
+    def response_text_basic(self, text):
+        """
+        返回用于插件返回值的文字XML数据 (基本模式)
+        :param text: 文字内容
+        :return: 生成的文字XML数据
+        """
+        return self.wechat.response_text(content=text)
+
+    def response_text_library(self, library_id, pattern='auto'):
         """
         向用户发送文字信息
-        :param text: 文本内容
+        :param library_id: 文字在本地素材库中的ID
         :param pattern: 发送模式, 可选字符串: 'auto'(自动选择), 'basic'(基本被动响应发送模式), 'service'(多客服发送模式),
                         'simulation'(模拟登陆发送模式)
         """
         if pattern == 'auto':
             pattern = self.best_pattern(response_type='text')
 
+        try:
+            text = LibraryText.manager.get(
+                official_account=self.official_account,
+                plugin_iden=self.plugin.iden,
+                text_id=library_id,
+            )
+        except ObjectDoesNotExist, e:
+            raise PluginResponseError(e)
+
         if pattern == 'basic':
-            return self.wechat.response_text(content=text)
+            return self.wechat.response_text(content=text.content)
         elif pattern == 'service':
             raise Exception('have not yet implemented')
         else:
@@ -93,7 +111,7 @@ class PluginProcessor(object):
                 raise PluginResponseError(e)
 
             try:
-                simulation.send_message(fakeid=fakeid, content=text)
+                simulation.send_message(fakeid=fakeid, content=text.content)
             except SimulationException, e:
                 raise PluginResponseError(e)
 
@@ -102,9 +120,9 @@ class PluginProcessor(object):
                 wechat_instance=self.wechat,
                 type=Response.TYPE_TEXT,
                 pattern=Response.PATTERN_SIMULATION,
-                raw=text,
+                raw=text.content,
                 plugin_dict={
-                    'iden': 'text',
+                    'iden': self.plugin.iden,
                     'reply_id': self.reply_id,
                 }
             )

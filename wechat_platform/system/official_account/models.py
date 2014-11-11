@@ -60,6 +60,7 @@ class OfficialAccountManager(models.Manager):
         )
         default_library_text = LibraryText.manager.add(
             official_account=official_account,
+            plugin_iden='text',
             content=u'此处为默认回复内容，请在后台更改',
         )
         default_rule_match = RuleMatch.manager.add(
@@ -76,6 +77,7 @@ class OfficialAccountManager(models.Manager):
         )
         subscribe_library_text = LibraryText.manager.add(
             official_account=official_account,
+            plugin_iden='text',
             content=u'此处为订阅回复内容，请在后台更改',
         )
         subscribe_rule_match = RuleMatch.manager.add(

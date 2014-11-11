@@ -99,10 +99,8 @@ class KeywordManager(models.Manager):
         sorted(result, key=attrgetter('rule.top', 'rule.order'), reverse=True)
 
         if result:
-            logger_keyword.debug('Search result with keyword %s: %s' % (keyword, result[0].__dict__))
             return result[0]
         else:
-            logger_keyword.debug('Search nothing with keyword %s' % keyword)
             return None
 
 
