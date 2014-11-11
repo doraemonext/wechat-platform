@@ -59,7 +59,6 @@ class Common(Configuration):
         'system.library.news',
         'system.library.voice',
         'system.library.image',
-
         'admin.dashboard',
         'admin.user',
         'admin.official_account',

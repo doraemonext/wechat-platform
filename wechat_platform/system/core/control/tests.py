@@ -27,7 +27,7 @@ class ControlCenterTest(WechatTestCase):
         self.assertEqual(1, DatabaseContext.objects.count())
 
         # 初始化公众号实例及微信请求实例
-        official_account = OfficialAccount.manager.add(level=OfficialAccount.LEVEL_3, name='name', email='email@email.com', original='original', wechat='wechat')
+        official_account = self.make_official_account(level=OfficialAccount.LEVEL_2)
         wechat = WechatBasic(token='token')
         wechat.parse_data(data=self.make_raw_text_message(source=source, content=u'乐者为王, that\'s all'))
 
@@ -40,7 +40,11 @@ class ControlCenterTest(WechatTestCase):
 
         rule = Rule.manager.add(official_account=official_account, name='rule one', reply_pattern=Rule.REPLY_PATTERN_ALL)
         keyword = Keyword.manager.add(rule=rule, keyword=u'乐者为王', type=Keyword.TYPE_CONTAIN)
-        library_text = LibraryText.manager.add(official_account=official_account, content=u'测试回复文字哟')
+        library_text = LibraryText.manager.add(
+            official_account=official_account,
+            plugin_iden='text',
+            content=u'测试回复文字哟'
+        )
         rule_match = RuleMatch.manager.add(rule=rule, plugin_iden='text', reply_id=library_text.pk)
 
         response = control.response

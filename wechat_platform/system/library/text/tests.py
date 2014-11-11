@@ -10,7 +10,11 @@ class LibraryTextTest(WechatTestCase):
         """
         测试添加新的文字素材
         """
-        official_account = OfficialAccount.manager.add(level=OfficialAccount.LEVEL_1, name='Ace Kwok', email='doraemonext@gmail.com', original='original', wechat='wechat')
-        text = LibraryText.manager.add(official_account, content=u'你好吗')
+        official_account = self.make_official_account(level=OfficialAccount.LEVEL_2)
+        text = LibraryText.manager.add(
+            official_account=official_account,
+            plugin_iden='text',
+            content=u'你好吗',
+        )
         self.assertEqual(text.official_account, official_account)
         self.assertEqual(text.content, u'你好吗')
