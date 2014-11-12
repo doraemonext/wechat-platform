@@ -2,6 +2,7 @@
 
 {% url 'admin:dashboard:dashboard' as dashboard %}
 {% url 'admin:group:index' as group %}
+{% url 'admin:library:music:index' as library_music %}
 {% url 'admin:official_account:index' as official_account %}
 
 <!DOCTYPE html>
@@ -109,17 +110,17 @@
                                 <i class="fa fa-user"></i> <span>用户管理</span>
                             </a>
                         </li>
-                        <li class="treeview">
+                        <li class="treeview {% if request.path == library_music %} active{% endif %}">
                             <a href="#">
                                 <i class="fa fa-heart"></i>
                                 <span>素材管理</span>
                                 <i class="fa fa-angle-left pull-right"></i>
                             </a>
                             <ul class="treeview-menu">
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 图文消息</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 图片库</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 语音</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 视频</a></li>
+                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 图文素材</a></li>
+                                <li{% if request.path == library_music %} class="active"{% endif %}><a href="{{ library_music }}"><i class="fa fa-angle-double-right"></i> 音乐素材</a></li>
+                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 图片素材</a></li>
+                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 语音素材</a></li>
                             </ul>
                         </li>
                         <li class="treeview">
@@ -140,7 +141,6 @@
                             <ul class="treeview-menu">
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 系统设置</a></li>
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 插件管理</a></li>
-
                                 <li{% if request.path == official_account %} class="active"{% endif %}><a href="{{ official_account }}"><i class="fa fa-angle-double-right"></i> 公众号管理</a></li>
                             </ul>
                         </li>

@@ -3590,3 +3590,14 @@ fieldset[disabled] .btn-vk.active {
     width: 400px;
     max-width: 700px;
 }
+
+.music-widget .panel-body { padding:0px; }
+.music-widget .list-group { margin-bottom: 0; }
+.music-widget .panel-title { display:inline }
+.music-widget .label-info { float: right; }
+.music-widget li.list-group-item {border-radius: 0;border: 0;border-top: 1px solid #ddd;}
+.music-widget li.list-group-item:hover { background-color: rgba(86,61,124,.1); }
+.music-widget .mic-info { color: #666666;font-size: 11px; }
+.music-widget .action { margin-top:5px; }
+.music-widget .comment-text { font-size: 12px; }
+.music-widget .btn-block { border-top-left-radius:0px;border-top-right-radius:0px; }

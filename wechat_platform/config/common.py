@@ -62,6 +62,7 @@ class Common(Configuration):
         'admin.dashboard',
         'admin.user',
         'admin.official_account',
+        'admin.library.music',
     )
 
     # Wechat Plugin App
