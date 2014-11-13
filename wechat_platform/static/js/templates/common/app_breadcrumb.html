@@ -5,10 +5,6 @@
 <ol class="breadcrumb">
     <li><a href="/admin/dashboard/"><i class="fa fa-dashboard"></i> 仪表盘</a></li>
     <% _.each(breadcrumbs, function(breadcrumb, index, list) { %>
-    <%     if (index < _.size(list) - 1) { %>
-    <li><a href="<%= breadcrumb.url %>"><%= breadcrumb.title %></a></li>
-    <%     } else { %>
     <li class="active"><%= breadcrumb.title %></li>
-    <%     } %>
     <% }); %>
 </ol>
