@@ -1,0 +1,23 @@
+<li class="list-group-item">
+    <div class="row">
+        <div class="col-xs-2 col-md-1">
+            <img src="/static/img/default_music.jpeg" class="img-circle img-responsive" alt="" /></div>
+        <div class="col-xs-10 col-md-11">
+            <div><%= title %></div>
+            <div class="comment-text">
+                <%= description %>
+            </div>
+            <div class="action">
+                <a type="button" class="btn btn-success btn-xs" title="下载" href="<%= music_url %>">
+                    <i class="fa fa-fw fa-download"></i>
+                </a>
+                <a type="button" class="btn btn-primary btn-xs" title="编辑">
+                    <i class="fa fa-fw fa-pencil"></i>
+                </a>
+                <a type="button" class="btn btn-danger btn-xs delete" title="删除">
+                    <i class="fa fa-fw fa-trash-o"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</li>

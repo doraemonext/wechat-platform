@@ -12,7 +12,6 @@ from .serializer import LoginSerializer
 
 
 class LoginAPI(APIView):
-    authentication_classes = (authentication.SessionAuthentication, )
     permission_classes = (permissions.AllowAny, )
     parser_classes = (parsers.FormParser, )
 
@@ -46,7 +45,6 @@ class LoginAPI(APIView):
 
 
 class LogoutAPI(APIView):
-    authentication_classes = (authentication.SessionAuthentication, )
     permission_classes = (permissions.IsAuthenticated, )
 
     def get(self, request):

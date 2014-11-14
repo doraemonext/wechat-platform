@@ -2,10 +2,12 @@ require.config({
     baseUrl: '/static/js',
     shim: {
         'underscore': { 'exports': '_' },
+        'backbone-paginator': { 'deps': ['backbone'] },
         'bootstrap': { 'deps': ['jquery'] },
         'jquery-cookie': { 'deps': ['jquery'] },
         'noty': { 'deps': ['jquery'] },
         'jquery-validate': { 'deps': ['jquery'] },
+        'spin': { 'exports': 'Spinner' },
         'theme-app': { 'deps': ['jquery', 'bootstrap'] }
     },
     paths: {
@@ -13,10 +15,12 @@ require.config({
         'underscore': 'plugins/underscore/underscore.min',
         'backbone': 'plugins/backbone/backbone.min',
 
+        'backbone-paginator': 'plugins/backbone/backbone.paginator.min',
         'bootstrap': 'plugins/bootstrap/bootstrap.min',
         'jquery-cookie': 'plugins/jquerycookie/jquery.cookie',
         'jquery-validate': 'plugins/jqueryvalidate/jquery.validate.min',
         'noty': 'plugins/noty/jquery.noty.packaged.min',
+        'spin': 'plugins/spin/spin.min',
         'theme-app': 'AdminLTE/app',
         'common': 'common',
 

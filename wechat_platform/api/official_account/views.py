@@ -14,7 +14,6 @@ from .serializer import OfficialAccountSerializer
 
 
 class OfficialAccountListAPI(mixins.ListModelMixin, mixins.CreateModelMixin, GenericAPIView):
-    authentication_classes = (authentication.SessionAuthentication, )
     permission_classes = (permissions.IsAuthenticated, )
     model = OfficialAccount
     serializer_class = OfficialAccountSerializer
@@ -27,7 +26,6 @@ class OfficialAccountListAPI(mixins.ListModelMixin, mixins.CreateModelMixin, Gen
 
 
 class OfficialAccountDetailAPI(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericAPIView):
-    authentication_classes = (authentication.SessionAuthentication, )
     permission_classes = (permissions.IsAuthenticated, )
     model = OfficialAccount
     serializer_class = OfficialAccountSerializer
