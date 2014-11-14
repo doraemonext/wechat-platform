@@ -7,6 +7,7 @@ require.config({
         'jquery-cookie': { 'deps': ['jquery'] },
         'noty': { 'deps': ['jquery'] },
         'jquery-validate': { 'deps': ['jquery'] },
+        'spin': { 'exports': 'Spinner' },
         'theme-app': { 'deps': ['jquery', 'bootstrap'] }
     },
     paths: {
@@ -19,6 +20,7 @@ require.config({
         'jquery-cookie': 'plugins/jquerycookie/jquery.cookie',
         'jquery-validate': 'plugins/jqueryvalidate/jquery.validate.min',
         'noty': 'plugins/noty/jquery.noty.packaged.min',
+        'spin': 'plugins/spin/spin.min',
         'theme-app': 'AdminLTE/app',
         'common': 'common',
 

@@ -2,6 +2,7 @@ define(function(require, exports, module) {
     var $ = require('jquery');
     var Backbone = require('backbone');
     var ConfirmModal = require('helper.confirm-modal');
+    require('spin');
     require('jquery-validate');
     require('jquery-cookie');
     require('backbone-paginator');
@@ -74,7 +75,9 @@ define(function(require, exports, module) {
         template: _.template(list_template),
         events: {
             "click .pagination-previous": "pagination_previous",
-            "click .pagination-next": "pagination_next"
+            "click .pagination-next": "pagination_next",
+            "click .goto-area button ": "goto_area",
+            "keyup .goto-area input": "goto_area_enter"
         },
         initialize: function() {
             this.collection = new LibraryMusicCollection;
@@ -110,6 +113,24 @@ define(function(require, exports, module) {
         pagination_next: function () {
             this.collection.reset();
             this.collection.getNextPage().done(this._adjust_pagination());
+        },
+        goto_area: function () {
+            var page = this.$('.goto-area input[type=text]').val();
+            if ($.isNumeric(page) && parseInt(page) > 0 && parseInt(page) <= this.collection.state.totalPages) {
+                this.collection.reset();
+                this.$('.goto-area input[type=text]').val('');
+                this.collection.getPage(parseInt(page)).done(this._adjust_pagination());
+            } else {
+                noty({
+                    type: "error",
+                    text: "您输入的跳转页数非法"
+                });
+            }
+        },
+        goto_area_enter: function (event) {
+            if (event.keyCode == 13) {
+                this.$('.goto-area button').click();
+            }
         },
         /**
          * 根据当前页面状态调整页码的显示
