@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from rest_framework.generics import GenericAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import authentication, permissions, mixins
+from rest_framework import authentication, permissions, mixins, filters
 from rest_framework import status, parsers
 
 from system.library.music.models import LibraryMusic
@@ -14,10 +14,14 @@ from api.library.music.serializer import LibraryMusicSerializer
 
 
 class LibraryMusicListAPI(mixins.ListModelMixin, mixins.CreateModelMixin, GenericAPIView):
-    authentication_classes = (authentication.SessionAuthentication, )
     permission_classes = (permissions.IsAuthenticated, )
     model = LibraryMusic
     serializer_class = LibraryMusicSerializer
+    filter_fields = ('official_account', 'plugin_iden', 'title', 'description', 'music_url', 'hq_music_url',
+                     'thumb_media_id')
+    search_fields = ('title', 'description')
+    ordering = ('id', )
+    paginate_by = 10
 
     def get(self, request, *args, **kwargs):
         return super(LibraryMusicListAPI, self).list(request, *args, **kwargs)
@@ -27,7 +31,6 @@ class LibraryMusicListAPI(mixins.ListModelMixin, mixins.CreateModelMixin, Generi
 
 
 class LibraryMusicDetailAPI(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericAPIView):
-    authentication_classes = (authentication.SessionAuthentication, )
     permission_classes = (permissions.IsAuthenticated, )
     model = LibraryMusic
     serializer_class = LibraryMusicSerializer

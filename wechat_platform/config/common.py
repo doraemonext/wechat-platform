@@ -359,6 +359,20 @@ class Common(Configuration):
 
     AUTH_USER_MODEL = 'users.User'
 
+    # REST FRAMEWORK
+
+    REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework.authentication.BasicAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
+        ),
+        'DEFAULT_FILTER_BACKENDS': (
+            'rest_framework.filters.DjangoFilterBackend',
+            'rest_framework.filters.SearchFilter',
+            'rest_framework.filters.OrderingFilter',
+        ),
+    }
+
     # Your common stuff: Below this line define 3rd party libary settings
     USERNAME_MIN_LEN = 2
     USERNAME_MAX_LEN = 30
