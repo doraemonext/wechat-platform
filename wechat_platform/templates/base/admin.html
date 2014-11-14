@@ -9,7 +9,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>微信管理平台</title>
+        <title>{{ setting.title }}</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
         <!-- bootstrap 3.0.2 -->
         <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" type="text/css"/>
@@ -32,7 +32,7 @@
         <header class="header">
             <a href="{{ dashboard }}" class="logo">
                 <!-- Add the class icon to your logo image or logo icon to add the margining -->
-                微信管理平台
+                {{ setting.title }}
             </a>
             <!-- Header Navbar: style can be found in header.less -->
             <nav class="navbar navbar-static-top" role="navigation">
@@ -193,6 +193,7 @@
 
             <!-- Right side column. Contains the navbar and content of the page -->
             {% block content %}{% endblock %}
+            <input type="hidden" value="{{ current_official_account }}" id="current-official-account">
             <!-- /.right-side -->
         </div>
         <!-- ./wrapper -->
