@@ -21,7 +21,6 @@ class LibraryMusicListAPI(mixins.ListModelMixin, mixins.CreateModelMixin, Generi
                      'thumb_media_id')
     search_fields = ('title', 'description')
     ordering = ('id', )
-    paginate_by = 10
 
     def get(self, request, *args, **kwargs):
         return super(LibraryMusicListAPI, self).list(request, *args, **kwargs)

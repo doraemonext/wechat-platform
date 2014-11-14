@@ -371,6 +371,9 @@ class Common(Configuration):
             'rest_framework.filters.SearchFilter',
             'rest_framework.filters.OrderingFilter',
         ),
+        'PAGINATE_BY': 10,
+        'PAGINATE_BY_PARAM': 'per_page',
+        'MAX_PAGINATE_BY': 100,
     }
 
     # Your common stuff: Below this line define 3rd party libary settings

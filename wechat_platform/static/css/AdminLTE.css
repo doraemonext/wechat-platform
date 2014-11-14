@@ -3601,3 +3601,20 @@ fieldset[disabled] .btn-vk.active {
 .music-widget .action { margin-top:5px; }
 .music-widget .comment-text { font-size: 12px; }
 .music-widget .btn-block { border-top-left-radius:0px;border-top-right-radius:0px; }
+
+.paginator .page {
+    margin: 0 3px;
+}
+
+.goto_area input {
+    width: 60px;
+    padding: 4px 12px;
+    font-size: 14px;
+    line-height: 1.428571429;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
