@@ -10,7 +10,9 @@ define(function (require, exports, module) {
     var LibraryMusicModule = require('module.library.music');
     var LibraryMusicModel = LibraryMusicModule.LibraryMusicModel;
     var LibraryMusicCollection = LibraryMusicModel.LibraryMusicCollection;
+    var LibraryMusicItemView = LibraryMusicModule.LibraryMusicItemView;
     var LibraryMusicListView = LibraryMusicModule.LibraryMusicListView;
+    var LibraryMusicItemAddView = LibraryMusicModule.LibraryMusicItemAddView;
 
     var AppView = CommonAppView.extend({
         default_interface: function () {
@@ -40,7 +42,7 @@ define(function (require, exports, module) {
             this.set_header(new ContentHeaderView({
                 html: require('text!templates/library/music/app_content_header_add.html')
             }));
-//            this.set_content(new OfficialAccountItemAddView);
+            this.set_content(new LibraryMusicItemAddView);
         },
         edit_interface: function (id) {
             this.set_breadcrumb(new BreadcrumbView({

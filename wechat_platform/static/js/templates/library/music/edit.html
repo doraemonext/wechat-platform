@@ -1,0 +1,63 @@
+<form class="form-horizontal" role="form" id="form">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><span><strong>音乐上传</strong></span></h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12 col-lg-12">
+                    <div class="form-group">
+                        <label for="music" class="col-sm-2 control-label">普通音乐文件 <span class="text-red">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="file" id="music" name="music">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="hq_music" class="col-sm-2 control-label">高清音乐文件</label>
+                        <div class="col-sm-9">
+                            <input type="file" id="hq_music" name="hq_music">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="thumb_media" class="col-sm-2 control-label">音乐封面图片</label>
+                        <div class="col-sm-9">
+                            <input type="file" id="thumb_media" name="thumb_media">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><span><strong>基本信息</strong></span></h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12 col-lg-12">
+                    <div class="form-group">
+                        <label for="title" class="col-sm-2 control-label">音乐标题</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="title" id="title">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description" class="col-sm-2 control-label">音乐描述</label>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" name="description" id="description"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-2">
+            <button type="submit" class="btn btn-primary btn-block">提交</button>
+        </div>
+    </div>
+</form>

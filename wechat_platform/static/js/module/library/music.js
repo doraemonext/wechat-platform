@@ -10,7 +10,7 @@ define(function(require, exports, module) {
     var item_template = require('text!templates/library/music/item.html');
     var list_template = require('text!templates/library/music/list.html');
     //var detail_template = require('text!templates/library/music/detail.html');
-    //var add_template = require('text!templates/library/music/edit.html');
+    var add_template = require('text!templates/library/music/edit.html');
     //var edit_template = require('text!templates/library/music/edit.html');
 
     var confirm_modal_view = new ConfirmModal;
@@ -150,9 +150,164 @@ define(function(require, exports, module) {
         }
     });
 
+    var LibraryMusicItemAddView = Backbone.View.extend({
+        template: _.template(add_template),
+        initialize: function() {},
+        /**
+         * 渲染添加音乐素材页面
+         * @returns {LibraryMusicItemAddView}
+         */
+        render: function() {
+            this.$el.html(this.template());
+            /*this.set_validate();
+            this.$('input[name=level]').on('change', this, this.toggle_level);
+            this.$('input[name=is_advanced]').on('change', this, this.toggle_is_advanced);*/
+            return this;
+        },
+        /**
+         * 设置表单的验证
+         */
+        /*set_validate: function() {
+            var that = this;
+            this.$el.find('#form').validate({
+                rules: {
+                    name: 'required',
+                    level: 'required',
+                    appid: {
+                        required: function(element) {
+                            return that.get_level() == 2 || that.get_level() == 3;
+                        }
+                    },
+                    appsecret: {
+                        required: function(element) {
+                            return that.get_level() == 2 || that.get_level() == 3;
+                        }
+                    },
+                    is_advanced: 'required',
+                    username: {
+                        required: function(element) {
+                            return that.get_is_advanced();
+                        }
+                    },
+                    password: {
+                        required: function(element) {
+                            return that.get_is_advanced();
+                        }
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    original: 'required',
+                    wechat: 'required'
+                },
+                messages: {
+                    name: {
+                        required: '公众号名称不能为空'
+                    },
+                    level: {
+                        required: '必须选择一个公众号级别'
+                    },
+                    appid: {
+                        required: '当前公众号级别必须填入App ID'
+                    },
+                    appsecret: {
+                        required: '当前公众号级别必须填入App Secret'
+                    },
+                    is_advanced: {
+                        required: '必选选择是否开启高级支持'
+                    },
+                    username: {
+                        required: '开启高级支持时必须输入公众平台用户名'
+                    },
+                    password: {
+                        required: '开启高级支持时必须输入公众平台密码'
+                    },
+                    email: {
+                        required: '登录邮箱不能为空',
+                        email: '登录邮箱不合法'
+                    },
+                    original: {
+                        required: '原始ID不能为空'
+                    },
+                    wechat: {
+                        required: '绑定微信号不能为空'
+                    }
+                },
+                errorClass: 'control-label text-red',
+                errorPlacement: function(error, element) {
+                    if ($(element).prop('name') == 'level' || $(element).prop('name') == 'is_advanced') {
+                        $(element).parent().parent().append(error);
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                highlight: function(element) {},
+                unhighlight: function(element) {},
+                submitHandler: function(form) {
+                    var validator = this;
+
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        url: '/api/official_account/',
+                        cache: false,
+                        data: {
+                            name: $("input[name=name]").val(),
+                            level: $("input[name=level]:checked").val(),
+                            appid: $("input[name=appid]").val(),
+                            appsecret: $("input[name=appsecret]").val(),
+                            is_advanced: $("input[name=is_advanced]:checked").val(),
+                            username: $("input[name=username]").val(),
+                            password: $("input[name=password]").val(),
+                            email: $("input[name=email]").val(),
+                            original: $("input[name=original]").val(),
+                            wechat: $("input[name=wechat]").val(),
+                            introduction: $("textarea[name=introduction]").val(),
+                            address: $("input[name=address]").val()
+                        },
+                        beforeSend: function(xhr, settings) {
+                            xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
+                            $("button[type=submit]").attr("disabled", "disabled");
+                            $("button[type=submit]").text("提交中…");
+                        },
+                        success: function(data) {
+                            noty({
+                                type: "success",
+                                text: "成功添加 <strong>" + data["name"] + "</strong> 公众号"
+                            });
+                            window.location.href = "#";
+                        },
+                        statusCode: {
+                            400: function(xhr) {
+                                var data = $.parseJSON(xhr.responseText);
+                                var errors = {};
+                                for (var key in data) {
+                                    if (key == "non_field_errors") {
+                                        errors["name"] = data[key][0];
+                                    } else {
+                                        errors[key] = data[key][0];
+                                    }
+                                }
+                                validator.showErrors(errors);
+                            }
+                        },
+                        complete: function() {
+                            $("button[type=submit]").removeAttr("disabled");
+                            $("button[type=submit]").text("提交");
+                        }
+                    });
+                    return false;
+                }
+            });
+        }*/
+    });
+
     module.exports = {
         'LibraryMusicModel': LibraryMusicModel,
         'LibraryMusicCollection': LibraryMusicCollection,
-        'LibraryMusicListView': LibraryMusicListView
+        'LibraryMusicItemView': LibraryMusicItemView,
+        'LibraryMusicListView': LibraryMusicListView,
+        'LibraryMusicItemAddView': LibraryMusicItemAddView
     }
 });
