@@ -17,6 +17,7 @@ class OfficialAccountListAPI(mixins.ListModelMixin, mixins.CreateModelMixin, Gen
     permission_classes = (permissions.IsAuthenticated, )
     model = OfficialAccount
     serializer_class = OfficialAccountSerializer
+    paginate_by = None
 
     def get(self, request, *args, **kwargs):
         return super(OfficialAccountListAPI, self).list(request, *args, **kwargs)
