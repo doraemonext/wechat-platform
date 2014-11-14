@@ -31,6 +31,8 @@ class LoginAPI(APIView):
             user = authenticate(username=username, password=password)
             if user:
                 login(request, user)
+                if 'current_official_account' not in request.session:
+                    request.session['current_official_account'] = 0  # 代表当前处于系统设置环境中
                 response = {
                     'redirect_url': self.get_redirect_url(redirect_url),
                 }
