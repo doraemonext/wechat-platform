@@ -2590,6 +2590,9 @@ Component: timeline
 .skin-blue .user-panel > .image > img {
   border: 1px solid #dfdfdf;
 }
+.skin-blue .user-panel h4 {
+  display: inline;
+}
 .skin-blue .user-panel > .info,
 .skin-blue .user-panel > .info > span {
   color: #555555;

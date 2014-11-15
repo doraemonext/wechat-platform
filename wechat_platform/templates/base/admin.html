@@ -64,7 +64,6 @@
                                                                 <small><span class="label label-success">当前公众号</span></small>
                                                             {% endifequal %}
                                                         </h4>
-
                                                         <p><strong>类型：</strong>{{ item.level_verbose }}</p>
                                                     </a>
                                                 </li>
@@ -73,9 +72,9 @@
                                     </div>
                                 </li>
                                 {% ifequal current_official_account 0 %}
-                                    <li class="footer"><a><h4><span class="label label-success">当前为系统设置界面</span></h4></a></li>
+                                    <li class="footer"><a><h4><span class="label label-success">当前为系统设置模式</span></h4></a></li>
                                 {% else %}
-                                    <li class="footer"><a href="#" data-official-account-id="0" class="official-account-switch"><h4><span class="label label-danger">进入系统设置界面</span></h4></a></li>
+                                    <li class="footer"><a href="#" data-official-account-id="0" class="official-account-switch"><h4><span class="label label-danger">进入系统设置模式</span></h4></a></li>
                                 {% endifequal %}
                             </ul>
                         </li>
@@ -112,6 +111,19 @@
             <aside class="left-side sidebar-offcanvas">
                 <!-- sidebar: style can be found in sidebar.less -->
                 <section class="sidebar">
+                    <div class="user-panel">
+                        <div class="info">
+                            {% ifequal current_official_account 0 %}
+                                <h4><span class="label label-danger">当前处于系统设置模式</span></h4>
+                            {% else %}
+                                {% for item in official_account %}
+                                    {% ifequal current_official_account item.pk %}
+                                        当前公众号：<h4><span class="label label-success">{{ item.name }}</span></h4>
+                                    {% endifequal %}
+                                {% endfor %}
+                            {% endifequal %}
+                        </div>
+                    </div>
                     <!-- sidebar menu: : style can be found in sidebar.less -->
                     <ul class="sidebar-menu">
                         <li{% if request.path == dashboard_url %} class="active"{% endif %}>
@@ -119,63 +131,62 @@
                                 <i class="fa fa-dashboard"></i> <span>仪表盘</span>
                             </a>
                         </li>
-                        <li class="treeview">
-                            <a href="#">
-                                <i class="fa fa-reply"></i>
-                                <span>自动回复</span>
-                                <i class="fa fa-angle-left pull-right"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 添加规则</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 规则管理</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 默认回复</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 订阅回复</a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fa fa-bell-o"></i> <span>消息管理</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fa fa-user"></i> <span>用户管理</span>
-                            </a>
-                        </li>
-                        <li class="treeview {% if request.path == library_music_url %} active{% endif %}">
-                            <a href="#">
-                                <i class="fa fa-heart"></i>
-                                <span>素材管理</span>
-                                <i class="fa fa-angle-left pull-right"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 图文素材</a></li>
-                                <li{% if request.path == library_music_url %} class="active"{% endif %}><a href="{{ library_music_url }}"><i class="fa fa-angle-double-right"></i> 音乐素材</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 图片素材</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 语音素材</a></li>
-                            </ul>
-                        </li>
-                        <li class="treeview">
-                            <a href="#">
-                                <i class="fa fa-magnet"></i>
-                                <span>扩展功能</span>
-                                <i class="fa fa-angle-left pull-right"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 测试插件</a></li>
-                            </ul>
-                        </li>
-                        <li class="treeview {% if request.path == official_account_url %} active{% endif %}">
-                            <a href="#">
-                                <i class="fa fa-cogs"></i> <span>系统设置</span>
-                                <i class="fa fa-angle-left pull-right"></i>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 系统设置</a></li>
-                                <li><a href="#"><i class="fa fa-angle-double-right"></i> 插件管理</a></li>
-                                <li{% if request.path == official_account_url %} class="active"{% endif %}><a href="{{ official_account_url }}"><i class="fa fa-angle-double-right"></i> 公众号管理</a></li>
-                            </ul>
-                        </li>
+                        {% ifnotequal current_official_account 0 %}  {# 如果当前不处于系统设置模式 #}
+                            <li class="treeview">
+                                <a href="#">
+                                    <i class="fa fa-reply"></i>
+                                    <span>自动回复</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    <li><a href="#"><i class="fa fa-angle-double-right"></i> 添加规则</a></li>
+                                    <li><a href="#"><i class="fa fa-angle-double-right"></i> 规则管理</a></li>
+                                    <li><a href="#"><i class="fa fa-angle-double-right"></i> 默认回复</a></li>
+                                    <li><a href="#"><i class="fa fa-angle-double-right"></i> 订阅回复</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-bell-o"></i> <span>消息管理</span>
+                                </a>
+                            </li>
+                            <li class="treeview {% if request.path == library_music_url %} active{% endif %}">
+                                <a href="#">
+                                    <i class="fa fa-heart"></i>
+                                    <span>素材管理</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    <li><a href="#"><i class="fa fa-angle-double-right"></i> 图文素材</a></li>
+                                    <li{% if request.path == library_music_url %} class="active"{% endif %}><a href="{{ library_music_url }}"><i class="fa fa-angle-double-right"></i> 音乐素材</a></li>
+                                    <li><a href="#"><i class="fa fa-angle-double-right"></i> 图片素材</a></li>
+                                    <li><a href="#"><i class="fa fa-angle-double-right"></i> 语音素材</a></li>
+                                </ul>
+                            </li>
+                            <li class="treeview">
+                                <a href="#">
+                                    <i class="fa fa-magnet"></i>
+                                    <span>扩展功能</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    <li><a href="#"><i class="fa fa-angle-double-right"></i> 测试插件</a></li>
+                                </ul>
+                            </li>
+                        {% endifnotequal %}
+                        {% ifequal current_official_account 0 %}  {# 如果当前处于系统设置模式 #}
+                            <li class="treeview {% if request.path == official_account_url %} active{% endif %}">
+                                <a href="#">
+                                    <i class="fa fa-cogs"></i> <span>系统设置</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    <li><a href="#"><i class="fa fa-angle-double-right"></i> 系统设置</a></li>
+                                    <li><a href="#"><i class="fa fa-angle-double-right"></i> 插件管理</a></li>
+                                    <li{% if request.path == official_account_url %} class="active"{% endif %}><a href="{{ official_account_url }}"><i class="fa fa-angle-double-right"></i> 公众号管理</a></li>
+                                </ul>
+                            </li>
+                        {% endifequal %}
                     </ul>
                 </section>
                 <!-- /.sidebar -->
