@@ -19,7 +19,7 @@ define(function(require, exports, module) {
         urlRoot: '/api/library/music/'
     });
     var LibraryMusicCollection = Backbone.PageableCollection.extend({
-        url: '/api/library/music/',
+        url: '/api/library/music/?official_account=' + $('#current-official-account').val(),
         model: LibraryMusicModel,
         state: {
             pageSize: 5
