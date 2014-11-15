@@ -39,3 +39,25 @@ class OfficialAccountDetailAPI(mixins.RetrieveModelMixin, mixins.UpdateModelMixi
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+
+class OfficialAccountSwitchAPI(APIView):
+    """
+    当前公众号切换 API
+    """
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def post(self, request):
+        official_account_id = request.POST.get('official_account')
+        if not official_account_id:
+            return Response(data={'official_account': [u'切换公众号不能为空', ]}, status=status.HTTP_400_BAD_REQUEST)
+
+        if official_account_id == '0':  # 当 official_account_id 为 0 时代表进入管理模式
+            request.session['current_official_account'] = 0
+        else:
+            try:
+                official_account = OfficialAccount.objects.get(pk=official_account_id)
+            except Exception:
+                return Response(data={'official_account': [u'切换公众号非法', ]}, status=status.HTTP_400_BAD_REQUEST)
+            request.session['current_official_account'] = official_account.pk
+        return Response(data={'redirect_url': reverse('admin:dashboard:dashboard')})

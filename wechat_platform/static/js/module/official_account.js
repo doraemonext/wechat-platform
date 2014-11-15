@@ -80,7 +80,7 @@ define(function(require, exports, module) {
             this.$('#account-name').html(official_account.get('name'));
             this.$('#account-request-url').html(official_account.get('request_url'));
             this.$('#account-token').html(official_account.get('token'));
-            this.$('#account-level').html(official_account.get('level_readable'));
+            this.$('#account-level').html(official_account.get('level_verbose'));
             if (official_account.get('is_advanced')) {
                 this.$('#account-is-advanced').html('是');
             } else {
