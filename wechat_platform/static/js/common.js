@@ -74,5 +74,29 @@ define(['jquery', 'bootstrap', 'noty', 'theme-app'], function ($) {
                 }
             });
         });
+
+        $(".official-account-switch").bind("click", function () {
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "official_account": $(this).data("official-account-id")
+                },
+                url: "/api/official_account/switch/",
+                cache: false,
+                success: function (data) {
+                    window.location.href = data["redirect_url"];
+                },
+                statusCode: {
+                    400: function(xhr) {
+                        var data = $.parseJSON(xhr.responseText);
+                        noty({
+                            type: "error",
+                            text: data["official_account"][0]
+                        });
+                    }
+                }
+            });
+        });
     });
 });

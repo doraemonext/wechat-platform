@@ -13,6 +13,9 @@ logger_official_account = logging.getLogger(__name__)
 
 
 class OfficialAccountManager(models.Manager):
+    def get_all(self):
+        return super(OfficialAccountManager, self).get_queryset()
+
     def add(self, level, name, email, original, wechat, introduction=None, address=None,
             appid=None, appsecret=None, username=None, password=None, is_advanced=False, token=None):
         """
@@ -132,6 +135,14 @@ class OfficialAccount(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @property
+    def level_verbose(self):
+        """
+        返回公众号级别的文字解释 (用于template)
+        :return: 公众号级别的文字解释
+        """
+        return dict(OfficialAccount.LEVEL)[self.level]
 
     @property
     def simulation_available(self):

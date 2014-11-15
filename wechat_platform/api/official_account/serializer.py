@@ -52,7 +52,7 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
     address = serializers.CharField(required=False)
 
     request_url = serializers.SerializerMethodField('get_request_url')
-    level_readable = serializers.SerializerMethodField('get_level_readable')
+    level_verbose = serializers.SerializerMethodField('get_level_verbose')
 
     def get_request_url(self, obj):
         """
@@ -70,16 +70,14 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
         else:
             return None
 
-    def get_level_readable(self, obj):
+    def get_level_verbose(self, obj):
         """
         返回公众号等级的具体描述
 
         :param obj: 当前 object
         :return: 描述公众号等级的字符串
         """
-        for level in OfficialAccount.LEVEL:
-            if obj.level == level[0]:
-                return level[1]
+        return obj.level_verbose
 
     def validate_appid(self, attrs, source):
         """
@@ -89,7 +87,7 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
         :param source: 此处为'appid'
         :return: 属性字典
         """
-        appid = attrs[source]
+        appid = attrs.get(source)
         if attrs.get('level') == OfficialAccount.LEVEL_1:
             if appid:
                 del attrs[source]
@@ -106,7 +104,7 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
         :param source: 此处为'appsecret'
         :return: 属性字典
         """
-        appsecret = attrs[source]
+        appsecret = attrs.get(source)
         if attrs.get('level') == OfficialAccount.LEVEL_1:
             if appsecret:
                 del attrs[source]
@@ -123,7 +121,7 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
         :param source: 此处为'username'
         :return: 属性字典
         """
-        username = attrs[source]
+        username = attrs.get(source)
         if attrs.get('is_advanced'):
             if not username:
                 raise serializers.ValidationError(u'高级支持模式下必须输入公众平台用户名')
@@ -140,7 +138,7 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
         :param source: 此处为'password'
         :return: 属性字典
         """
-        password = attrs[source]
+        password = attrs.get(source)
         if attrs.get('is_advanced'):
             if not password:
                 raise serializers.ValidationError(u'高级支持模式下必须输入公众平台密码')
@@ -195,4 +193,4 @@ class OfficialAccountSerializer(serializers.ModelSerializer):
         model = OfficialAccount
         fields = ('id', 'iden', 'token', 'appid', 'appsecret', 'username', 'password', 'is_advanced', 'level',
                   'name', 'email', 'original', 'wechat', 'introduction', 'address',
-                  'request_url', 'level_readable')
+                  'request_url', 'level_verbose')

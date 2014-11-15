@@ -1,9 +1,9 @@
 {% load staticfiles i18n %}
 
-{% url 'admin:dashboard:dashboard' as dashboard %}
-{% url 'admin:group:index' as group %}
-{% url 'admin:library:music:index' as library_music %}
-{% url 'admin:official_account:index' as official_account %}
+{% url 'admin:dashboard:dashboard' as dashboard_url %}
+{% url 'admin:group:index' as group_url %}
+{% url 'admin:library:music:index' as library_music_url %}
+{% url 'admin:official_account:index' as official_account_url %}
 
 <!DOCTYPE html>
 <html>
@@ -30,7 +30,7 @@
     <body class="skin-blue">
         <!-- header logo: style can be found in header.less -->
         <header class="header">
-            <a href="{{ dashboard }}" class="logo">
+            <a href="{{ dashboard_url }}" class="logo">
                 <!-- Add the class icon to your logo image or logo icon to add the margining -->
                 {{ setting.title }}
             </a>
@@ -55,38 +55,28 @@
                                 <li>
                                     <div>
                                         <ul class="menu">
-                                            <li>
-                                                <a href="#">
-                                                    <h4>
-                                                        掌上武大
-                                                        <small><span class="label label-success">当前公众号</span></small>
-                                                    </h4>
+                                            {% for item in official_account %}
+                                                <li>
+                                                    <a href="#" data-official-account-id="{{ item.pk }}" class="official-account-switch">
+                                                        <h4>
+                                                            {{ item.name }}
+                                                            {% ifequal current_official_account item.pk %}
+                                                                <small><span class="label label-success">当前公众号</span></small>
+                                                            {% endifequal %}
+                                                        </h4>
 
-                                                    <p><strong>类型：</strong>订阅号</p>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <h4>掌上武大</h4>
-                                                    <p><strong>类型：</strong>订阅号</p>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <h4>掌上武大</h4>
-                                                    <p><strong>类型：</strong>订阅号</p>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    <h4>掌上武大</h4>
-                                                    <p><strong>类型：</strong>订阅号</p>
-                                                </a>
-                                            </li>
+                                                        <p><strong>类型：</strong>{{ item.level_verbose }}</p>
+                                                    </a>
+                                                </li>
+                                            {% endfor %}
                                         </ul>
                                     </div>
                                 </li>
-                                <li class="footer"><a href="#">进入系统设置界面</a></li>
+                                {% ifequal current_official_account 0 %}
+                                    <li class="footer"><a><h4><span class="label label-success">当前为系统设置界面</span></h4></a></li>
+                                {% else %}
+                                    <li class="footer"><a href="#" data-official-account-id="0" class="official-account-switch"><h4><span class="label label-danger">进入系统设置界面</span></h4></a></li>
+                                {% endifequal %}
                             </ul>
                         </li>
                         <li class="dropdown user user-menu">
@@ -124,8 +114,8 @@
                 <section class="sidebar">
                     <!-- sidebar menu: : style can be found in sidebar.less -->
                     <ul class="sidebar-menu">
-                        <li{% if request.path == dashboard %} class="active"{% endif %}>
-                            <a href="{{ dashboard }}">
+                        <li{% if request.path == dashboard_url %} class="active"{% endif %}>
+                            <a href="{{ dashboard_url }}">
                                 <i class="fa fa-dashboard"></i> <span>仪表盘</span>
                             </a>
                         </li>
@@ -152,7 +142,7 @@
                                 <i class="fa fa-user"></i> <span>用户管理</span>
                             </a>
                         </li>
-                        <li class="treeview {% if request.path == library_music %} active{% endif %}">
+                        <li class="treeview {% if request.path == library_music_url %} active{% endif %}">
                             <a href="#">
                                 <i class="fa fa-heart"></i>
                                 <span>素材管理</span>
@@ -160,7 +150,7 @@
                             </a>
                             <ul class="treeview-menu">
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 图文素材</a></li>
-                                <li{% if request.path == library_music %} class="active"{% endif %}><a href="{{ library_music }}"><i class="fa fa-angle-double-right"></i> 音乐素材</a></li>
+                                <li{% if request.path == library_music_url %} class="active"{% endif %}><a href="{{ library_music_url }}"><i class="fa fa-angle-double-right"></i> 音乐素材</a></li>
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 图片素材</a></li>
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 语音素材</a></li>
                             </ul>
@@ -175,7 +165,7 @@
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 测试插件</a></li>
                             </ul>
                         </li>
-                        <li class="treeview {% if request.path == official_account %} active{% endif %}">
+                        <li class="treeview {% if request.path == official_account_url %} active{% endif %}">
                             <a href="#">
                                 <i class="fa fa-cogs"></i> <span>系统设置</span>
                                 <i class="fa fa-angle-left pull-right"></i>
@@ -183,7 +173,7 @@
                             <ul class="treeview-menu">
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 系统设置</a></li>
                                 <li><a href="#"><i class="fa fa-angle-double-right"></i> 插件管理</a></li>
-                                <li{% if request.path == official_account %} class="active"{% endif %}><a href="{{ official_account }}"><i class="fa fa-angle-double-right"></i> 公众号管理</a></li>
+                                <li{% if request.path == official_account_url %} class="active"{% endif %}><a href="{{ official_account_url }}"><i class="fa fa-angle-double-right"></i> 公众号管理</a></li>
                             </ul>
                         </li>
                     </ul>

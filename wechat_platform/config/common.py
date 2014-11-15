@@ -172,6 +172,7 @@ class Common(Configuration):
         'django.core.context_processors.request',
         # Your stuff: custom template context processers go here
         'system.setting.context_processors.setting',
+        'system.official_account.context_processors.official_account',
         'system.users.context_processors.current_info',
     )
 
