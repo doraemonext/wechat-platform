@@ -54,6 +54,7 @@ class Common(Configuration):
         'system.setting',
         'system.plugin',
         'system.simulation',
+        'system.media',
         'system.library.text',
         'system.library.music',
         'system.library.news',
