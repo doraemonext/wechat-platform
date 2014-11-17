@@ -9,17 +9,14 @@ from system.official_account.models import OfficialAccount
 
 
 class MediaManager(models.Manager):
-    def get(self, official_account, key):
+    def get(self, key):
         """
         获取一个媒体文件
-        :param official_account: 所属公众号
         :param key: 文件唯一 key
         :return: 媒体文件实例 (Media)
         """
-        return super(MediaManager, self).get_queryset().filter(
+        return super(MediaManager, self).get_queryset().get(
             key=key
-        ).get(
-            official_account=official_account
         )
 
     def add(self, official_account, file_object, type):
@@ -76,6 +73,10 @@ class Media(models.Model):
         verbose_name = u'媒体存储'
         verbose_name_plural = u'媒体存储'
         db_table = 'wechat_media'
+
+    @property
+    def full_filename(self):
+        return self.filename + self.extension
 
     def save(self, *args, **kwargs):
         """
