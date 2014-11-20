@@ -14,6 +14,12 @@ class LibraryMusicSerializer(serializers.ModelSerializer):
     """
     系统素材库 - 音乐库 序列化类
     """
+    music = serializers.PrimaryKeyRelatedField(error_messages={
+        'required': '必须上传普通音乐文件',
+    })
+    hq_music = serializers.PrimaryKeyRelatedField(required=False)
+    thumb = serializers.PrimaryKeyRelatedField(required=False)
+
     def save(self, **kwargs):
         """
         重载默认的 save 方法，使得在 POST 请求新建公众号时可以调用 LibraryMusic manager 中的方法
@@ -32,7 +38,7 @@ class LibraryMusicSerializer(serializers.ModelSerializer):
                 thumb_media_id=self.object.thumb_media_id,
                 music=self.object.music,
                 hq_music=self.object.hq_music,
-                thumb_media=self.object.thumb_media,
+                thumb=self.object.thumb,
             )
             return self.object
         else:

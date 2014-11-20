@@ -11,4 +11,5 @@ urlpatterns = patterns('',
     url(r'^user/', include('api.user.urls', namespace='user')),
     url(r'^official_account/', include('api.official_account.urls', namespace='official_account')),
     url(r'^library/', include('api.library.urls', namespace='library')),
+    url(r'^filetranslator/', include('api.media.urls', namespace='media')),
 )

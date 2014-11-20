@@ -391,3 +391,12 @@ class Common(Configuration):
     OFFICIAL_ACCOUNT_NAME_MAX_LEN = 100
     OFFICIAL_ACCOUNT_ORIGINAL_MAX_LEN = 30
     OFFICIAL_ACCOUNT_WECHAT_MAX_LEN = 100
+
+    MEDIA_FILENAME_MAX_LEN = 50
+    MEDIA_EXTENSION_MAX_LEN = 10
+    MEDIA_MAX_IMAGE_SIZE = 4194304
+    MEDIA_MAX_VOICE_SIZE = 20971520
+    MEDIA_MAX_MUSIC_SIZE = 41943040
+    MEDIA_IMAGE_EXTENSION = ('.bmp', '.png', '.jpeg', '.jpg', '.gif')
+    MEDIA_VOICE_EXTENSION = ('.mp3', '.wma', '.wav', '.amr')
+    MEDIA_MUSIC_EXTENSION = ('.mp3', '.wma', '.wav', '.amr')

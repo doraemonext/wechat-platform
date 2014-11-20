@@ -35,7 +35,6 @@ class MediaManager(models.Manager):
             filename=filename,
             extension=extension,
             media=file_object,
-            size=file_object.size,
         )
 
 
@@ -82,6 +81,7 @@ class Media(models.Model):
         """
         在数据库保存过程中新建媒体文件的唯一 key 值
         """
+        self.size = self.media.size
         if not self.key:
             self.key = self.generate_key()
         return super(Media, self).save(*args, **kwargs)

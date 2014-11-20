@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.core.urlresolvers import reverse
 
 from system.official_account.models import OfficialAccount
 from system.media.models import Media
@@ -31,6 +32,13 @@ class LibraryMusicManager(models.Manager):
         """
         添加一条新的音乐素材
         """
+        if not music_url and music:
+            music_url = reverse('filetranslator:download', kwargs={'key': music.pk})
+        if not hq_music_url and hq_music:
+            hq_music_url = reverse('filetranslator:download', kwargs={'key': hq_music.pk})
+        if not thumb_media_id and thumb:
+            pass  # TODO: 待开发
+
         return super(LibraryMusicManager, self).create(
             official_account=official_account,
             plugin_iden=plugin_iden,

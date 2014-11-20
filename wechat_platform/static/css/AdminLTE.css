@@ -3622,3 +3622,41 @@ fieldset[disabled] .btn-vk.active {
     border: 1px solid #ccc;
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
+
+.upload-info {
+    height: 22px;
+    line-height: 22px;
+    margin: 10px 0 0 0;
+}
+
+.upload-progress {
+    margin-bottom: 0;
+    margin-top: 15px;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+.help-inline {
+    margin-left: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    color: #737373;
+}
