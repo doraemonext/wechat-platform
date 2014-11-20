@@ -5,6 +5,7 @@ define(function(require, exports, module) {
     require('spin');
     require('jquery-validate');
     require('jquery-cookie');
+    require('jquery-form');
     require('backbone-paginator');
 
     var item_template = require('text!templates/library/music/item.html');
@@ -157,13 +158,97 @@ define(function(require, exports, module) {
          * 渲染添加音乐素材页面
          * @returns {LibraryMusicItemAddView}
          */
-        render: function() {
+        render: function () {
             this.$el.html(this.template());
+            this.set_file_upload();
             /*this.set_validate();
             this.$('input[name=level]').on('change', this, this.toggle_level);
             this.$('input[name=is_advanced]').on('change', this, this.toggle_is_advanced);*/
             return this;
         },
+        set_file_upload: function () {
+            var that = this;
+            var info = this.$('.upload-info');
+            var progress = this.$('.upload-progress');
+            var btn = this.$('.upload-button');
+
+            info.set_content = function (filename, size, key) {
+                var that = this;
+                var content = '<strong>文件名</strong>: ' + filename + ' <strong>大小</strong>: ' + size + ' KB ';
+                content += '&nbsp;<strong><a class="delete-media" data-key="' + key +'" href="javascript:void(0)">删除该文件</a></strong>';
+                $(this).html(content);
+                $(this).find('.delete-media').click(function () {
+                    var key = $(this).data('key');
+                    $.ajax({
+                        url: '/api/filetranslator/' + key + '/',
+                        type: 'DELETE',
+                        success: function () {
+                            btn.display_select_upload();
+                            info.hide();
+                        },
+                        error: function () {
+                            noty({
+                                type: "error",
+                                text: "删除文件时出错, 请重试"
+                            });
+                        }
+                    });
+                });
+            };
+            progress.set_progress = function (percent) {
+                progress.find('.progress-bar').css('width', percent + '%');
+                progress.find('.progress-bar').attr('aria-valuenow', percent);
+                progress.find('.progress-bar').html(percent + '%');
+            };
+            btn.display_select_upload = function () {
+                $(this).find('input').prop('disabled', false);
+                $(this).find('span').html('上传音乐');
+            };
+            btn.display_uploading = function () {
+                $(this).find('input').prop('disabled', true);
+                $(this).find('span').html('上传中...');
+            };
+            btn.display_restart_upload = function () {
+                $(this).find('input').prop('disabled', false);
+                $(this).find('span').html('重新上传');
+            };
+
+            this.$('input[id=music_media]').click(function () {
+                $(this).val('');
+            });
+            this.$('input[id=music_media]').change(function () {
+                that.$('#upload_music form').ajaxSubmit({
+                    dataType: 'json',
+                    data: {
+                        'official_account': $('#current-official-account').val(),
+                        'type': 3
+                    },
+                    beforeSend: function () {
+                        btn.display_uploading();
+                        progress.set_progress(0);
+                        progress.show();
+                        info.hide();
+                    },
+                    uploadProgress: function (event, position, total, percentComplete) {
+                        progress.set_progress(percentComplete);
+                    },
+                    success: function (data) {
+                        that.$('input[name=music]').val(data['key']);
+
+                        var full_filename = data['filename'] + data['extension'];
+                        var size = parseInt(parseInt(data['size']) / 1024);
+
+                        btn.display_restart_upload();
+                        progress.hide();
+                        info.set_content(full_filename, size, data['key']);
+                        info.show();
+                    },
+                    error: function (xhr) {
+                        alert('failed');
+                    }
+                });
+            });
+        }
         /**
          * 设置表单的验证
          */

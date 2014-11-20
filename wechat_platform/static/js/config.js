@@ -7,6 +7,7 @@ require.config({
         'jquery-cookie': { 'deps': ['jquery'] },
         'noty': { 'deps': ['jquery'] },
         'jquery-validate': { 'deps': ['jquery'] },
+        'jquery-form': { 'deps': ['jquery'] },
         'spin': { 'exports': 'Spinner' },
         'theme-app': { 'deps': ['jquery', 'bootstrap'] }
     },
@@ -19,6 +20,7 @@ require.config({
         'bootstrap': 'plugins/bootstrap/bootstrap.min',
         'jquery-cookie': 'plugins/jquerycookie/jquery.cookie',
         'jquery-validate': 'plugins/jqueryvalidate/jquery.validate.min',
+        'jquery-form': 'plugins/jqueryform/jquery.form',
         'noty': 'plugins/noty/jquery.noty.packaged.min',
         'spin': 'plugins/spin/spin.min',
         'theme-app': 'AdminLTE/app',

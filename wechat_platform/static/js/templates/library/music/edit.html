@@ -1,5 +1,4 @@
-<form class="form-horizontal" role="form" id="form">
-
+<div class="form-horizontal" role="form" id="form">
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title"><span><strong>音乐上传</strong></span></h3>
@@ -7,12 +6,24 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-12 col-lg-12">
-                    <div class="form-group">
+                    <div class="form-group" id="upload_music">
                         <label for="music" class="col-sm-2 control-label">普通音乐文件 <span class="text-red">*</span></label>
                         <div class="col-sm-9">
-                            <input type="file" id="music" name="music">
+                            <div class="upload-button">
+                                <span>添加音乐</span>
+                                <form action="/api/filetranslator/" method="post" enctype="multipart/form-data">
+                                    <input type="file" name="media" id="music_media">
+                                </form>
+                            </div>
+                            <div class="upload-info" style="display: none"></div>
+                            <div class="progress upload-progress" style="display: none">
+                                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                                    0%
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <!--
                     <div class="form-group">
                         <label for="hq_music" class="col-sm-2 control-label">高清音乐文件</label>
                         <div class="col-sm-9">
@@ -25,11 +36,17 @@
                             <input type="file" id="thumb_media" name="thumb_media">
                         </div>
                     </div>
+                    -->
                 </div>
             </div>
         </div>
     </div>
+</div>
 
+<form class="form-horizontal" role="form" id="form">
+    <input type="hidden" name="music" id="music" value="">
+    <input type="hidden" name="hq_music" id="hq_music" value="">
+    <input type="hidden" name="thumb" id="thumb" value="">
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title"><span><strong>基本信息</strong></span></h3>
