@@ -3623,41 +3623,6 @@ fieldset[disabled] .btn-vk.active {
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
 
-.upload-button {
-    position: relative;
-    overflow: hidden;
-    margin-right: 4px;
-    margin-top: 3px;
-    display: inline-block;
-    *display: inline;
-    padding: 4px 10px 4px;
-    font-size: 14px;
-    line-height: 18px;
-    *line-height: 20px;
-    color: #fff;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    background: #5bb75b;
-    border: 1px solid #cccccc;
-    border-color: #e6e6e6 #e6e6e6 #bfbfbf;
-    border-bottom-color: #b3b3b3;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-}
-
-.upload-button input {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 0;
-    border: solid transparent;
-    opacity: 0;
-    filter: alpha(opacity=0);
-    cursor: pointer;
-}
-
 .upload-info {
     height: 22px;
     line-height: 22px;
@@ -3667,4 +3632,24 @@ fieldset[disabled] .btn-vk.active {
 .upload-progress {
     margin-bottom: 0;
     margin-top: 15px;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
 }

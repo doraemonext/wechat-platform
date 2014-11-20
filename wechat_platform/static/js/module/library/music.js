@@ -166,6 +166,18 @@ define(function(require, exports, module) {
             this.$('input[name=is_advanced]').on('change', this, this.toggle_is_advanced);*/
             return this;
         },
+        delete_media_file: function (key) {
+            return $.ajax({
+                url: '/api/filetranslator/' + key + '/',
+                type: 'DELETE',
+                error: function () {
+                    noty({
+                        type: "error",
+                        text: "删除文件时出错, 请重试"
+                    });
+                }
+            });
+        },
         set_file_upload: function () {
             var that = this;
             var info = this.$('.upload-info');
@@ -173,25 +185,15 @@ define(function(require, exports, module) {
             var btn = this.$('.upload-button');
 
             info.set_content = function (filename, size, key) {
-                var that = this;
                 var content = '<strong>文件名</strong>: ' + filename + ' <strong>大小</strong>: ' + size + ' KB ';
                 content += '&nbsp;<strong><a class="delete-media" data-key="' + key +'" href="javascript:void(0)">删除该文件</a></strong>';
                 $(this).html(content);
                 $(this).find('.delete-media').click(function () {
                     var key = $(this).data('key');
-                    $.ajax({
-                        url: '/api/filetranslator/' + key + '/',
-                        type: 'DELETE',
-                        success: function () {
-                            btn.display_select_upload();
-                            info.hide();
-                        },
-                        error: function () {
-                            noty({
-                                type: "error",
-                                text: "删除文件时出错, 请重试"
-                            });
-                        }
+                    that.delete_media_file(key).success(function () {
+                        btn.display_select_upload();
+                        info.hide();
+                        that.$('input[name=music]').val('');
                     });
                 });
             };
@@ -202,14 +204,17 @@ define(function(require, exports, module) {
             };
             btn.display_select_upload = function () {
                 $(this).find('input').prop('disabled', false);
+                $(this).removeClass('disabled');
                 $(this).find('span').html('上传音乐');
             };
             btn.display_uploading = function () {
                 $(this).find('input').prop('disabled', true);
+                $(this).addClass('disabled');
                 $(this).find('span').html('上传中...');
             };
             btn.display_restart_upload = function () {
                 $(this).find('input').prop('disabled', false);
+                $(this).removeClass('disabled');
                 $(this).find('span').html('重新上传');
             };
 
@@ -224,6 +229,10 @@ define(function(require, exports, module) {
                         'type': 3
                     },
                     beforeSend: function () {
+                        var origin_key = that.$('input[name=music]').val();
+                        if (origin_key.length > 0) {
+                            that.delete_media_file(origin_key);
+                        }
                         btn.display_uploading();
                         progress.set_progress(0);
                         progress.show();

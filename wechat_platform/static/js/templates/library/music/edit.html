@@ -9,12 +9,12 @@
                     <div class="form-group" id="upload_music">
                         <label for="music" class="col-sm-2 control-label">普通音乐文件 <span class="text-red">*</span></label>
                         <div class="col-sm-9">
-                            <div class="upload-button">
-                                <span>添加音乐</span>
+                            <span class="btn btn-success btn-file upload-button">
+                                <span>上传音乐</span>
                                 <form action="/api/filetranslator/" method="post" enctype="multipart/form-data">
                                     <input type="file" name="media" id="music_media">
                                 </form>
-                            </div>
+                            </span>
                             <div class="upload-info" style="display: none"></div>
                             <div class="progress upload-progress" style="display: none">
                                 <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
