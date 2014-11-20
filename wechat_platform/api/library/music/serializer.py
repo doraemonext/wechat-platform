@@ -41,4 +41,4 @@ class LibraryMusicSerializer(serializers.ModelSerializer):
     class Meta:
         model = LibraryMusic
         fields = ('id', 'official_account', 'plugin_iden', 'title', 'description', 'music_url', 'hq_music_url',
-                  'thumb_media_id', 'music', 'hq_music', 'thumb_media')
+                  'thumb_media_id', 'music', 'hq_music', 'thumb')

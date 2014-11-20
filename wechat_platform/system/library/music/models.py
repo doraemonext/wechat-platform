@@ -3,6 +3,7 @@
 from django.db import models
 
 from system.official_account.models import OfficialAccount
+from system.media.models import Media
 
 
 class LibraryMusicManager(models.Manager):
@@ -26,7 +27,7 @@ class LibraryMusicManager(models.Manager):
         )
 
     def add(self, official_account, plugin_iden, title=None, description=None, music_url=None, hq_music_url=None,
-            thumb_media_id=None, music=None, hq_music=None, thumb_media=None):
+            thumb_media_id=None, music=None, hq_music=None, thumb=None):
         """
         添加一条新的音乐素材
         """
@@ -40,7 +41,7 @@ class LibraryMusicManager(models.Manager):
             thumb_media_id=thumb_media_id,
             music=music,
             hq_music=hq_music,
-            thumb_media=thumb_media,
+            thumb=thumb,
         )
 
 
@@ -55,9 +56,9 @@ class LibraryMusic(models.Model):
     music_url = models.CharField(u'音乐URL', max_length=1024, blank=True, null=True)
     hq_music_url = models.CharField(u'高清音乐URL', max_length=1024, blank=True, null=True)
     thumb_media_id = models.CharField(u'缩略图媒体ID', max_length=255, blank=True, null=True)
-    music = models.FileField(u'音乐文件', upload_to='library/music', blank=True, null=True)
-    hq_music = models.FileField(u'高清音乐文件', upload_to='library/music/hq', blank=True, null=True)
-    thumb_media = models.ImageField(u'缩略图媒体图像', upload_to='library/music/thumb', blank=True, null=True)
+    music = models.ForeignKey(Media, related_name='+', verbose_name=u'音乐文件', blank=True, null=True)
+    hq_music = models.ForeignKey(Media, related_name='+', verbose_name=u'高清音乐文件', blank=True, null=True)
+    thumb = models.ForeignKey(Media, related_name='+', verbose_name=u'缩略图媒体图像', blank=True, null=True)
 
     objects = models.Manager()
     manager = LibraryMusicManager()
