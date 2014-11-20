@@ -197,6 +197,9 @@ define(function(require, exports, module) {
                     });
                 });
             };
+            info.set_error_content = function (content) {
+                $(this).html('<span class="text-red">上传失败：' + content + '</span>');
+            };
             progress.set_progress = function (percent) {
                 progress.find('.progress-bar').css('width', percent + '%');
                 progress.find('.progress-bar').attr('aria-valuenow', percent);
@@ -205,7 +208,7 @@ define(function(require, exports, module) {
             btn.display_select_upload = function () {
                 $(this).find('input').prop('disabled', false);
                 $(this).removeClass('disabled');
-                $(this).find('span').html('上传音乐');
+                $(this).find('span').html('上传文件');
             };
             btn.display_uploading = function () {
                 $(this).find('input').prop('disabled', true);
@@ -218,7 +221,7 @@ define(function(require, exports, module) {
                 $(this).find('span').html('重新上传');
             };
 
-            this.$('input[id=music_media]').click(function () {
+            this.$('input[id=music_media]').click(function () {  // 此处为两次提交重复文件不响应 change 的解决方案
                 $(this).val('');
             });
             this.$('input[id=music_media]').change(function () {
@@ -252,8 +255,26 @@ define(function(require, exports, module) {
                         info.set_content(full_filename, size, data['key']);
                         info.show();
                     },
-                    error: function (xhr) {
-                        alert('failed');
+                    statusCode: {
+                        400: function(xhr) {
+                            var data = $.parseJSON(xhr.responseText);
+                            for (var key in data) {
+                                btn.display_select_upload();
+                                progress.hide();
+                                info.set_error_content(data[key][0]);
+                                info.show();
+                                break;  // 直接针对第一条错误给出提示, 其他忽略
+                            }
+                        },
+                        500: function(xhr) {
+                            btn.display_select_upload();
+                            progress.hide();
+                            info.hide();
+                            noty({
+                                type: "error",
+                                text: "服务器内部出错, 请重试"
+                            });
+                        }
                     }
                 });
             });
