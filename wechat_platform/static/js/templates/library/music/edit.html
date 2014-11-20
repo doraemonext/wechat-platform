@@ -23,20 +23,41 @@
                             </div>
                         </div>
                     </div>
-                    <!--
-                    <div class="form-group">
-                        <label for="hq_music" class="col-sm-2 control-label">高清音乐文件</label>
+                    <div class="form-group" id="upload_hq_music">
+                        <label for="music" class="col-sm-2 control-label">高清音乐文件</label>
                         <div class="col-sm-9">
-                            <input type="file" id="hq_music" name="hq_music">
+                            <span class="btn btn-success btn-file upload-button">
+                                <span>上传文件</span>
+                                <form action="/api/filetranslator/" method="post" enctype="multipart/form-data">
+                                    <input type="file" name="media" id="hq_music_media">
+                                </form>
+                            </span>
+                            <span class="help-inline">高清音乐文件可选, 如果不上传将默认使用普通音乐文件代替</span>
+                            <div class="upload-info" style="display: none"></div>
+                            <div class="progress upload-progress" style="display: none">
+                                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                                    0%
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="thumb_media" class="col-sm-2 control-label">音乐封面图片</label>
+                    <div class="form-group" id="upload_thumb">
+                        <label for="music" class="col-sm-2 control-label">音乐封面图片</label>
                         <div class="col-sm-9">
-                            <input type="file" id="thumb_media" name="thumb_media">
+                            <span class="btn btn-success btn-file upload-button">
+                                <span>上传文件</span>
+                                <form action="/api/filetranslator/" method="post" enctype="multipart/form-data">
+                                    <input type="file" name="media" id="thumb_media">
+                                </form>
+                            </span>
+                            <div class="upload-info" style="display: none"></div>
+                            <div class="progress upload-progress" style="display: none">
+                                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                                    0%
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    -->
                 </div>
             </div>
         </div>

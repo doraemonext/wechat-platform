@@ -160,7 +160,9 @@ define(function(require, exports, module) {
          */
         render: function () {
             this.$el.html(this.template());
-            this.set_file_upload();
+            this.set_file_upload('music');
+            this.set_file_upload('hq_music');
+            this.set_file_upload('thumb');
             /*this.set_validate();
             this.$('input[name=level]').on('change', this, this.toggle_level);
             this.$('input[name=is_advanced]').on('change', this, this.toggle_is_advanced);*/
@@ -178,11 +180,11 @@ define(function(require, exports, module) {
                 }
             });
         },
-        set_file_upload: function () {
+        set_file_upload: function (media_type) {
             var that = this;
-            var info = this.$('.upload-info');
-            var progress = this.$('.upload-progress');
-            var btn = this.$('.upload-button');
+            var info = this.$('#upload_' + media_type + ' .upload-info');
+            var progress = this.$('#upload_' + media_type + ' .upload-progress');
+            var btn = this.$('#upload_' + media_type + ' .upload-button');
 
             info.set_content = function (filename, size, key) {
                 var content = '<strong>文件名</strong>: ' + filename + ' <strong>大小</strong>: ' + size + ' KB ';
@@ -193,7 +195,7 @@ define(function(require, exports, module) {
                     that.delete_media_file(key).success(function () {
                         btn.display_select_upload();
                         info.hide();
-                        that.$('input[name=music]').val('');
+                        that.$('input[name=' + media_type + ']').val('');
                     });
                 });
             };
@@ -221,18 +223,24 @@ define(function(require, exports, module) {
                 $(this).find('span').html('重新上传');
             };
 
-            this.$('input[id=music_media]').click(function () {  // 此处为两次提交重复文件不响应 change 的解决方案
+            this.$('input[id=' + media_type + '_media]').click(function () {  // 此处为两次提交重复文件不响应 change 的解决方案
                 $(this).val('');
             });
-            this.$('input[id=music_media]').change(function () {
-                that.$('#upload_music form').ajaxSubmit({
+            this.$('input[id=' + media_type + '_media]').change(function () {
+                var media_type_number;
+                if (media_type == 'music' || media_type == 'hq_music') {
+                    media_type_number = 3;
+                } else {
+                    media_type_number = 1;
+                }
+                that.$('#upload_' + media_type + ' form').ajaxSubmit({
                     dataType: 'json',
                     data: {
                         'official_account': $('#current-official-account').val(),
-                        'type': 3
+                        'type': media_type_number
                     },
                     beforeSend: function () {
-                        var origin_key = that.$('input[name=music]').val();
+                        var origin_key = that.$('input[name=' + media_type + ']').val();
                         if (origin_key.length > 0) {
                             that.delete_media_file(origin_key);
                         }
@@ -245,7 +253,7 @@ define(function(require, exports, module) {
                         progress.set_progress(percentComplete);
                     },
                     success: function (data) {
-                        that.$('input[name=music]').val(data['key']);
+                        that.$('input[name=' + media_type + ']').val(data['key']);
 
                         var full_filename = data['filename'] + data['extension'];
                         var size = parseInt(parseInt(data['size']) / 1024);
