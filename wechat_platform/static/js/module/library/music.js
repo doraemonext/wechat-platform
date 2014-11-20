@@ -163,11 +163,14 @@ define(function(require, exports, module) {
             this.set_file_upload('music');
             this.set_file_upload('hq_music');
             this.set_file_upload('thumb');
-            /*this.set_validate();
-            this.$('input[name=level]').on('change', this, this.toggle_level);
-            this.$('input[name=is_advanced]').on('change', this, this.toggle_is_advanced);*/
+            this.set_validate();
             return this;
         },
+        /**
+         * 删除系统媒体文件
+         * @param key 媒体文件标识符 key
+         * @returns {*}
+         */
         delete_media_file: function (key) {
             return $.ajax({
                 url: '/api/filetranslator/' + key + '/',
@@ -180,6 +183,10 @@ define(function(require, exports, module) {
                 }
             });
         },
+        /**
+         * 设置页面中的文件上传组件
+         * @param media_type 组件标识符 (可选 music/hq_music/thumb)
+         */
         set_file_upload: function (media_type) {
             var that = this;
             var info = this.$('#upload_' + media_type + ' .upload-info');
@@ -286,81 +293,24 @@ define(function(require, exports, module) {
                     }
                 });
             });
-        }
+        },
         /**
          * 设置表单的验证
          */
-        /*set_validate: function() {
+        set_validate: function() {
             var that = this;
-            this.$el.find('#form').validate({
-                rules: {
-                    name: 'required',
-                    level: 'required',
-                    appid: {
-                        required: function(element) {
-                            return that.get_level() == 2 || that.get_level() == 3;
-                        }
-                    },
-                    appsecret: {
-                        required: function(element) {
-                            return that.get_level() == 2 || that.get_level() == 3;
-                        }
-                    },
-                    is_advanced: 'required',
-                    username: {
-                        required: function(element) {
-                            return that.get_is_advanced();
-                        }
-                    },
-                    password: {
-                        required: function(element) {
-                            return that.get_is_advanced();
-                        }
-                    },
-                    email: {
-                        required: true,
-                        email: true
-                    },
-                    original: 'required',
-                    wechat: 'required'
-                },
-                messages: {
-                    name: {
-                        required: '公众号名称不能为空'
-                    },
-                    level: {
-                        required: '必须选择一个公众号级别'
-                    },
-                    appid: {
-                        required: '当前公众号级别必须填入App ID'
-                    },
-                    appsecret: {
-                        required: '当前公众号级别必须填入App Secret'
-                    },
-                    is_advanced: {
-                        required: '必选选择是否开启高级支持'
-                    },
-                    username: {
-                        required: '开启高级支持时必须输入公众平台用户名'
-                    },
-                    password: {
-                        required: '开启高级支持时必须输入公众平台密码'
-                    },
-                    email: {
-                        required: '登录邮箱不能为空',
-                        email: '登录邮箱不合法'
-                    },
-                    original: {
-                        required: '原始ID不能为空'
-                    },
-                    wechat: {
-                        required: '绑定微信号不能为空'
-                    }
-                },
+            this.$('#form').validate({
                 errorClass: 'control-label text-red',
                 errorPlacement: function(error, element) {
-                    if ($(element).prop('name') == 'level' || $(element).prop('name') == 'is_advanced') {
-                        $(element).parent().parent().append(error);
+                    if ($(element).prop('name') == 'music') {
+                        that.$('#upload_music .upload-info').html('<span class="text-red">' + error.html() + '</span>');
+                        that.$('#upload_music .upload-info').show();
+                    } else if ($(element).prop('name') == 'hq_music') {
+                        that.$('#upload_hq_music .upload-info').html('<span class="text-red">' + error.html() + '</span>');
+                        that.$('#upload_hq_music .upload-info').show();
+                    } else if ($(element).prop('name') == 'thumb') {
+                        that.$('#upload_thumb .upload-info').html('<span class="text-red">' + error.html() + '</span>');
+                        that.$('#upload_thumb .upload-info').show();
                     } else {
                         error.insertAfter(element);
                     }
@@ -373,31 +323,26 @@ define(function(require, exports, module) {
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
-                        url: '/api/official_account/',
+                        url: '/api/library/music/',
                         cache: false,
                         data: {
-                            name: $("input[name=name]").val(),
-                            level: $("input[name=level]:checked").val(),
-                            appid: $("input[name=appid]").val(),
-                            appsecret: $("input[name=appsecret]").val(),
-                            is_advanced: $("input[name=is_advanced]:checked").val(),
-                            username: $("input[name=username]").val(),
-                            password: $("input[name=password]").val(),
-                            email: $("input[name=email]").val(),
-                            original: $("input[name=original]").val(),
-                            wechat: $("input[name=wechat]").val(),
-                            introduction: $("textarea[name=introduction]").val(),
-                            address: $("input[name=address]").val()
+                            official_account: $('#current-official-account').val(),
+                            plugin_iden: 'music',
+                            title: that.$('input[name=title]').val(),
+                            description: that.$('textarea[name=description]').val(),
+                            music: that.$('input[name=music]').val(),
+                            hq_music: that.$('input[name=hq_music]').val(),
+                            thumb: that.$('input[name=thumb]').val()
                         },
                         beforeSend: function(xhr, settings) {
                             xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
-                            $("button[type=submit]").attr("disabled", "disabled");
-                            $("button[type=submit]").text("提交中…");
+                            that.$("button[type=submit]").attr("disabled", "disabled");
+                            that.$("button[type=submit]").text("提交中…");
                         },
                         success: function(data) {
                             noty({
                                 type: "success",
-                                text: "成功添加 <strong>" + data["name"] + "</strong> 公众号"
+                                text: "成功添加 <strong>" + data["title"] + "</strong> 音乐素材"
                             });
                             window.location.href = "#";
                         },
@@ -407,7 +352,7 @@ define(function(require, exports, module) {
                                 var errors = {};
                                 for (var key in data) {
                                     if (key == "non_field_errors") {
-                                        errors["name"] = data[key][0];
+                                        errors["title"] = data[key][0];
                                     } else {
                                         errors[key] = data[key][0];
                                     }
@@ -416,14 +361,14 @@ define(function(require, exports, module) {
                             }
                         },
                         complete: function() {
-                            $("button[type=submit]").removeAttr("disabled");
-                            $("button[type=submit]").text("提交");
+                            that.$("button[type=submit]").removeAttr("disabled");
+                            that.$("button[type=submit]").text("提交");
                         }
                     });
                     return false;
                 }
             });
-        }*/
+        }
     });
 
     module.exports = {
