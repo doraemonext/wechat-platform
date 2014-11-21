@@ -10,7 +10,6 @@ define(function(require, exports, module) {
 
     var item_template = require('text!templates/library/music/item.html');
     var list_template = require('text!templates/library/music/list.html');
-    //var detail_template = require('text!templates/library/music/detail.html');
     var add_template = require('text!templates/library/music/edit.html');
     var edit_template = require('text!templates/library/music/edit.html');
 
@@ -26,7 +25,7 @@ define(function(require, exports, module) {
         url: '/api/library/music/?official_account=' + $('#current-official-account').val(),
         model: LibraryMusicModel,
         state: {
-            pageSize: 15
+            pageSize: 10
         },
         parseRecords: function (resp) {
             return resp.results;
