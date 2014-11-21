@@ -26,7 +26,7 @@ define(function(require, exports, module) {
         url: '/api/library/music/?official_account=' + $('#current-official-account').val(),
         model: LibraryMusicModel,
         state: {
-            pageSize: 5
+            pageSize: 15
         },
         parseRecords: function (resp) {
             return resp.results;
