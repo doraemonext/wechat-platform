@@ -171,12 +171,17 @@ define(function(require, exports, module) {
         /**
          * 删除系统媒体文件
          * @param key 媒体文件标识符 key
+         * @param media_type 媒体文件类型
          * @returns {*}
          */
-        delete_media_file: function (key) {
+        delete_media_file: function (key, media_type) {
+            var that = this;
             return $.ajax({
                 url: '/api/filetranslator/' + key + '/',
                 type: 'DELETE',
+                success: function () {
+                    that.$('input[name=' + media_type + ']').val('');
+                },
                 error: function () {
                     noty({
                         type: "error",
@@ -206,10 +211,9 @@ define(function(require, exports, module) {
                     $(this).html(content);
                     $(this).find('.delete-media').click(function () {
                         var key = $(this).data('key');
-                        that.delete_media_file(key).success(function () {
+                        that.delete_media_file(key, media_type).success(function () {
                             btn.display_select_upload();
                             info.hide();
-                            that.$('input[name=' + media_type + ']').val('');
                         });
                     });
                 }
@@ -256,11 +260,6 @@ define(function(require, exports, module) {
                     },
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
-
-                        var origin_key = that.$('input[name=' + media_type + ']').val();
-                        if (origin_key.length > 0) {
-                            that.delete_media_file(origin_key);
-                        }
                         btn.display_uploading();
                         progress.set_progress(0);
                         progress.show();
@@ -270,6 +269,10 @@ define(function(require, exports, module) {
                         progress.set_progress(percentComplete);
                     },
                     success: function (data) {
+                        var origin_key = that.$('input[name=' + media_type + ']').val();
+                        if (origin_key.length > 0) {
+                            that.delete_media_file(origin_key, media_type);
+                        }
                         that.$('input[name=' + media_type + ']').val(data['key']);
 
                         var full_filename = data['filename'] + data['extension'];
@@ -288,7 +291,6 @@ define(function(require, exports, module) {
                                 progress.hide();
                                 info.set_error_content(data[key][0]);
                                 info.show();
-                                that.$('input[name=' + media_type + ']').val('');
                                 break;  // 直接针对第一条错误给出提示, 其他忽略
                             }
                         },
@@ -296,7 +298,6 @@ define(function(require, exports, module) {
                             btn.display_select_upload();
                             progress.hide();
                             info.hide();
-                            that.$('input[name=' + media_type + ']').val('');
                             noty({
                                 type: "error",
                                 text: "服务器内部出错, 请重试"
@@ -313,7 +314,6 @@ define(function(require, exports, module) {
                                 info.set_error_content('错误' + xhr.status);
                             }
                             info.show();
-                            that.$('input[name=' + media_type + ']').val('');
                         }
                     }
                 });
@@ -356,7 +356,9 @@ define(function(require, exports, module) {
                             title: that.$('input[name=title]').val(),
                             description: that.$('textarea[name=description]').val(),
                             music: that.$('input[name=music]').val(),
+                            music_url: that.$('input[name=music_url]').val(),
                             hq_music: that.$('input[name=hq_music]').val(),
+                            hq_music_url: that.$('input[name=hq_music_url]').val(),
                             thumb: that.$('input[name=thumb]').val()
                         },
                         beforeSend: function(xhr, settings) {
@@ -430,12 +432,17 @@ define(function(require, exports, module) {
         /**
          * 删除系统媒体文件
          * @param key 媒体文件标识符 key
+         * @param media_type 媒体文件类型
          * @returns {*}
          */
-        delete_media_file: function (key) {
+        delete_media_file: function (key, media_type) {
+            var that = this;
             return $.ajax({
                 url: '/api/filetranslator/' + key + '/',
                 type: 'DELETE',
+                success: function () {
+                    that.$('input[name=' + media_type + ']').val('');
+                },
                 error: function () {
                     noty({
                         type: "error",
@@ -465,10 +472,9 @@ define(function(require, exports, module) {
                     $(this).html(content);
                     $(this).find('.delete-media').click(function () {
                         var key = $(this).data('key');
-                        that.delete_media_file(key).success(function () {
+                        that.delete_media_file(key, media_type).success(function () {
                             btn.display_select_upload();
                             info.hide();
-                            that.$('input[name=' + media_type + ']').val('');
                         });
                     });
                 }
@@ -540,7 +546,7 @@ define(function(require, exports, module) {
                     success: function (data) {
                         var origin_key = that.$('input[name=' + media_type + ']').val();
                         if (origin_key.length > 0) {
-                            that.delete_media_file(origin_key);
+                            that.delete_media_file(origin_key, media_type);
                         }
                         that.$('input[name=' + media_type + ']').val(data['key']);
 
@@ -625,7 +631,9 @@ define(function(require, exports, module) {
                             title: that.$('input[name=title]').val(),
                             description: that.$('textarea[name=description]').val(),
                             music: that.$('input[name=music]').val(),
+                            music_url: that.$('input[name=music_url]').val(),
                             hq_music: that.$('input[name=hq_music]').val(),
+                            hq_music_url: that.$('input[name=hq_music_url]').val(),
                             thumb: that.$('input[name=thumb]').val()
                         },
                         beforeSend: function(xhr, settings) {
