@@ -196,17 +196,23 @@ define(function(require, exports, module) {
             var btn = this.$('#upload_' + media_type + ' .upload-button');
 
             info.set_content = function (filename, size, key) {
-                var content = '<strong>文件名</strong>: ' + filename + ' <strong>大小</strong>: ' + size + ' KB ';
-                content += '&nbsp;<strong><a class="delete-media" data-key="' + key +'" href="javascript:void(0)">删除该文件</a></strong>';
-                $(this).html(content);
-                $(this).find('.delete-media').click(function () {
-                    var key = $(this).data('key');
-                    that.delete_media_file(key).success(function () {
-                        btn.display_select_upload();
-                        info.hide();
-                        that.$('input[name=' + media_type + ']').val('');
+                var content = '';
+                if (media_type == 'music') {
+                    content += '<strong>文件名</strong>: ' + filename + ' <strong>大小</strong>: ' + size + ' KB ';
+                    $(this).html(content);
+                } else {
+                    content += '<strong>文件名</strong>: ' + filename + ' <strong>大小</strong>: ' + size + ' KB ';
+                    content += '&nbsp;<strong><a class="delete-media" data-key="' + key + '" href="javascript:void(0)">删除该文件</a></strong>';
+                    $(this).html(content);
+                    $(this).find('.delete-media').click(function () {
+                        var key = $(this).data('key');
+                        that.delete_media_file(key).success(function () {
+                            btn.display_select_upload();
+                            info.hide();
+                            that.$('input[name=' + media_type + ']').val('');
+                        });
                     });
-                });
+                }
             };
             info.set_error_content = function (content) {
                 $(this).html('<span class="text-red">上传失败：' + content + '</span>');
@@ -282,6 +288,7 @@ define(function(require, exports, module) {
                                 progress.hide();
                                 info.set_error_content(data[key][0]);
                                 info.show();
+                                that.$('input[name=' + media_type + ']').val('');
                                 break;  // 直接针对第一条错误给出提示, 其他忽略
                             }
                         },
@@ -289,6 +296,7 @@ define(function(require, exports, module) {
                             btn.display_select_upload();
                             progress.hide();
                             info.hide();
+                            that.$('input[name=' + media_type + ']').val('');
                             noty({
                                 type: "error",
                                 text: "服务器内部出错, 请重试"
@@ -305,6 +313,7 @@ define(function(require, exports, module) {
                                 info.set_error_content('错误' + xhr.status);
                             }
                             info.show();
+                            that.$('input[name=' + media_type + ']').val('');
                         }
                     }
                 });
@@ -407,7 +416,7 @@ define(function(require, exports, module) {
             return this;
         },
         render_library_music: function (music) {
-            if (music.get('music')) {
+            if (music.get('music') || music.get('hq_music') || music.get('thumb')) {
                 this.$('input[name=music]').val(music.get('music'));
                 this.$('input[name=hq_music]').val(music.get('hq_music'));
                 this.$('input[name=thumb]').val(music.get('thumb'));
@@ -446,17 +455,23 @@ define(function(require, exports, module) {
             var btn = this.$('#upload_' + media_type + ' .upload-button');
 
             info.set_content = function (filename, size, key) {
-                var content = '<strong>文件名</strong>: ' + filename + ' <strong>大小</strong>: ' + size + ' KB ';
-                content += '&nbsp;<strong><a class="delete-media" data-key="' + key +'" href="javascript:void(0)">删除该文件</a></strong>';
-                $(this).html(content);
-                $(this).find('.delete-media').click(function () {
-                    var key = $(this).data('key');
-                    that.delete_media_file(key).success(function () {
-                        btn.display_select_upload();
-                        info.hide();
-                        that.$('input[name=' + media_type + ']').val('');
+                var content = '';
+                if (media_type == 'music') {
+                    content += '<strong>文件名</strong>: ' + filename + ' <strong>大小</strong>: ' + size + ' KB ';
+                    $(this).html(content);
+                } else {
+                    content += '<strong>文件名</strong>: ' + filename + ' <strong>大小</strong>: ' + size + ' KB ';
+                    content += '&nbsp;<strong><a class="delete-media" data-key="' + key + '" href="javascript:void(0)">删除该文件</a></strong>';
+                    $(this).html(content);
+                    $(this).find('.delete-media').click(function () {
+                        var key = $(this).data('key');
+                        that.delete_media_file(key).success(function () {
+                            btn.display_select_upload();
+                            info.hide();
+                            that.$('input[name=' + media_type + ']').val('');
+                        });
                     });
-                });
+                }
             };
             info.set_error_content = function (content) {
                 $(this).html('<span class="text-red">上传失败：' + content + '</span>');
@@ -514,11 +529,6 @@ define(function(require, exports, module) {
                     },
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
-
-                        var origin_key = that.$('input[name=' + media_type + ']').val();
-                        if (origin_key.length > 0) {
-                            that.delete_media_file(origin_key);
-                        }
                         btn.display_uploading();
                         progress.set_progress(0);
                         progress.show();
@@ -528,6 +538,10 @@ define(function(require, exports, module) {
                         progress.set_progress(percentComplete);
                     },
                     success: function (data) {
+                        var origin_key = that.$('input[name=' + media_type + ']').val();
+                        if (origin_key.length > 0) {
+                            that.delete_media_file(origin_key);
+                        }
                         that.$('input[name=' + media_type + ']').val(data['key']);
 
                         var full_filename = data['filename'] + data['extension'];
@@ -542,7 +556,7 @@ define(function(require, exports, module) {
                         400: function(xhr) {
                             var data = $.parseJSON(xhr.responseText);
                             for (var key in data) {
-                                btn.display_select_upload();
+                                btn.display_restart_upload();
                                 progress.hide();
                                 info.set_error_content(data[key][0]);
                                 info.show();
@@ -550,7 +564,7 @@ define(function(require, exports, module) {
                             }
                         },
                         500: function(xhr) {
-                            btn.display_select_upload();
+                            btn.display_restart_upload();
                             progress.hide();
                             info.hide();
                             noty({
@@ -561,7 +575,7 @@ define(function(require, exports, module) {
                     },
                     error: function(xhr) {
                         if (xhr.status != 400 && xhr.status != 400) {
-                            btn.display_select_upload();
+                            btn.display_restart_upload();
                             progress.hide();
                             if (xhr.status == 413) {
                                 info.set_error_content('错误' + xhr.status + ' - 请求数据过长，请尝试增大服务器最大上传限制');
