@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.core.urlresolvers import reverse
 
 from system.official_account.models import OfficialAccount
 from system.simulation import Simulation, SimulationException
+from system.media.models import Media
 
 
 class LibraryNewsManager(models.Manager):
@@ -43,7 +45,7 @@ class LibraryNewsManager(models.Manager):
         :param official_account: 所属公众号 (OfficialAccount)
         :param plugin_iden: 所属插件标识符
         :param news: 一个 list 对象, 每个元素为一个 dict 对象, key 包括 'msgid', 'title', 'description', 'picture',
-                    'author', 'content', 'picture_id', 'from_url', 对应 value 解释见 LibraryNews Model,
+                    'author', 'content', 'picid', 'from_url', 对应 value 解释见 LibraryNews Model,
                     除 'title', 'content' 外所有 key 值均为可选
         :return: 第一条图文的实例 (LibraryNews)
         """
@@ -60,7 +62,7 @@ class LibraryNewsManager(models.Manager):
                 picture=item.get('picture'),
                 author=item.get('author'),
                 content=item.get('content'),
-                picture_id=item.get('picture_id', 0),
+                picture_id=item.get('picid', 0),
                 from_url=item.get('from_url'),
             )
             if not first_instance:
@@ -115,7 +117,7 @@ class LibraryNews(models.Model):
     parent = models.ForeignKey('self', verbose_name=u'本地/远程-父ID', blank=True, null=True)
     title = models.CharField(u'本地/远程-图文标题', max_length=100)
     description = models.TextField(u'本地/远程-图文描述', blank=True, null=True)
-    picture = models.ImageField(u'本地/远程-图片存储地址', upload_to='library/news/picture', blank=True, null=True)
+    picture = models.ForeignKey(Media, related_name='+', verbose_name=u'本地/远程-图片存储地址', blank=True, null=True, on_delete=models.SET_NULL)
 
     picurl = models.CharField(u'远程-缩略图图片地址', max_length=1024, blank=True, null=True)
     url = models.CharField(u'远程-跳转地址', max_length=1024, blank=True, null=True)
@@ -123,7 +125,7 @@ class LibraryNews(models.Model):
     msgid = models.BigIntegerField(u'本地-公众平台图文ID号', default=0)
     author = models.CharField(u'本地-图文作者', max_length=100, blank=True, null=True)
     content = models.TextField(u'本地-图文内容', blank=True, null=True)
-    picture_id = models.IntegerField(u'本地-素材库中的图片ID', default=0)
+    picid = models.IntegerField(u'本地-素材库中的图片ID', default=0)
     from_url = models.CharField(u'本地-来源URL', max_length=1024, blank=True, null=True)
     view_count = models.IntegerField(u'本地-图文访问次数', default=0)
     vote_count = models.IntegerField(u'本地-图文点赞数目', default=0)
@@ -178,21 +180,21 @@ class LibraryNews(models.Model):
 
     def update_picture_id(self, simulation):
         """
-        由 picture 更新 picture_id
+        由 picture 更新 picid
         :param simulation: 模拟登陆实例 (Simulation)
         """
-        if not self.picture:  # 当本地没有存储图片时, 清空 picture_id
-            self.picture_id = 0
+        if not self.picture:  # 当本地没有存储图片时, 清空 picid
+            self.picid = 0
             self.save()
-            return self.picture_id
+            return self.picid
 
         try:
-            fid = simulation.upload_file(filepath=self.picture.path)
-            self.picture_id = int(fid)
+            fid = simulation.upload_file(filepath=self.picture.media.path)
+            self.picid = int(fid)
         except SimulationException:  # 出现模拟登录错误时放弃上传
-            self.picture_id = 0
+            self.picid = 0
         self.save()
-        return self.picture_id
+        return self.picid
 
     def update_picurl(self):
         """
@@ -201,6 +203,6 @@ class LibraryNews(models.Model):
         if not self.picture:
             self.picurl = None
         else:
-            self.picurl = self.picture.url
+            self.picurl = reverse('filetranslator:download', kwargs={'key': self.picture.pk})
         self.save()
         return self.picurl

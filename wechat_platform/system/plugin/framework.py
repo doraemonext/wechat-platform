@@ -463,11 +463,11 @@ class PluginProcessor(object):
                 'author': item.author,
                 'summary': item.description,
                 'content': item.content,
-                'picture_id': item.picture_id,
+                'picid': item.picture_id,
                 'from_url': item.from_url,
             })
-            for x in news_dealt[-1]:  # 将所有非 picture_id 的空字段转换为空字符串
-                if x != 'picture_id' and not news_dealt[-1][x]:
+            for x in news_dealt[-1]:  # 将所有非 picid 的空字段转换为空字符串
+                if x != 'picid' and not news_dealt[-1][x]:
                     news_dealt[-1][x] = ''
         try:
             simulation.add_news(news=news_dealt)
@@ -478,7 +478,7 @@ class PluginProcessor(object):
                 for item in news['multi_item']:
                     index = item['seq']
                     if item['title'] != news_dealt[index]['title'] or item['author'] != news_dealt[index]['author'] or \
-                        item['digest'] != news_dealt[index]['summary'] or item['file_id'] != news_dealt[index]['picture_id'] or \
+                        item['digest'] != news_dealt[index]['summary'] or item['file_id'] != news_dealt[index]['picid'] or \
                         item['source_url'] != news_dealt[index]['from_url']:
                         is_match = False
                         break

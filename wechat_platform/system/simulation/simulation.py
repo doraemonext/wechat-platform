@@ -335,7 +335,7 @@ class Simulation(object):
         在素材库中创建图文消息
 
         :param news: list 对象, 其中的每个元素为一个 dict 对象, 代表一条图文, key 值分别为 ``title``, ``author``, ``summary``,
-                     ``content``, ``picture_id``, ``from_url``, 对应内容为标题, 作者, 摘要, 内容, 素材库里的
+                     ``content``, ``picid``, ``from_url``, 对应内容为标题, 作者, 摘要, 内容, 素材库里的
                      图片ID(可通过 ``upload_file`` 函数上传获取), 来源链接。
 
                      其中必须提供的 key 值为 ``title`` 和 ``content``
@@ -348,7 +348,7 @@ class Simulation(object):
                                  'author': '图文作者',
                                  'summary': '图文摘要',
                                  'content': '图文内容',
-                                 'picture_id': '23412341',
+                                 'picid': '23412341',
                                  'from_url': 'http://www.baidu.com',
                              },
                              {
