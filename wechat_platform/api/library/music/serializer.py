@@ -14,7 +14,7 @@ class LibraryMusicSerializer(serializers.ModelSerializer):
     系统素材库 - 音乐库 序列化类
     """
     music = serializers.PrimaryKeyRelatedField(error_messages={
-        'required': '必须上传普通音乐文件',
+        'required': u'必须上传普通音乐文件',
     })
     hq_music = serializers.PrimaryKeyRelatedField(required=False)
     thumb = serializers.PrimaryKeyRelatedField(required=False)
@@ -46,6 +46,12 @@ class LibraryMusicSerializer(serializers.ModelSerializer):
             return obj.thumb.__dict__
         else:
             return {}
+
+    def validate_music(self, attrs, source):
+        music = attrs.get(source)
+        if not music:
+            raise serializers.ValidationError(u'必须上传普通音乐文件')
+        return attrs
 
     def save(self, **kwargs):
         """

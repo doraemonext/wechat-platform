@@ -32,13 +32,6 @@ class LibraryMusicManager(models.Manager):
         """
         添加一条新的音乐素材
         """
-        if not music_url and music:
-            music_url = reverse('filetranslator:download', kwargs={'key': music.pk})
-        if not hq_music_url and hq_music:
-            hq_music_url = reverse('filetranslator:download', kwargs={'key': hq_music.pk})
-        if not thumb_media_id and thumb:
-            pass  # TODO: 待开发
-
         return super(LibraryMusicManager, self).create(
             official_account=official_account,
             plugin_iden=plugin_iden,
@@ -70,6 +63,13 @@ class LibraryMusic(models.Model):
 
     objects = models.Manager()
     manager = LibraryMusicManager()
+
+    def save(self, *args, **kwargs):
+        if self.music:
+            self.music_url = reverse('filetranslator:download', kwargs={'key': self.music.pk})
+        if self.hq_music:
+            self.hq_music_url = reverse('filetranslator:download', kwargs={'key': self.hq_music.pk})
+        return super(LibraryMusic, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = u'素材库 - 音乐库'
