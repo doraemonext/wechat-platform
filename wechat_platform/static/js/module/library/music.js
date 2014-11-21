@@ -246,7 +246,9 @@ define(function(require, exports, module) {
                         'official_account': $('#current-official-account').val(),
                         'type': media_type_number
                     },
-                    beforeSend: function () {
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
+
                         var origin_key = that.$('input[name=' + media_type + ']').val();
                         if (origin_key.length > 0) {
                             that.delete_media_file(origin_key);
@@ -289,6 +291,18 @@ define(function(require, exports, module) {
                                 type: "error",
                                 text: "服务器内部出错, 请重试"
                             });
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status != 400 && xhr.status != 400) {
+                            btn.display_select_upload();
+                            progress.hide();
+                            if (xhr.status == 413) {
+                                info.set_error_content('错误' + xhr.status + ' - 请求数据过长，请尝试增大服务器最大上传限制');
+                            } else {
+                                info.set_error_content('错误' + xhr.status);
+                            }
+                            info.show();
                         }
                     }
                 });
