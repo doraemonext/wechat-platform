@@ -13,6 +13,7 @@ define(function (require, exports, module) {
     var LibraryMusicItemView = LibraryMusicModule.LibraryMusicItemView;
     var LibraryMusicListView = LibraryMusicModule.LibraryMusicListView;
     var LibraryMusicItemAddView = LibraryMusicModule.LibraryMusicItemAddView;
+    var LibraryMusicItemEditView = LibraryMusicModule.LibraryMusicItemEditView;
 
     var AppView = CommonAppView.extend({
         default_interface: function () {
@@ -57,25 +58,9 @@ define(function (require, exports, module) {
             this.set_header(new ContentHeaderView({
                 html: require('text!templates/library/music/app_content_header_edit.html')
             }));
-//            this.set_content(new OfficialAccountItemEditView({
-//                id: id
-//            }));
-        },
-        detail_interface: function (id) {
-            this.set_breadcrumb(new BreadcrumbView({
-                title: '音乐素材详情',
-                subtitle: '查看该音乐素材的详细信息',
-                breadcrumbs: [
-                    { title: '素材管理', url: '#' },
-                    { title: '音乐素材', url: '#' },
-                    { title: '音乐素材详情', url: '#/detail/' + id }
-                ]
+            this.set_content(new LibraryMusicItemEditView({
+                id: id
             }));
-            this.set_header(new ContentHeaderView({
-                html: require('text!templates/library/music/app_content_header_detail.html'),
-                data: { id: id }
-            }));
-            //this.set_content(new OfficialAccountItemDetailView({id: id}));
         }
     });
     var app_view = new AppView;
@@ -92,9 +77,6 @@ define(function (require, exports, module) {
         },
         edit: function (id) {
             app_view.edit_interface(id);
-        },
-        detail: function (id) {
-            app_view.detail_interface(id);
         },
         default_router: function (actions) {
             app_view.default_interface();
