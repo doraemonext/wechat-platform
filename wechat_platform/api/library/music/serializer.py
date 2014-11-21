@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
 from rest_framework import serializers
 
 from lib.tools import validator
 from system.library.music.models import LibraryMusic
+from system.media.models import Media
 
 
 class LibraryMusicSerializer(serializers.ModelSerializer):
@@ -19,6 +18,34 @@ class LibraryMusicSerializer(serializers.ModelSerializer):
     })
     hq_music = serializers.PrimaryKeyRelatedField(required=False)
     thumb = serializers.PrimaryKeyRelatedField(required=False)
+    thumb_url = serializers.SerializerMethodField('get_thumb_url')
+    music_detail = serializers.SerializerMethodField('get_music_detail')
+    hq_music_detail = serializers.SerializerMethodField('get_hq_music_detail')
+    thumb_detail = serializers.SerializerMethodField('get_thumb_detail')
+
+    def get_thumb_url(self, obj):
+        if obj.thumb:
+            return reverse('filetranslator:download', kwargs={'key': obj.thumb.pk})
+        else:
+            return None
+
+    def get_music_detail(self, obj):
+        if obj.music:
+            return obj.music.__dict__
+        else:
+            return {}
+
+    def get_hq_music_detail(self, obj):
+        if obj.hq_music:
+            return obj.hq_music.__dict__
+        else:
+            return {}
+
+    def get_thumb_detail(self, obj):
+        if obj.thumb:
+            return obj.thumb.__dict__
+        else:
+            return {}
 
     def save(self, **kwargs):
         """
@@ -47,4 +74,4 @@ class LibraryMusicSerializer(serializers.ModelSerializer):
     class Meta:
         model = LibraryMusic
         fields = ('id', 'official_account', 'plugin_iden', 'title', 'description', 'music_url', 'hq_music_url',
-                  'thumb_media_id', 'music', 'hq_music', 'thumb')
+                  'thumb_url', 'thumb_media_id', 'music', 'hq_music', 'thumb', 'music_detail', 'hq_music_detail', 'thumb_detail')

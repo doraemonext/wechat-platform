@@ -1,21 +1,33 @@
 <li class="list-group-item">
     <div class="row">
         <div class="col-xs-2 col-md-1">
+            <% if (thumb) { %>
+            <img src="<%= thumb_url %>" class="img-circle img-responsive" alt="" /></div>
+            <% } else { %>
             <img src="/static/img/default_music.jpeg" class="img-circle img-responsive" alt="" /></div>
+            <% } %>
         <div class="col-xs-10 col-md-11">
-            <div><%= title %></div>
+            <div>
+                <% if (hq_music) { %>
+                <span class="label label-success">高清</span>
+                <% } %>
+                <span><strong><%= title %></strong></span>
+            </div>
             <div class="comment-text">
                 <%= description %>
             </div>
+            <div class="comment-text">
+                <span class="filename"><strong>文件名</strong>: <%= music_detail.filename %><%= music_detail.extension %></span>
+            </div>
             <div class="action">
                 <a type="button" class="btn btn-success btn-xs" title="播放" href="<%= music_url %>">
-                    <i class="fa fa-fw fa-play"></i>
+                    <i class="fa fa-fw fa-play"></i> 播放
                 </a>
                 <a type="button" class="btn btn-primary btn-xs" title="编辑" href="#/edit/<%= id %>">
-                    <i class="fa fa-fw fa-pencil"></i>
+                    <i class="fa fa-fw fa-pencil"></i> 编辑
                 </a>
                 <a type="button" class="btn btn-danger btn-xs delete" title="删除">
-                    <i class="fa fa-fw fa-trash-o"></i>
+                    <i class="fa fa-fw fa-trash-o"></i> 删除
                 </a>
             </div>
         </div>

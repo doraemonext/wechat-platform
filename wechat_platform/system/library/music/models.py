@@ -64,9 +64,9 @@ class LibraryMusic(models.Model):
     music_url = models.CharField(u'音乐URL', max_length=1024, blank=True, null=True)
     hq_music_url = models.CharField(u'高清音乐URL', max_length=1024, blank=True, null=True)
     thumb_media_id = models.CharField(u'缩略图媒体ID', max_length=255, blank=True, null=True)
-    music = models.ForeignKey(Media, related_name='+', verbose_name=u'音乐文件', blank=True, null=True)
-    hq_music = models.ForeignKey(Media, related_name='+', verbose_name=u'高清音乐文件', blank=True, null=True)
-    thumb = models.ForeignKey(Media, related_name='+', verbose_name=u'缩略图媒体图像', blank=True, null=True)
+    music = models.ForeignKey(Media, related_name='+', verbose_name=u'音乐文件', blank=True, null=True, on_delete=models.SET_NULL)
+    hq_music = models.ForeignKey(Media, related_name='+', verbose_name=u'高清音乐文件', blank=True, null=True, on_delete=models.SET_NULL)
+    thumb = models.ForeignKey(Media, related_name='+', verbose_name=u'缩略图媒体图像', blank=True, null=True, on_delete=models.SET_NULL)
 
     objects = models.Manager()
     manager = LibraryMusicManager()

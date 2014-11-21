@@ -3605,6 +3605,10 @@ fieldset[disabled] .btn-vk.active {
 .music-widget .action { margin-top:5px; }
 .music-widget .comment-text { font-size: 12px; }
 .music-widget .btn-block { border-top-left-radius:0px;border-top-right-radius:0px; }
+.music-widget .label {
+    font-size: 11px;
+    margin-bottom: 20px;
+}
 
 .paginator .page {
     margin: 0 3px;
