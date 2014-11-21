@@ -11,10 +11,20 @@
                 <% if (hq_music) { %>
                 <span class="label label-success">高清</span>
                 <% } %>
-                <span><strong><%= title %></strong></span>
+                <span><strong>
+                    <% if (title) { %>
+                        <%= title %>
+                    <% } else { %>
+                        [无标题]
+                    <% } %>
+                </strong></span>
             </div>
             <div class="comment-text">
-                <%= description %>
+                <% if (description) { %>
+                    <%= description %>
+                <% } else { %>
+                    [无描述]
+                <% } %>
             </div>
             <div class="comment-text">
                 <span class="filename"><strong>文件名</strong>: <%= music_detail.filename %><%= music_detail.extension %></span>
