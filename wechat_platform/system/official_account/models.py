@@ -92,6 +92,12 @@ class OfficialAccountManager(models.Manager):
         logger_official_account.debug('New model created with iden %s [Model] %s' % (official_account.iden, official_account.__dict__))
         return official_account
 
+    def exists(self, pk):
+        """
+        判断 id 为 pk 的公众号是否存在
+        """
+        return super(OfficialAccountManager, self).get_queryset().filter(pk=pk).exists()
+
 
 class OfficialAccount(models.Model):
     """
