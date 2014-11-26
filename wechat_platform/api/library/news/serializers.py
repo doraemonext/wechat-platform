@@ -26,7 +26,10 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
         """
         获取文章访问的绝对路径
         """
-        return self.context['view'].request.build_absolute_uri(reverse('news:detail', kwargs={'pk': obj.pk}))
+        if obj.is_simulated():
+            return self.context['view'].request.build_absolute_uri(reverse('news:detail', kwargs={'pk': obj.pk}))
+        else:
+            return obj.url
 
     def get_storage_location(self, obj):
         if obj.is_simulated():  # 如果可以以模拟登陆方式发送, 说明图文信息已经存储在本地
