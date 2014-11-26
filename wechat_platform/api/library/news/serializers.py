@@ -13,6 +13,7 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
     """
     show_cover_pic = serializers.SerializerMethodField('get_show_cover_pic')
     content_url = serializers.SerializerMethodField('get_content_url')
+    storage_location = serializers.SerializerMethodField('get_storage_location')
     multi_item = serializers.SerializerMethodField('get_multi_item')
 
     def get_show_cover_pic(self, obj):
@@ -23,6 +24,12 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
 
     def get_content_url(self, obj):
         return reverse('news:detail', kwargs={'pk': obj.pk})
+
+    def get_storage_location(self, obj):
+        if obj.is_simulated():  # 如果可以以模拟登陆方式发送, 说明图文信息已经存储在本地
+            return 'local'
+        else:  # 否则图文是存储在远程(无法以模拟登陆方式发送)
+            return 'remote'
 
     def get_multi_item(self, obj):
         multi_item = LibraryNews.manager.get(
@@ -49,6 +56,6 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
         model = LibraryNews
         fields = (
             'id', 'title', 'description', 'author', 'show_cover_pic', 'picurl', 'content_url',
-            'from_url', 'multi_item',
+            'from_url', 'storage_location', 'multi_item',
         )
         read_only_fields = ('id', 'title', 'description', 'author', 'picurl', 'from_url')
