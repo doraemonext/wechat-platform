@@ -80,7 +80,19 @@ class LibraryNewsManager(models.Manager):
         """
         if root.plugin_iden != plugin_iden:
             return []
-        return [root] + self._get_without_root(official_account=official_account, plugin_iden=plugin_iden, root=root)
+        children = self._get_without_root(official_account=official_account, plugin_iden=plugin_iden, root=root)
+        if not children:
+            return [root]
+        else:
+            return [root] + children
+
+    def get_list(self, official_account):
+        """
+        获取 official_account 公众号下的所有根图文回复节点
+        :param official_account: 所属公众号 (OfficialAccount)
+        :return: QuerySet 对象, 为所有根图文回复节点的集合
+        """
+        return super(LibraryNewsManager, self).get_queryset().filter(official_account=official_account).filter(parent=None)
 
     def _get_without_root(self, official_account, plugin_iden, root):
         """
