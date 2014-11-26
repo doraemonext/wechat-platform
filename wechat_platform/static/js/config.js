@@ -31,6 +31,7 @@ require.config({
         'module.common.app-content-header-view': 'module/common/app_content_header_view',
         'module.official-account': 'module/official_account',
         'module.library.music': 'module/library/music',
+        'module.library.news': 'module/library/news',
 
         'helper.confirm-modal': 'helper/confirm_modal/confirm_modal'
     }
