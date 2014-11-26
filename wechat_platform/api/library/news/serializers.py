@@ -23,7 +23,10 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
             return False
 
     def get_content_url(self, obj):
-        return reverse('news:detail', kwargs={'pk': obj.pk})
+        """
+        获取文章访问的绝对路径
+        """
+        return self.context['view'].request.build_absolute_uri(reverse('news:detail', kwargs={'pk': obj.pk}))
 
     def get_storage_location(self, obj):
         if obj.is_simulated():  # 如果可以以模拟登陆方式发送, 说明图文信息已经存储在本地
@@ -44,9 +47,9 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
                 'title': item.title,
                 'description': item.description,
                 'author': item.author,
-                'show_cover_pic': (lambda x: True if x.picture else False)(item),
+                'show_cover_pic': self.get_show_cover_pic(item),
                 'picurl': item.picurl,
-                'content_url': (lambda x: reverse('news:detail', kwargs={'pk': obj.pk}))(item),
+                'content_url': self.get_content_url(item),
                 'from_url': item.from_url,
             })
         multi_item_expander = sorted(multi_item_expander, key=lambda k: k.get('id'))
