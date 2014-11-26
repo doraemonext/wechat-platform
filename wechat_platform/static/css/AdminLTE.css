@@ -3668,7 +3668,6 @@ fieldset[disabled] .btn-vk.active {
 .appmsg {
 	position: relative;
 	overflow: hidden;
-    width: 50%;
 	margin-bottom: 20px;
 	border: 1px solid #e7e7eb;
     border-radius: 4px;
