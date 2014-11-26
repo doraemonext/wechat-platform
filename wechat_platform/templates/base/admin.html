@@ -3,6 +3,7 @@
 {% url 'admin:dashboard:dashboard' as dashboard_url %}
 {% url 'admin:group:index' as group_url %}
 {% url 'admin:library:music:index' as library_music_url %}
+{% url 'admin:library:news:index' as library_news_url %}
 {% url 'admin:official_account:index' as official_account_url %}
 
 <!DOCTYPE html>
@@ -150,14 +151,14 @@
                                     <i class="fa fa-bell-o"></i> <span>消息管理</span>
                                 </a>
                             </li>
-                            <li class="treeview {% if request.path == library_music_url %} active{% endif %}">
+                            <li class="treeview {% if request.path == library_music_url or request.path == library_news_url %} active{% endif %}">
                                 <a href="#">
                                     <i class="fa fa-heart"></i>
                                     <span>素材管理</span>
                                     <i class="fa fa-angle-left pull-right"></i>
                                 </a>
                                 <ul class="treeview-menu">
-                                    <li><a href="#"><i class="fa fa-angle-double-right"></i> 图文素材</a></li>
+                                    <li{% if request.path == library_news_url %} class="active"{% endif %}><a href="{{ library_news_url }}"><i class="fa fa-angle-double-right"></i> 图文素材</a></li>
                                     <li{% if request.path == library_music_url %} class="active"{% endif %}><a href="{{ library_music_url }}"><i class="fa fa-angle-double-right"></i> 音乐素材</a></li>
                                     <li><a href="#"><i class="fa fa-angle-double-right"></i> 图片素材</a></li>
                                     <li><a href="#"><i class="fa fa-angle-double-right"></i> 语音素材</a></li>
