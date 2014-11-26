@@ -3664,3 +3664,310 @@ fieldset[disabled] .btn-vk.active {
     margin-bottom: 10px;
     color: #737373;
 }
+
+.appmsg {
+	position: relative;
+	overflow: hidden;
+    width: 50%;
+	margin-bottom: 20px;
+	border: 1px solid #e7e7eb;
+    border-radius: 4px;
+	background-color: #fff;
+	color: #666;
+}
+
+.appmsg_info {
+	padding-bottom: 10px;
+	font-size: 13px;
+	line-height: 20px;
+}
+
+.appmsg_date {
+	font-weight: 400;
+	font-style: normal;
+}
+
+.appmsg_content {
+	position: relative;
+	padding: 0 14px;
+	*zoom: 1;
+}
+
+.appmsg_title {
+	overflow: hidden;
+	padding-top: 10px;
+	max-height: 56px;
+	word-wrap: break-word;
+	font-weight: 400;
+	font-style: normal;
+	font-size: 16px;
+	line-height: 28px;
+	word-break: break-all;
+}
+
+.appmsg_title a {
+	display: block;
+	color: #666;
+}
+
+.appmsg_thumb_wrp {
+	overflow: hidden;
+	height: 160px;
+}
+
+.appmsg_thumb {
+	width: 100%;
+}
+
+.appmsg_desc {
+	padding: 5px 0 10px;
+	word-wrap: break-word;
+	word-break: break-all;
+}
+
+.appmsg_opr {
+	border-top: 1px solid #e7e7eb;
+	background-color: #f4f4f4;
+}
+
+.appmsg_opr ul {
+	overflow: hidden;
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 0;
+	*zoom: 1;
+}
+
+.appmsg_opr_item {
+	float: left;
+	height: 44px;
+	line-height: 44px;
+}
+
+.appmsg_opr_item a {
+	display: block;
+	border-right: 1px solid #e7e7eb;
+	text-align: center;
+	text-decoration: none;
+}
+
+.appmsg_opr_item a:hover {
+	text-decoration: none;
+}
+
+.appmsg_opr_item a.no_extra {
+	border-right-width: 0;
+}
+
+.appmsg_item {
+	position: relative;
+	padding: 20px 14px;
+	border-top: 1px solid #e7e7eb;
+	*zoom: 1;
+}
+
+.appmsg_item:after {
+	clear: both;
+	display: block;
+	height: 0;
+	content: "\200B";
+}
+
+.appmsg_item .appmsg_title {
+	overflow: hidden;
+	margin-top: 14px;
+	max-height: 48px;
+	line-height: 24px;
+	*zoom: 1;
+}
+
+.appmsg_item .appmsg_thumb {
+	float: right;
+	margin-left: 14px;
+	width: 78px;
+	height: 78px;
+}
+
+.multi .appmsg_info {
+	padding-top: 14px;
+	padding-right: 14px;
+	padding-left: 14px;
+}
+
+.multi .appmsg_content {
+	padding: 0;
+}
+
+.multi .appmsg_title {
+	padding-top: 0;
+	font-size: 14px;
+}
+
+.cover_appmsg_item {
+	position: relative;
+	margin: 0 14px 14px;
+}
+
+.cover_appmsg_item .appmsg_title {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background: rgba(0,0,0,0.6)!important;
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#99000000',endcolorstr = '#99000000');
+}
+
+.cover_appmsg_item .appmsg_title a {
+	padding: 0 8px;
+	color: #fff;
+}
+
+.appmsg_mask {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	display: none;
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	opacity: .6;
+	filter: alpha(opacity = 60);
+	-moz-opacity: .6;
+	-khtml-opacity: .6;
+}
+
+.appmsg .icon_card_selected {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	z-index: 1;
+	display: none;
+	overflow: hidden;
+	margin-top: -23px;
+	margin-left: -23px;
+	line-height: 999em;
+}
+
+.dialog_wrp .appmsg:hover {
+	cursor: pointer;
+}
+
+.appmsg:hover .appmsg_mask {
+	display: block;
+}
+
+.appmsg.selected .appmsg_mask {
+	display: block;
+}
+
+.appmsg.selected .icon_card_selected {
+	display: inline-block;
+}
+
+.appmsg_thumb.default {
+	display: block;
+	background-color: #ececec;
+	color: #c0c0c0;
+	text-align: center;
+	font-weight: 400;
+	font-style: normal;
+	font-size: 16px;
+	line-height: 160px;
+}
+
+.appmsg_item .appmsg_thumb.default {
+	font-size: 14px;
+	line-height: 78px;
+}
+
+.appmsg_edit_mask {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: none;
+	width: 100%;
+	height: 100%;
+	background: rgba(229,229,229,0.85)!important;
+	text-align: center;
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#d9e5e5e5',endcolorstr = '#d9e5e5e5');
+}
+
+.appmsg_item .appmsg_edit_mask {
+	line-height: 118px;
+}
+
+.cover_appmsg_item .appmsg_edit_mask {
+	line-height: 160px;
+}
+
+.appmsg_edit_mask a {
+	margin-right: 8px;
+	margin-left: 8px;
+}
+
+.appmsg_list {
+	margin: 25px 10px;
+	text-align: justify;
+	text-justify: distribute-all-lines;
+	letter-spacing: -4px;
+	font-size: 0;
+}
+
+.appmsg_list:after {
+	display: inline-block;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 0;
+	content: ".";
+	font-size: 0;
+}
+
+.appmsg_list .tj_item {
+	text-align: left;
+	text-justify: auto;
+	font-size: 14px;
+}
+
+.appmsg_col {
+	display: inline-block;
+	vertical-align: top;
+	text-align: left;
+	letter-spacing: normal;
+	font-size: 14px;
+	*display: inline;
+	*zoom: 1;
+}
+
+.icon18_common {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+    display: inline-block;
+    line-height: 100px;
+    overflow: hidden;
+}
+
+.icon18_common.edit_gray {
+    background: url(https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/style/base/base_z21def6.png) 0 -5280px no-repeat;
+}
+
+.icon18_common.del_gray {
+    background: url(https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/style/base/base_z21def6.png) 0 -4580px no-repeat;
+}
+
+.size1of2 {
+    width: 50%;
+}
+
+.grid_item {
+    float: left;
+}
+
+.grid_item.no_extra {
+    float: none;
+    width: auto;
+    overflow: hidden;
+}

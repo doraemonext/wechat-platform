@@ -6,6 +6,7 @@ define(function(require, exports, module) {
     require('jquery-validate');
     require('jquery-cookie');
     require('jquery-form');
+    require('masonry');
     require('backbone-paginator');
 
     // var item_template = require('text!templates/library/news/item.html');

@@ -2,6 +2,7 @@ define(function (require, exports, module) {
     require('common');
     var $ = require('jquery');
     var Backbone = require('backbone');
+    var Masonry = require('masonry');
 
     var CommonAppView = require('module.common.app-view');
     var BreadcrumbView = require('module.common.app-breadcrumb-view');
@@ -29,6 +30,10 @@ define(function (require, exports, module) {
                 html: require('text!templates/library/news/app_content_header_list.html')
             }));
             this.set_content(new LibraryNewsListView);
+//            new Masonry('#appmsg_col', {
+//                columnWidth: 200,
+//                itemSelector: '.appmsg'
+//            });
         },
 //        add_interface: function () {
 //            this.set_breadcrumb(new BreadcrumbView({
