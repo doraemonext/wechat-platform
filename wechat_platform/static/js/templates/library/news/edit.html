@@ -74,8 +74,25 @@
                         <textarea class="form-control" name="description" id="description" rows="5"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="news_content">正文</label>
-                        <textarea class="form-control" name="news_content" id="news_content" rows="15" cols="80"></textarea>
+                        <label for="news_content">正文显示方式</label>
+                        <div style="margin-bottom: 8px">
+                            <label class="radio-inline">
+                                <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> 文本内容
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> 跳转链接
+                            </label>
+                        </div>
+                        <div>
+                            <textarea class="form-control" name="news_content" id="news_content" rows="15" cols="80"></textarea>
+                        </div>
+                        <div>
+                            <input type="text" class="form-control" name="url" id="url">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="source">来源链接<span class="help-inline">（可选）</span></label>
+                        <input type="text" class="form-control" name="source" id="source">
                     </div>
                 </div>
             </div>
