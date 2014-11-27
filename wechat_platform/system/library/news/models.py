@@ -218,3 +218,17 @@ class LibraryNews(models.Model):
             self.picurl = reverse('filetranslator:download', kwargs={'key': self.picture.pk})
         self.save()
         return self.picurl
+
+    def update_url(self, url=None):
+        """
+        由 content 更新 url
+
+        注意当存在 content 时会强制令 url 为图文浏览页面 url, 如果需要更新 url, 请删除 content 中的内容
+        :param url: 指定 url, 默认为不指定
+        """
+        if not self.content:
+            self.url = url
+        else:
+            self.url = reverse('news:detail', kwargs={'pk': self.pk})
+        self.save()
+        return self.url

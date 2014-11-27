@@ -1,26 +1,28 @@
 <div class="appmsg">
     <div class="appmsg_content">
         <h4 class="appmsg_title">
-            <a href="#" target="_blank">掌上武大团队招新，珞珞等你来！</a>
+            <a href="<%= content_url %>" target="_blank"><%= title %></a>
         </h4>
         <div class="appmsg_info">
-            <em class="appmsg_date">昨天 13:15</em>
+            <em class="appmsg_date"><%= datetime %></em>
         </div>
         <div class="appmsg_thumb_wrp">
-            <img src="https://mmbiz.qlogo.cn/mmbiz/WtKuHswZ0dcQzwvicJ07RnbUBrH13LcOVpjiatZL3g3OnkENA8J3TKN9zUdGibzjtQNUs5X25OJI84osYNVhicgOQg/0" alt="" class="appmsg_thumb">
+            <% if (picurl) { %>
+            <img src="<%= picurl %>" alt="" class="appmsg_thumb">
+            <% } %>
         </div>
         <p class="appmsg_desc">
-            掌上武大微信团队招新啦Hi，这里是珞珞。掌上武大微信自2012年8月第一次推送消息，到今天已经两年多了，感谢
+            <%= description %>
         </p>
     </div>
 
     <div class="appmsg_opr">
         <ul>
             <li class="appmsg_opr_item grid_item size1of2">
-                <a class="js_tooltip" href="/cgi-bin/appmsg?t=media/appmsg_edit&amp;action=edit&amp;lang=zh_CN&amp;token=1460738644&amp;type=10&amp;appmsgid=202634566&amp;isMul=0" data-tooltip="编辑">&nbsp;<i class="icon18_common edit_gray">编辑</i></a>
+                <a class="js_tooltip" href="#" data-tooltip="编辑">&nbsp;<i class="icon18_common edit_gray">编辑</i></a>
             </li>
             <li class="appmsg_opr_item grid_item size1of2 no_extra">
-                <a class="js_del no_extra js_tooltip" data-id="202634566" href="javascript:void(0);" data-tooltip="删除">&nbsp;<i class="icon18_common del_gray">删除</i></a>
+                <a class="js_del no_extra delete" href="javascript:void(0);" data-tooltip="删除">&nbsp;<i class="icon18_common del_gray">删除</i></a>
             </li>
         </ul>
     </div>

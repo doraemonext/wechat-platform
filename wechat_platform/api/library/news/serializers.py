@@ -13,6 +13,7 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
     系统素材库 - 图文库 序列化类 (仅限获取列表信息[GET])
     """
     show_cover_pic = serializers.SerializerMethodField('get_show_cover_pic')
+    picurl = serializers.SerializerMethodField('get_picurl')
     content_url = serializers.SerializerMethodField('get_content_url')
     storage_location = serializers.SerializerMethodField('get_storage_location')
     multi_item = serializers.SerializerMethodField('get_multi_item')
@@ -23,6 +24,14 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
             return True
         else:
             return False
+
+    def get_picurl(self, obj):
+        if not obj.picurl:
+            return None
+        elif obj.picurl == reverse('filetranslator:download', kwargs={'key': obj.picture.key}):
+            return self.context['view'].request.build_absolute_uri(obj.picurl)
+        else:
+            return obj.picurl
 
     def get_content_url(self, obj):
         """
@@ -53,7 +62,7 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
                 'description': item.description,
                 'author': item.author,
                 'show_cover_pic': self.get_show_cover_pic(item),
-                'picurl': item.picurl,
+                'picurl': self.get_picurl(item),
                 'content_url': self.get_content_url(item),
                 'from_url': item.from_url,
             })
@@ -69,4 +78,4 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
             'id', 'title', 'description', 'author', 'show_cover_pic', 'picurl', 'content_url',
             'from_url', 'storage_location', 'multi_item', 'datetime'
         )
-        read_only_fields = ('id', 'title', 'description', 'author', 'picurl', 'from_url')
+        read_only_fields = ('id', 'title', 'description', 'author', 'from_url')

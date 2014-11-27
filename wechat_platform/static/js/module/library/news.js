@@ -150,7 +150,20 @@ define(function(require, exports, module) {
                 library_news_view = new LibraryNewsItemView({model: news});
             }
             this.$('#no-library-news').css('display', 'none');
-            this.$("#news-col-0").append(library_news_view.render().el);
+
+            // 计算下一次应该在哪一列插入图文
+            var col_length = [
+                this.$('#news-col-0').children().length,
+                this.$('#news-col-1').children().length,
+                this.$('#news-col-2').children().length
+            ];
+            var min_length_pos = 0;
+            for (var i = 0; i < col_length.length; i++) {
+                if (col_length[i] < col_length[min_length_pos]) {
+                    min_length_pos = i;
+                }
+            }
+            this.$('#news-col-' + min_length_pos).append(library_news_view.render().el);
         },
         reset: function() {
             this.$("#news-col-0").html('');
