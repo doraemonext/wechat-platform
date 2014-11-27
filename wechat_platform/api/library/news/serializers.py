@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from django.core.urlresolvers import reverse
+import time
 
+from django.core.urlresolvers import reverse
 from rest_framework import serializers
 
 from system.library.news.models import LibraryNews
@@ -15,6 +16,7 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
     content_url = serializers.SerializerMethodField('get_content_url')
     storage_location = serializers.SerializerMethodField('get_storage_location')
     multi_item = serializers.SerializerMethodField('get_multi_item')
+    datetime = serializers.SerializerMethodField('get_datetime')
 
     def get_show_cover_pic(self, obj):
         if obj.picture:
@@ -58,10 +60,13 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
         multi_item_expander = sorted(multi_item_expander, key=lambda k: k.get('id'))
         return multi_item_expander
 
+    def get_datetime(self, obj):
+        return time.strftime('%Y-%m-%d %H:%M', obj.datetime.timetuple())
+
     class Meta:
         model = LibraryNews
         fields = (
             'id', 'title', 'description', 'author', 'show_cover_pic', 'picurl', 'content_url',
             'from_url', 'storage_location', 'multi_item', 'datetime'
         )
-        read_only_fields = ('id', 'title', 'description', 'author', 'picurl', 'from_url', 'datetime')
+        read_only_fields = ('id', 'title', 'description', 'author', 'picurl', 'from_url')

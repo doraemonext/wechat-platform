@@ -1,0 +1,35 @@
+<div class="appmsg multi">
+    <div class="appmsg_content">
+        <div class="appmsg_info">
+            <em class="appmsg_date"><%= datetime %></em>
+        </div>
+        <div class="cover_appmsg_item">
+            <h4 class="appmsg_title">
+                <a href="<%= content_url %>" target="_blank"><%= title %></a>
+            </h4>
+            <div class="appmsg_thumb_wrp">
+                <% if (picurl) { %>
+                <img src="<%= picurl %>" alt="" class="appmsg_thumb">
+                <% } %>
+            </div>
+        </div>
+        <% _.each(multi_item.slice(1), function(element, index, list) { %>
+        <div class="appmsg_item">
+            <% if (element.picurl) { %>
+            <img src="<%= element.picurl %>" alt="" class="appmsg_thumb">
+            <% } %>
+            <h4 class="appmsg_title"><a href="<%= element.content_url %>" target="_blank"><%= element.title %>‬</a></h4>
+        </div>
+        <% }); %>
+    </div>
+    <div class="appmsg_opr">
+        <ul>
+            <li class="appmsg_opr_item grid_item size1of2">
+                <a class="js_tooltip" href="javascript:void(0)" data-tooltip="编辑">&nbsp;<i class="icon18_common edit_gray">编辑</i></a>
+            </li>
+            <li class="appmsg_opr_item grid_item size1of2 no_extra">
+                <a class="js_del no_extra delete" href="javascript:void(0);" data-tooltip="删除">&nbsp;<i class="icon18_common del_gray">删除</i></a>
+            </li>
+        </ul>
+    </div>
+</div>

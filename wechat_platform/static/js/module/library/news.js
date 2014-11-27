@@ -9,7 +9,8 @@ define(function(require, exports, module) {
     require('masonry');
     require('backbone-paginator');
 
-    // var item_template = require('text!templates/library/news/item.html');
+    var item_template = require('text!templates/library/news/item.html');
+    var multi_item_template = require('text!templates/library/news/multi_item.html');
     var list_template = require('text!templates/library/news/list.html');
     // var add_template = require('text!templates/library/news/edit.html');
     // var edit_template = require('text!templates/library/news/edit.html');
@@ -23,7 +24,7 @@ define(function(require, exports, module) {
         urlRoot: '/api/library/news/'
     });
     var LibraryNewsCollection = Backbone.PageableCollection.extend({
-        url: '/api/library/music/?official_account=' + $('#current-official-account').val(),
+        url: '/api/library/news/?official_account=' + $('#current-official-account').val(),
         model: LibraryNewsModel,
         state: {
             pageSize: 10
@@ -36,45 +37,84 @@ define(function(require, exports, module) {
         }
     });
 
-//    var LibraryMusicItemView = Backbone.View.extend({
-//        template: _.template(item_template),
-//        initialize: function(args) {
-//            this.model = args.model;
-//            this.listenTo(this.model, 'change', this.render);
-//            this.listenTo(this.model, 'destroy', this.remove);
-//        },
-//        events: {
-//            "click .delete": "delete_item"
-//        },
-//        render: function() {
-//            this.$el.html(this.template(this.model.toJSON()));
-//            return this;
-//        },
-//        delete_item: function() {
-//            var current_model = this.model;
-//            confirm_modal_view.show({
-//                cb: function() {
-//                    current_model.destroy({
-//                        wait: true,
-//                        success: function(model, response) {
-//                            noty({
-//                                type: "success",
-//                                text: "成功删除 <strong>" + model.get('title') + "</strong> 音乐素材"
-//                            });
-//                        },
-//                        error: function(model, response) {
-//                            noty({
-//                                type: "error",
-//                                text: "尝试删除 <strong>" + model.get('title') + "</strong> 音乐素材时出错，请重试"
-//                            });
-//                        }
-//                    });
-//                },
-//                title: "确认删除",
-//                body: "请确认您将删除 <strong><u>" + this.model.get('title') + "</u></strong> 音乐素材，该操作不可恢复。"
-//            });
-//        }
-//    });
+    var LibraryNewsItemView = Backbone.View.extend({
+        template: _.template(item_template),
+        initialize: function(args) {
+            this.model = args.model;
+            this.listenTo(this.model, 'change', this.render);
+            this.listenTo(this.model, 'destroy', this.remove);
+        },
+        events: {
+            "click .delete": "delete_item"
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            return this;
+        },
+        delete_item: function() {
+            var current_model = this.model;
+            confirm_modal_view.show({
+                cb: function() {
+                    current_model.destroy({
+                        wait: true,
+                        success: function(model, response) {
+                            noty({
+                                type: "success",
+                                text: "成功删除 <strong>" + model.get('title') + "</strong> 图文素材"
+                            });
+                        },
+                        error: function(model, response) {
+                            noty({
+                                type: "error",
+                                text: "尝试删除 <strong>" + model.get('title') + "</strong> 图文素材时出错，请重试"
+                            });
+                        }
+                    });
+                },
+                title: "确认删除",
+                body: "请确认您将删除 <strong><u>" + this.model.get('title') + "</u></strong> 图文素材，该操作不可恢复。"
+            });
+        }
+    });
+    var LibraryNewsMultiItemView = Backbone.View.extend({
+        template: _.template(multi_item_template),
+        initialize: function(args) {
+            this.model = args.model;
+            this.listenTo(this.model, 'change', this.render);
+            this.listenTo(this.model, 'destroy', this.remove);
+        },
+        events: {
+            "click .delete": "delete_item"
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            return this;
+        },
+        delete_item: function() {
+            var current_model = this.model;
+            confirm_modal_view.show({
+                cb: function() {
+                    current_model.destroy({
+                        wait: true,
+                        success: function(model, response) {
+                            noty({
+                                type: "success",
+                                text: "成功删除 <strong>" + model.get('title') + "</strong> 图文素材"
+                            });
+                        },
+                        error: function(model, response) {
+                            noty({
+                                type: "error",
+                                text: "尝试删除 <strong>" + model.get('title') + "</strong> 图文素材时出错，请重试"
+                            });
+                        }
+                    });
+                },
+                title: "确认删除",
+                body: "请确认您将删除 <strong><u>" + this.model.get('title') + "</u></strong> 图文素材，该操作不可恢复。"
+            });
+        }
+    });
     var LibraryNewsListView = Backbone.View.extend({
         template: _.template(list_template),
 //        events: {
@@ -84,32 +124,39 @@ define(function(require, exports, module) {
 //            "keyup .goto-area input": "goto_area_enter"
 //        },
         initialize: function() {
-//            this.collection = new LibraryNewsCollection;
-//            this.listenTo(this.collection, 'add', this.add);
-//            this.listenTo(this.collection, 'reset', this.reset);
+            this.collection = new LibraryNewsCollection;
+            this.listenTo(this.collection, 'add', this.add);
+            this.listenTo(this.collection, 'reset', this.reset);
         },
         render: function() {
             var that = this;
             this.$el.html(this.template());
-//            _(this.collection.models).each(this.add, this);
-//            this.collection.fetch({
-//                success: function(collection) {
-//                    if (!collection.length) {
-//                        that.$('#no-library-music').css('display', 'block');
-//                    }
-//                    that._adjust_pagination();
-//                }
-//            });
+            _(this.collection.models).each(this.add, this);
+            this.collection.fetch({
+                success: function(collection) {
+                    if (!collection.length) {
+                        that.$('#no-library-news').css('display', 'block');
+                    }
+                    // that._adjust_pagination();
+                }
+            });
             return this;
         },
-//        add: function (music) {
-//            var library_music_view = new LibraryNewsItemView({model: music});
-//            this.$('#no-library-music').css('display', 'none');
-//            this.$(".list").append(library_music_view.render().el);
-//        },
-//        reset: function() {
-//            this.$(".list").html('');
-//        },
+        add: function (news) {
+            var library_news_view;
+            if (news.get('multi_item').length > 1) {
+                library_news_view = new LibraryNewsMultiItemView({model: news});
+            } else {
+                library_news_view = new LibraryNewsItemView({model: news});
+            }
+            this.$('#no-library-news').css('display', 'none');
+            this.$("#news-col-0").append(library_news_view.render().el);
+        },
+        reset: function() {
+            this.$("#news-col-0").html('');
+            this.$("#news-col-1").html('');
+            this.$("#news-col-2").html('');
+        },
 //        pagination_previous: function () {
 //            this.collection.reset();
 //            this.collection.getPreviousPage().done(this._adjust_pagination());
