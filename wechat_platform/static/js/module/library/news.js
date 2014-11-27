@@ -27,7 +27,7 @@ define(function(require, exports, module) {
         url: '/api/library/news/?official_account=' + $('#current-official-account').val(),
         model: LibraryNewsModel,
         state: {
-            pageSize: 10
+            pageSize: 12
         },
         parseRecords: function (resp) {
             return resp.results;
@@ -117,12 +117,12 @@ define(function(require, exports, module) {
     });
     var LibraryNewsListView = Backbone.View.extend({
         template: _.template(list_template),
-//        events: {
-//            "click .pagination-previous": "pagination_previous",
-//            "click .pagination-next": "pagination_next",
-//            "click .goto-area button ": "goto_area",
-//            "keyup .goto-area input": "goto_area_enter"
-//        },
+        events: {
+            "click .pagination-previous": "pagination_previous",
+            "click .pagination-next": "pagination_next",
+            "click .goto-area button ": "goto_area",
+            "keyup .goto-area input": "goto_area_enter"
+        },
         initialize: function() {
             this.collection = new LibraryNewsCollection;
             this.listenTo(this.collection, 'add', this.add);
@@ -137,7 +137,7 @@ define(function(require, exports, module) {
                     if (!collection.length) {
                         that.$('#no-library-news').css('display', 'block');
                     }
-                    // that._adjust_pagination();
+                    that._adjust_pagination();
                 }
             });
             return this;
@@ -170,48 +170,48 @@ define(function(require, exports, module) {
             this.$("#news-col-1").html('');
             this.$("#news-col-2").html('');
         },
-//        pagination_previous: function () {
-//            this.collection.reset();
-//            this.collection.getPreviousPage().done(this._adjust_pagination());
-//        },
-//        pagination_next: function () {
-//            this.collection.reset();
-//            this.collection.getNextPage().done(this._adjust_pagination());
-//        },
-//        goto_area: function () {
-//            var page = this.$('.goto-area input[type=text]').val();
-//            if ($.isNumeric(page) && parseInt(page) > 0 && parseInt(page) <= this.collection.state.totalPages) {
-//                this.collection.reset();
-//                this.$('.goto-area input[type=text]').val('');
-//                this.collection.getPage(parseInt(page)).done(this._adjust_pagination());
-//            } else {
-//                noty({
-//                    type: "error",
-//                    text: "您输入的跳转页数非法"
-//                });
-//            }
-//        },
-//        goto_area_enter: function (event) {
-//            if (event.keyCode == 13) {
-//                this.$('.goto-area button').click();
-//            }
-//        },
-//        /**
-//         * 根据当前页面状态调整页码的显示
-//         */
-//        _adjust_pagination: function () {
-//            this.$('.page').html(this.collection.state.currentPage + ' / ' + this.collection.state.totalPages);
-//            if (this.collection.hasPreviousPage()) {
-//                this.$('.pagination-previous').css('display', 'inline');
-//            } else {
-//                this.$('.pagination-previous').css('display', 'none');
-//            }
-//            if (this.collection.hasNextPage()) {
-//                this.$('.pagination-next').css('display', 'inline');
-//            } else {
-//                this.$('.pagination-next').css('display', 'none');
-//            }
-//        }
+        pagination_previous: function () {
+            this.collection.reset();
+            this.collection.getPreviousPage().done(this._adjust_pagination());
+        },
+        pagination_next: function () {
+            this.collection.reset();
+            this.collection.getNextPage().done(this._adjust_pagination());
+        },
+        goto_area: function () {
+            var page = this.$('.goto-area input[type=text]').val();
+            if ($.isNumeric(page) && parseInt(page) > 0 && parseInt(page) <= this.collection.state.totalPages) {
+                this.collection.reset();
+                this.$('.goto-area input[type=text]').val('');
+                this.collection.getPage(parseInt(page)).done(this._adjust_pagination());
+            } else {
+                noty({
+                    type: "error",
+                    text: "您输入的跳转页数非法"
+                });
+            }
+        },
+        goto_area_enter: function (event) {
+            if (event.keyCode == 13) {
+                this.$('.goto-area button').click();
+            }
+        },
+        /**
+         * 根据当前页面状态调整页码的显示
+         */
+        _adjust_pagination: function () {
+            this.$('.page').html(this.collection.state.currentPage + ' / ' + this.collection.state.totalPages);
+            if (this.collection.hasPreviousPage()) {
+                this.$('.pagination-previous').css('display', 'inline');
+            } else {
+                this.$('.pagination-previous').css('display', 'none');
+            }
+            if (this.collection.hasNextPage()) {
+                this.$('.pagination-next').css('display', 'inline');
+            } else {
+                this.$('.pagination-next').css('display', 'none');
+            }
+        }
     });
 
 //    var LibraryMusicItemAddView = Backbone.View.extend({
