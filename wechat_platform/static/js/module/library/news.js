@@ -6,13 +6,12 @@ define(function(require, exports, module) {
     require('jquery-validate');
     require('jquery-cookie');
     require('jquery-form');
-    require('masonry');
     require('backbone-paginator');
 
     var item_template = require('text!templates/library/news/item.html');
     var multi_item_template = require('text!templates/library/news/multi_item.html');
     var list_template = require('text!templates/library/news/list.html');
-    // var add_template = require('text!templates/library/news/edit.html');
+    var add_template = require('text!templates/library/news/edit.html');
     // var edit_template = require('text!templates/library/news/edit.html');
 
     var confirm_modal_view = new ConfirmModal;
@@ -219,47 +218,45 @@ define(function(require, exports, module) {
         }
     });
 
-//    var LibraryMusicItemAddView = Backbone.View.extend({
-//        template: _.template(add_template),
-//        initialize: function() {},
-//        /**
-//         * 渲染添加音乐素材页面
-//         * @returns {LibraryMusicItemAddView}
-//         */
-//        render: function () {
-//            this.$el.html(this.template());
+    var LibraryNewsItemAddView = Backbone.View.extend({
+        template: _.template(add_template),
+        initialize: function() {},
+        /**
+         * 渲染添加图文素材页面
+         * @returns {LibraryNewsItemAddView}
+         */
+        render: function () {
+            this.$el.html(this.template());
 //            this.set_file_upload('music');
-//            this.set_file_upload('hq_music');
-//            this.set_file_upload('thumb');
 //            this.set_validate();
-//            return this;
-//        },
-//        /**
-//         * 删除系统媒体文件
-//         * @param key 媒体文件标识符 key
-//         * @param media_type 媒体文件类型
-//         * @returns {*}
-//         */
-//        delete_media_file: function (key, media_type) {
-//            var that = this;
-//            return $.ajax({
-//                url: '/api/filetranslator/' + key + '/',
-//                type: 'DELETE',
-//                success: function () {
-//                    that.$('input[name=' + media_type + ']').val('');
-//                },
-//                error: function () {
-//                    noty({
-//                        type: "error",
-//                        text: "删除文件时出错, 请重试"
-//                    });
-//                }
-//            });
-//        },
-//        /**
-//         * 设置页面中的文件上传组件
-//         * @param media_type 组件标识符 (可选 music/hq_music/thumb)
-//         */
+            return this;
+        },
+        /**
+         * 删除系统媒体文件
+         * @param key 媒体文件标识符 key
+         * @param media_type 媒体文件类型
+         * @returns {*}
+         */
+        delete_media_file: function (key, media_type) {
+            var that = this;
+            return $.ajax({
+                url: '/api/filetranslator/' + key + '/',
+                type: 'DELETE',
+                success: function () {
+                    that.$('input[name=' + media_type + ']').val('');
+                },
+                error: function () {
+                    noty({
+                        type: "error",
+                        text: "删除文件时出错, 请重试"
+                    });
+                }
+            });
+        },
+        /**
+         * 设置页面中的文件上传组件
+         * @param media_type 组件标识符 (可选 music/hq_music/thumb)
+         */
 //        set_file_upload: function (media_type) {
 //            var that = this;
 //            var info = this.$('#upload_' + media_type + ' .upload-info');
@@ -385,9 +382,9 @@ define(function(require, exports, module) {
 //                });
 //            });
 //        },
-//        /**
-//         * 设置表单的验证
-//         */
+        /**
+         * 设置表单的验证
+         */
 //        set_validate: function() {
 //            var that = this;
 //            this.$('#form').validate({
@@ -462,7 +459,7 @@ define(function(require, exports, module) {
 //                }
 //            });
 //        }
-//    });
+    });
 //
 //    var LibraryMusicItemEditView = Backbone.View.extend({
 //        template: _.template(edit_template),
@@ -742,9 +739,9 @@ define(function(require, exports, module) {
     module.exports = {
         'LibraryNewsModel': LibraryNewsModel,
         'LibraryNewsCollection': LibraryNewsCollection,
-//        'LibraryMusicItemView': LibraryMusicItemView,
+        'LibraryNewsItemView': LibraryNewsItemView,
         'LibraryNewsListView': LibraryNewsListView,
-//        'LibraryMusicItemAddView': LibraryMusicItemAddView,
+        'LibraryNewsItemAddView': LibraryNewsItemAddView,
 //        'LibraryMusicItemEditView': LibraryMusicItemEditView
     }
 });

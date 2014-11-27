@@ -8,8 +8,8 @@ require.config({
         'noty': { 'deps': ['jquery'] },
         'jquery-validate': { 'deps': ['jquery'] },
         'jquery-form': { 'deps': ['jquery'] },
-        'masonry': { 'deps': ['jquery'], 'exports': 'jQuery.masonry' },
         'spin': { 'exports': 'Spinner' },
+        'ckeditor': { 'exports': 'CKEDITOR' },
         'theme-app': { 'deps': ['jquery', 'bootstrap'] }
     },
     paths: {
@@ -22,9 +22,9 @@ require.config({
         'jquery-cookie': 'plugins/jquerycookie/jquery.cookie',
         'jquery-validate': 'plugins/jqueryvalidate/jquery.validate.min',
         'jquery-form': 'plugins/jqueryform/jquery.form',
-        'masonry': 'plugins/masonry/masonry.pkgd.min',
         'noty': 'plugins/noty/jquery.noty.packaged.min',
         'spin': 'plugins/spin/spin.min',
+        'ckeditor': 'plugins/ckeditor/ckeditor',
         'theme-app': 'AdminLTE/app',
         'common': 'common',
 

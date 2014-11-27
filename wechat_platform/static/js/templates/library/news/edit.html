@@ -1,0 +1,95 @@
+<div class="main_bd">
+    <div class="media_preview_area">
+        <div class="appmsg multi editing">
+            <div class="appmsg_content">
+                <div class="js_appmsg_item">
+                    <div class="appmsg_info">
+                        <em class="appmsg_date"></em>
+                    </div>
+                    <div class="cover_appmsg_item">
+                        <h4 class="appmsg_title"><a href="javascript:void(0);" onclick="return false;" target="_blank">标题</a></h4>
+                        <div class="appmsg_thumb_wrp">
+                            <img class="js_appmsg_thumb appmsg_thumb" src="">
+                            <i class="appmsg_thumb default">封面图片</i>
+                        </div>
+                        <div class="appmsg_edit_mask">
+                            <a class="edit" href="javascript:void(0)"><i class="fa fa-fw fa-edit fa-lg"></i> 编辑</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="appmsg_item js_appmsg_item">
+                    <img class="js_appmsg_thumb appmsg_thumb" src="">
+                    <i class="appmsg_thumb default">缩略图</i>
+                    <h4 class="appmsg_title"><a onclick="return false;" href="javascript:void(0);" target="_blank">标题</a></h4>
+                    <div class="appmsg_edit_mask">
+                        <a class="edit" href="javascript:void(0)"><i class="fa fa-fw fa-edit fa-lg"></i> 编辑</a>
+                        <a class="delete" href="javascript:void(0)"><i class="fa fa-fw fa-trash-o fa-lg"></i> 删除</a>
+                    </div>
+                </div>
+                <div class="appmsg_item js_appmsg_item">
+                    <img class="js_appmsg_thumb appmsg_thumb" src="">
+                    <i class="appmsg_thumb default">缩略图</i>
+                    <h4 class="appmsg_title"><a onclick="return false;" href="javascript:void(0);" target="_blank">标题</a></h4>
+                    <div class="appmsg_edit_mask">
+                        <a class="edit" href="javascript:void(0)"><i class="fa fa-fw fa-edit fa-lg"></i> 编辑</a>
+                        <a class="delete" href="javascript:void(0)"><i class="fa fa-fw fa-trash-o fa-lg"></i> 删除</a>
+                    </div>
+                </div>
+            </div>
+            <a class="create_access_primary appmsg_add" href="javascript:void(0)"><i class="fa fa-fw fa-plus fa-2x"></i></a>
+        </div>
+    </div>
+    <div class="media_edit_area">
+        <div id="editor" class="appmsg_editor" style="margin-top: 0px;">
+            <div class="inner">
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="title">标题</label>
+                        <input type="text" class="form-control" name="title" id="title">
+                    </div>
+                    <div class="form-group">
+                        <label for="author">作者<span class="help-inline">（选填）</span></label>
+                        <input type="text" class="form-control" name="author" id="author">
+                    </div>
+                    <div class="form-group">
+                        <label for="picture">封面图片<span class="help-inline">（可选，大图片建议尺寸：900像素 * 500像素）</span></label>
+                        <div>
+                            <span class="btn btn-default btn-file upload-button">
+                                <span>上传</span>
+                                <form action="/api/filetranslator/" method="post" enctype="multipart/form-data">
+                                    <input type="file" name="media" id="hq_music_media">
+                                </form>
+                            </span>
+
+                            <div class="upload-info" style="display: none"></div>
+                            <div class="progress upload-progress" style="display: none">
+                                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                                    0%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">摘要<span class="help-inline">（可选）</span></label>
+                        <textarea class="form-control" name="description" id="description" rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="news_content">正文</label>
+                        <textarea class="form-control" name="news_content" id="news_content" rows="15" cols="80"></textarea>
+                    </div>
+                </div>
+            </div>
+            <i class="arrow arrow_out" style="margin-top: 0px;"></i>
+            <i class="arrow arrow_in" style="margin-top: 0px;"></i>
+        </div>
+    </div>
+    <div class="tool_area">
+        <div class="tool_bar border tc">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-2">
+                    <button type="submit" class="btn btn-primary btn-block">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
