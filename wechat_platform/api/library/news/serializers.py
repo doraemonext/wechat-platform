@@ -43,10 +43,15 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
             return obj.url
 
     def get_storage_location(self, obj):
-        if obj.is_simulated():  # 如果可以以模拟登陆方式发送, 说明图文信息已经存储在本地
-            return 'local'
-        else:  # 否则图文是存储在远程(无法以模拟登陆方式发送)
-            return 'remote'
+        multi_item = LibraryNews.manager.get(
+            official_account=obj.official_account,
+            plugin_iden=obj.plugin_iden,
+            root=obj
+        )
+        for item in multi_item:
+            if not item.is_simulated():
+                return 'remote'
+        return 'local'
 
     def get_multi_item(self, obj):
         multi_item = LibraryNews.manager.get(
