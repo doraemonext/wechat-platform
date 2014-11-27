@@ -75,7 +75,7 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
     class Meta:
         model = LibraryNews
         fields = (
-            'id', 'title', 'description', 'author', 'show_cover_pic', 'picurl', 'content_url',
+            'id', 'msgid', 'title', 'description', 'author', 'show_cover_pic', 'picurl', 'content_url',
             'from_url', 'storage_location', 'multi_item', 'datetime'
         )
-        read_only_fields = ('id', 'title', 'description', 'author', 'from_url')
+        read_only_fields = ('id', 'msgid', 'title', 'description', 'author', 'from_url')

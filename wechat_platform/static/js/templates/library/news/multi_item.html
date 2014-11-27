@@ -2,6 +2,15 @@
     <div class="appmsg_content">
         <div class="appmsg_info">
             <em class="appmsg_date"><%= datetime %></em>
+            <div class="pull-right">
+                <% if (msgid > 0) { %>
+                <span class="label label-success" data-toggle="tooltip" data-placement="top" title="已经与微信官方后台素材库同步">已同步</span>
+                <% } else if (storage_location == 'local') { %>
+                <span class="label label-warning" data-toggle="tooltip" data-placement="top" title="尚未与微信官方后台素材库同步，您可以手动同步或什么也不做，因为该图文会在第一次被触发回复的时候自动与官方后台素材库同步。">未同步</span>
+                <% } else if (storage_location == 'remote') { %>
+                <span class="label label-default" data-toggle="tooltip" data-placement="top" title="该图文不可与微信官方后台素材库进行同步，因为存在一个或多个子图文的内容显示方式为跳转链接。<br><br>这意味着该图文不能在开启高级支持的订阅号下作为全部回复中的一份子，其他情况下没有限制。">不可同步</span>
+                <% } %>
+            </div>
         </div>
         <div class="cover_appmsg_item">
             <h4 class="appmsg_title">
@@ -24,11 +33,14 @@
     </div>
     <div class="appmsg_opr">
         <ul>
-            <li class="appmsg_opr_item grid_item size1of2">
-                <a class="js_tooltip" href="javascript:void(0)" data-tooltip="编辑">&nbsp;<i class="icon18_common edit_gray">编辑</i></a>
+            <li class="appmsg_opr_item grid_item size1of3">
+                <a class="sync" href="javascript:void(0)"><i class="fa fa-fw fa-refresh fa-lg"></i> 手动同步</a>
             </li>
-            <li class="appmsg_opr_item grid_item size1of2 no_extra">
-                <a class="js_del no_extra delete" href="javascript:void(0);" data-tooltip="删除">&nbsp;<i class="icon18_common del_gray">删除</i></a>
+            <li class="appmsg_opr_item grid_item size1of3">
+                <a class="edit" href="javascript:void(0)"><i class="fa fa-fw fa-edit fa-lg"></i> 编辑</a>
+            </li>
+            <li class="appmsg_opr_item grid_item size1of3 no_extra">
+                <a class="delete" href="javascript:void(0)"><i class="fa fa-fw fa-trash-o fa-lg"></i> 删除</a>
             </li>
         </ul>
     </div>

@@ -164,6 +164,11 @@ define(function(require, exports, module) {
                 }
             }
             this.$('#news-col-' + min_length_pos).append(library_news_view.render().el);
+            this.$("span[data-toggle=tooltip]").tooltip({
+                container: 'body',
+                html: true,
+                template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+            })
         },
         reset: function() {
             this.$("#news-col-0").html('');

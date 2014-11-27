@@ -3709,6 +3709,10 @@ fieldset[disabled] .btn-vk.active {
 	color: #666;
 }
 
+.appmsg_title a:hover {
+    text-decoration: underline;
+}
+
 .appmsg_thumb_wrp {
 	overflow: hidden;
 	height: 160px;
@@ -3748,14 +3752,11 @@ fieldset[disabled] .btn-vk.active {
 	border-right: 1px solid #e7e7eb;
 	text-align: center;
 	text-decoration: none;
+    color: gray;
 }
 
 .appmsg_opr_item a:hover {
-	text-decoration: none;
-}
-
-.appmsg_opr_item a.no_extra {
-	border-right-width: 0;
+    color: #428bca;
 }
 
 .appmsg_item {
@@ -3940,25 +3941,11 @@ fieldset[disabled] .btn-vk.active {
 	*zoom: 1;
 }
 
-.icon18_common {
-    width: 18px;
-    height: 18px;
-    vertical-align: middle;
-    display: inline-block;
-    line-height: 100px;
-    overflow: hidden;
-}
-
-.icon18_common.edit_gray {
-    background: url(https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/style/base/base_z21def6.png) 0 -5280px no-repeat;
-}
-
-.icon18_common.del_gray {
-    background: url(https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/style/base/base_z21def6.png) 0 -4580px no-repeat;
-}
-
 .size1of2 {
     width: 50%;
+}
+.size1of3 {
+    width: 33.33%;
 }
 
 .grid_item {
@@ -3969,4 +3956,15 @@ fieldset[disabled] .btn-vk.active {
     float: none;
     width: auto;
     overflow: hidden;
+}
+
+.tooltip-inner {
+    border: 2px solid #e7e7eb;
+    background: #f9f9f9;
+    color: #000;
+    text-align: left;
+}
+
+.tooltip.top .tooltip-arrow {
+  border-top-color: #f9f9f9;
 }
