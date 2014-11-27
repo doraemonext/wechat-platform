@@ -228,6 +228,7 @@ define(function(require, exports, module) {
         events: {
             "click #add_sub_news": "add_sub_news",
             "click .edit": "edit_sub_news",
+            "click .delete": "delete_sub_news",
         },
         /**
          * 渲染添加图文素材页面
@@ -285,10 +286,39 @@ define(function(require, exports, module) {
          */
         edit_sub_news: function (event) {
             var news_array = this._get_news_array();
-            var news_id = $(event.currentTarget).data('news-id');
+            var news_id = parseInt($(event.currentTarget).attr('data-news-id'));
 
             this._set_news_current(news_id);
             this._update_editor(news_id);
+        },
+        /**
+         * 当点击删除子图文按钮时触发该函数
+         * @param event
+         */
+        delete_sub_news: function (event) {
+            var news_array = this._get_news_array();
+            var news_current = this._get_news_current();
+            var news_id = parseInt($(event.currentTarget).attr('data-news-id'));
+
+            this.$('.appmsg_content .js_appmsg_item:nth-child(' + (news_id+1) + ')').remove();
+            this._update_preview_area();
+            news_array.splice(news_id, 1);
+            if ((news_id == news_current && news_current >= news_array.length) || (news_id < news_current)) {
+                news_current--;
+            }
+            this._update_editor(news_current);
+            this._set_news_current(news_current);
+            this._set_news_array(news_array);
+        },
+        /**
+         * 更新所有左侧预览图文中的序号 (用于对左侧预览图文顺序变动后)
+         * @private
+         */
+        _update_preview_area: function () {
+            this.$('.appmsg_content .js_appmsg_item').each(function (index) {
+                $(this).find('.edit').attr('data-news-id', index);
+                $(this).find('.delete').attr('data-news-id', index);
+            });
         },
         /**
          * 更新编辑表单中的所有信息并且移动到适当位置
@@ -300,14 +330,7 @@ define(function(require, exports, module) {
             this.$('input[name=title]').val(news_array[news_id].title);
             this.$('input[name=author]').val(news_array[news_id].author);
             this.$('textarea[name=description]').val(news_array[news_id].description);
-            this._move_editor_position(news_id);
-        },
-        /**
-         * 根据图文消息的序号来将编辑器框移动到正确的位置
-         * @param news_id
-         * @private
-         */
-        _move_editor_position: function (news_id) {
+
             if (news_id == 0) {
                 this.$('#editor').css('margin-top', '0');
             } else {
