@@ -12,6 +12,7 @@ define(function(require, exports, module) {
     var multi_item_template = require('text!templates/library/news/multi_item.html');
     var list_template = require('text!templates/library/news/list.html');
     var add_template = require('text!templates/library/news/edit.html');
+    var add_sub_news_template = require('text!templates/library/news/add_sub_news.html');
     // var edit_template = require('text!templates/library/news/edit.html');
 
     var confirm_modal_view = new ConfirmModal;
@@ -220,13 +221,27 @@ define(function(require, exports, module) {
 
     var LibraryNewsItemAddView = Backbone.View.extend({
         template: _.template(add_template),
-        initialize: function() {},
+        initialize: function() {
+            localStorage.setItem('news_current', '0');
+            localStorage.setItem('news_array', JSON.stringify([this._get_empty_news()]));
+        },
+        events: {
+            "click #add_sub_news": "add_sub_news",
+            "click .edit": "edit_sub_news",
+        },
         /**
          * 渲染添加图文素材页面
          * @returns {LibraryNewsItemAddView}
          */
         render: function () {
             this.$el.html(this.template());
+
+            var news_current = this._get_news_current();
+            var news_array = this._get_news_array();
+            for (var i = 1; i < news_array.length; i++) {  // 注意因为至少存在一条图文，默认图文已经在模板中写好，所以从 i=1 开始动态添加
+                this.add_sub_news();
+            }
+            this._update_editor(news_current);
 //            this.set_file_upload('music');
 //            this.set_validate();
             return this;
@@ -252,6 +267,101 @@ define(function(require, exports, module) {
                     });
                 }
             });
+        },
+        /**
+         * 当点击添加子图文按钮时触发该函数
+         */
+        add_sub_news: function () {
+            var news_array = this._get_news_array();
+            var news_sum = news_array.length;
+
+            this.$('.appmsg_content').append(_.template(add_sub_news_template)({'id': news_sum}));
+            news_array.push(this._get_empty_news());
+            this._set_news_array(news_array);
+        },
+        /**
+         * 当点击编辑子图文按钮时触发该函数
+         * @param event
+         */
+        edit_sub_news: function (event) {
+            var news_array = this._get_news_array();
+            var news_id = $(event.currentTarget).data('news-id');
+
+            this._set_news_current(news_id);
+            this._update_editor(news_id);
+        },
+        /**
+         * 更新编辑表单中的所有信息并且移动到适当位置
+         * @param news_id {Number}
+         * @private
+         */
+        _update_editor: function (news_id) {
+            var news_array = this._get_news_array();
+            this.$('input[name=title]').val(news_array[news_id].title);
+            this.$('input[name=author]').val(news_array[news_id].author);
+            this.$('textarea[name=description]').val(news_array[news_id].description);
+            this._move_editor_position(news_id);
+        },
+        /**
+         * 根据图文消息的序号来将编辑器框移动到正确的位置
+         * @param news_id
+         * @private
+         */
+        _move_editor_position: function (news_id) {
+            if (news_id == 0) {
+                this.$('#editor').css('margin-top', '0');
+            } else {
+                this.$('#editor').css('margin-top', 79 + news_id * 119 + 'px');
+            }
+        },
+        /**
+         * 返回 localStorage 中存储的当前正在编辑的图文序号
+         * @returns {Number}
+         * @private
+         */
+        _get_news_current: function () {
+            return parseInt(localStorage.getItem('news_current'));
+        },
+        /**
+         * 设置 localStorage 中存储的当前正在编辑的图文序号
+         * @param news_id {Number}
+         * @private
+         */
+        _set_news_current: function (news_id) {
+            localStorage.setItem('news_current', news_id);
+        },
+        /**
+         * 返回 localStorage 中存储的当前图文信息数组
+         * @returns {*}
+         * @private
+         */
+        _get_news_array: function () {
+            return JSON.parse(localStorage.getItem('news_array'));
+        },
+        /**
+         * 设置 localStorage 中的当前图文信息数组
+         * @param news {Array}
+         * @private
+         */
+        _set_news_array: function (news) {
+            localStorage.setItem('news_array', JSON.stringify(news));
+        },
+        /**
+         * 生成一个空的 news 对象, 默认使用文本内容
+         * @returns {{title: string, description: string, picture: string, author: string, pattern: string, content: string, url: string, from_url: string}}
+         * @private
+         */
+        _get_empty_news: function () {
+            return {
+                title: '',
+                description: '',
+                picture: '',
+                author: '',
+                pattern: 'text',
+                content: '',
+                url: '',
+                from_url: ''
+            }
         },
         /**
          * 设置页面中的文件上传组件

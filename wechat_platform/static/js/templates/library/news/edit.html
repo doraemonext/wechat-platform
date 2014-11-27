@@ -13,30 +13,12 @@
                             <i class="appmsg_thumb default">封面图片</i>
                         </div>
                         <div class="appmsg_edit_mask">
-                            <a class="edit" href="javascript:void(0)"><i class="fa fa-fw fa-edit fa-lg"></i> 编辑</a>
+                            <a class="edit" href="javascript:void(0)" data-news-id="0"><i class="fa fa-fw fa-edit fa-lg"></i> 编辑</a>
                         </div>
                     </div>
                 </div>
-                <div class="appmsg_item js_appmsg_item">
-                    <img class="js_appmsg_thumb appmsg_thumb" src="">
-                    <i class="appmsg_thumb default">缩略图</i>
-                    <h4 class="appmsg_title"><a onclick="return false;" href="javascript:void(0);" target="_blank">标题</a></h4>
-                    <div class="appmsg_edit_mask">
-                        <a class="edit" href="javascript:void(0)"><i class="fa fa-fw fa-edit fa-lg"></i> 编辑</a>
-                        <a class="delete" href="javascript:void(0)"><i class="fa fa-fw fa-trash-o fa-lg"></i> 删除</a>
-                    </div>
-                </div>
-                <div class="appmsg_item js_appmsg_item">
-                    <img class="js_appmsg_thumb appmsg_thumb" src="">
-                    <i class="appmsg_thumb default">缩略图</i>
-                    <h4 class="appmsg_title"><a onclick="return false;" href="javascript:void(0);" target="_blank">标题</a></h4>
-                    <div class="appmsg_edit_mask">
-                        <a class="edit" href="javascript:void(0)"><i class="fa fa-fw fa-edit fa-lg"></i> 编辑</a>
-                        <a class="delete" href="javascript:void(0)"><i class="fa fa-fw fa-trash-o fa-lg"></i> 删除</a>
-                    </div>
-                </div>
             </div>
-            <a class="create_access_primary appmsg_add" href="javascript:void(0)"><i class="fa fa-fw fa-plus fa-2x"></i></a>
+            <a id="add_sub_news" class="create_access_primary appmsg_add" href="javascript:void(0)"><i class="fa fa-fw fa-plus fa-2x"></i></a>
         </div>
     </div>
     <div class="media_edit_area">
@@ -77,10 +59,10 @@
                         <label for="news_content">正文显示方式</label>
                         <div style="margin-bottom: 8px">
                             <label class="radio-inline">
-                                <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> 文本内容
+                                <input type="radio" name="pattern" value="text"> 文本内容
                             </label>
                             <label class="radio-inline">
-                                <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> 跳转链接
+                                <input type="radio" name="pattern" value="url"> 跳转链接
                             </label>
                         </div>
                         <div>
