@@ -3627,9 +3627,15 @@ fieldset[disabled] .btn-vk.active {
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
 
+.news-picture {
+
+}
+
+.news-picture-opr {
+
+}
+
 .upload-info {
-    height: 22px;
-    line-height: 22px;
     margin: 10px 0 0 0;
 }
 

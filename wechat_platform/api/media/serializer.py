@@ -50,6 +50,10 @@ class MediaSerializer(serializers.ModelSerializer, MediaValidatorMixin):
     """
     系统媒体文件 序列化类 (仅用于单个媒体文件的 获取(GET)/更新(PATCH)/删除(DELETE))
     """
+    url = serializers.SerializerMethodField('get_url')
+
+    def get_url(self, obj):
+        return self.context['view'].request.build_absolute_uri(reverse('filetranslator:download', kwargs={'key': obj.pk}))
 
     def restore_object(self, attrs, instance=None):
         """
@@ -67,7 +71,7 @@ class MediaSerializer(serializers.ModelSerializer, MediaValidatorMixin):
     class Meta:
         model = Media
         fields = ('key', 'official_account', 'type', 'filename', 'extension', 'media', 'size',
-                  'created_datetime', 'modified_datetime')
+                  'url', 'created_datetime', 'modified_datetime')
         read_only_fields = ('key', 'official_account', 'size', 'created_datetime', 'modified_datetime')
 
 
@@ -78,6 +82,10 @@ class MediaUploadSerializer(serializers.ModelSerializer, MediaValidatorMixin):
     official_account = serializers.PrimaryKeyRelatedField()
     media = serializers.FileField()  # 以文件形式上传
     type = serializers.IntegerField()
+    url = serializers.SerializerMethodField('get_url')
+
+    def get_url(self, obj):
+        return self.context['view'].request.build_absolute_uri(reverse('filetranslator:download', kwargs={'key': obj.pk}))
 
     def save(self, **kwargs):
         """
@@ -100,5 +108,5 @@ class MediaUploadSerializer(serializers.ModelSerializer, MediaValidatorMixin):
     class Meta:
         model = Media
         fields = ('key', 'official_account', 'type', 'filename', 'extension', 'media', 'size',
-                  'created_datetime', 'modified_datetime')
+                  'url', 'created_datetime', 'modified_datetime')
         read_only_fields = ('key', 'filename', 'extension', 'size', 'created_datetime', 'modified_datetime')

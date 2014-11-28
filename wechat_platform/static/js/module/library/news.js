@@ -245,31 +245,8 @@ define(function(require, exports, module) {
                 this.add_sub_news();
             }
             this._update_editor(news_current);
-//            this.set_file_upload('music');
 //            this.set_validate();
             return this;
-        },
-        /**
-         * 删除系统媒体文件
-         * @param key 媒体文件标识符 key
-         * @param media_type 媒体文件类型
-         * @returns {*}
-         */
-        delete_media_file: function (key, media_type) {
-            var that = this;
-            return $.ajax({
-                url: '/api/filetranslator/' + key + '/',
-                type: 'DELETE',
-                success: function () {
-                    that.$('input[name=' + media_type + ']').val('');
-                },
-                error: function () {
-                    noty({
-                        type: "error",
-                        text: "删除文件时出错, 请重试"
-                    });
-                }
-            });
         },
         /**
          * 当点击添加子图文按钮时触发该函数
@@ -338,6 +315,7 @@ define(function(require, exports, module) {
             var news_array = this._get_news_array();
             this.$('input[name="title"]').val(news_array[news_id].title);
             this.$('input[name="author"]').val(news_array[news_id].author);
+            this._update_editor_picture(news_id);
             this.$('textarea[name="description"]').val(news_array[news_id].description);
             this.$('textarea[name="news_content"]').val(news_array[news_id].content);
             if (CKEDITOR.instances.hasOwnProperty('news_content')) {
@@ -399,6 +377,9 @@ define(function(require, exports, module) {
                 news_array[news_id].from_url = $(this).val();
                 that._set_news_array(news_array);
             });
+        },
+        _update_editor_picture: function (news_id) {
+            this.set_file_upload(news_id);
         },
         /**
          * 触发内容展现方式 radio 时触发此函数
@@ -469,134 +450,166 @@ define(function(require, exports, module) {
             }
         },
         /**
-         * 设置页面中的文件上传组件
-         * @param media_type 组件标识符 (可选 music/hq_music/thumb)
+         * 删除系统媒体文件
+         * @param key 媒体文件标识符 key
+         * @returns {*}
          */
-//        set_file_upload: function (media_type) {
-//            var that = this;
-//            var info = this.$('#upload_' + media_type + ' .upload-info');
-//            var progress = this.$('#upload_' + media_type + ' .upload-progress');
-//            var btn = this.$('#upload_' + media_type + ' .upload-button');
-//
-//            info.set_content = function (filename, size, key) {
-//                var content = '';
-//                if (media_type == 'music') {
-//                    content += '<strong>文件名</strong>: ' + filename + ' <strong>大小</strong>: ' + size + ' KB ';
-//                    $(this).html(content);
-//                } else {
-//                    content += '<strong>文件名</strong>: ' + filename + ' <strong>大小</strong>: ' + size + ' KB ';
-//                    content += '&nbsp;<strong><a class="delete-media" data-key="' + key + '" href="javascript:void(0)">删除该文件</a></strong>';
-//                    $(this).html(content);
-//                    $(this).find('.delete-media').click(function () {
-//                        var key = $(this).data('key');
-//                        that.delete_media_file(key, media_type).success(function () {
-//                            btn.display_select_upload();
-//                            info.hide();
-//                        });
-//                    });
-//                }
-//            };
-//            info.set_error_content = function (content) {
-//                $(this).html('<span class="text-red">上传失败：' + content + '</span>');
-//            };
-//            progress.set_progress = function (percent) {
-//                progress.find('.progress-bar').css('width', percent + '%');
-//                progress.find('.progress-bar').attr('aria-valuenow', percent);
-//                progress.find('.progress-bar').html(percent + '%');
-//            };
-//            btn.display_select_upload = function () {
-//                $(this).find('input').prop('disabled', false);
-//                $(this).removeClass('disabled');
-//                $(this).find('span').html('上传文件');
-//            };
-//            btn.display_uploading = function () {
-//                $(this).find('input').prop('disabled', true);
-//                $(this).addClass('disabled');
-//                $(this).find('span').html('上传中...');
-//            };
-//            btn.display_restart_upload = function () {
-//                $(this).find('input').prop('disabled', false);
-//                $(this).removeClass('disabled');
-//                $(this).find('span').html('重新上传');
-//            };
-//
-//            this.$('input[id=' + media_type + '_media]').click(function () {  // 此处为两次提交重复文件不响应 change 的解决方案
-//                $(this).val('');
-//            });
-//            this.$('input[id=' + media_type + '_media]').change(function () {
-//                var media_type_number;
-//                if (media_type == 'music' || media_type == 'hq_music') {
-//                    media_type_number = 3;
-//                } else {
-//                    media_type_number = 1;
-//                }
-//                that.$('#upload_' + media_type + ' form').ajaxSubmit({
-//                    dataType: 'json',
-//                    data: {
-//                        'official_account': $('#current-official-account').val(),
-//                        'type': media_type_number
-//                    },
-//                    beforeSend: function (xhr) {
-//                        xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
-//                        btn.display_uploading();
-//                        progress.set_progress(0);
-//                        progress.show();
-//                        info.hide();
-//                    },
-//                    uploadProgress: function (event, position, total, percentComplete) {
-//                        progress.set_progress(percentComplete);
-//                    },
-//                    success: function (data) {
-//                        var origin_key = that.$('input[name=' + media_type + ']').val();
-//                        if (origin_key.length > 0) {
-//                            that.delete_media_file(origin_key, media_type);
-//                        }
-//                        that.$('input[name=' + media_type + ']').val(data['key']);
-//
-//                        var full_filename = data['filename'] + data['extension'];
-//                        var size = parseInt(parseInt(data['size']) / 1024);
-//
-//                        btn.display_restart_upload();
-//                        progress.hide();
-//                        info.set_content(full_filename, size, data['key']);
-//                        info.show();
-//                    },
-//                    statusCode: {
-//                        400: function(xhr) {
-//                            var data = $.parseJSON(xhr.responseText);
-//                            for (var key in data) {
-//                                btn.display_select_upload();
-//                                progress.hide();
-//                                info.set_error_content(data[key][0]);
-//                                info.show();
-//                                break;  // 直接针对第一条错误给出提示, 其他忽略
-//                            }
-//                        },
-//                        500: function(xhr) {
-//                            btn.display_select_upload();
-//                            progress.hide();
-//                            info.hide();
-//                            noty({
-//                                type: "error",
-//                                text: "服务器内部出错, 请重试"
-//                            });
-//                        }
-//                    },
-//                    error: function(xhr) {
-//                        if (xhr.status != 400 && xhr.status != 400) {
-//                            btn.display_select_upload();
-//                            progress.hide();
-//                            if (xhr.status == 413) {
-//                                info.set_error_content('错误' + xhr.status + ' - 请求数据过长，请尝试增大服务器最大上传限制');
-//                            } else {
-//                                info.set_error_content('错误' + xhr.status);
-//                            }
-//                            info.show();
-//                        }
-//                    }
-//                });
-//            });
-//        },
+        delete_media_file: function (key) {
+            return $.ajax({
+                url: '/api/filetranslator/' + key + '/',
+                type: 'DELETE',
+                async: false,
+                error: function () {
+                    noty({
+                        type: "error",
+                        text: "删除文件时出错, 请重试"
+                    });
+                }
+            });
+        },
+        /**
+         * 设置页面中的文件上传组件
+         */
+        set_file_upload: function (news_id) {
+            var that = this;
+            var news_array = this._get_news_array();
+            var info = this.$('#upload_picture .upload-info');
+            var progress = this.$('#upload_picture .upload-progress');
+            var btn = this.$('#upload_picture .upload-button');
+
+            info.set_content = function (url, key) {
+                var content = '<div class="news-picture"><img class="img-responsive img-rounded" src="' + url + '" ></div>';
+                content += '<div class="news-picture-opr"><strong><a class="delete-media" data-key="' + key + '" href="javascript:void(0)">删除该文件</a></strong></div>';
+                $(this).html(content);
+                $(this).find('.delete-media').click(function () {
+                    var key = $(this).attr('data-key');
+                    that.delete_media_file(key).success(function () {
+                        btn.display_select_upload();
+                        info.hide();
+                        news_array[news_id].picture = '';
+                        that._set_news_array(news_array);
+                    });
+                });
+            };
+            info.set_error_content = function (content) {
+                $(this).html('<span class="text-red">上传失败：' + content + '</span>');
+            };
+            progress.set_progress = function (percent) {
+                progress.find('.progress-bar').css('width', percent + '%');
+                progress.find('.progress-bar').attr('aria-valuenow', percent);
+                progress.find('.progress-bar').html(percent + '%');
+            };
+            btn.display_select_upload = function () {
+                $(this).find('input').prop('disabled', false);
+                $(this).removeClass('disabled');
+                $(this).find('span').html('上传');
+            };
+            btn.display_uploading = function () {
+                $(this).find('input').prop('disabled', true);
+                $(this).addClass('disabled');
+                $(this).find('span').html('上传中...');
+            };
+            btn.display_restart_upload = function () {
+                $(this).find('input').prop('disabled', false);
+                $(this).removeClass('disabled');
+                $(this).find('span').html('重新上传');
+            };
+
+            this.$('input[id="picture"]').unbind('click change');
+            if (news_array[news_id].picture.length > 0) {
+                btn.display_restart_upload();
+                progress.hide();
+                $.ajax({
+                    url: '/api/filetranslator/' + news_array[news_id].picture + '/',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        info.set_content(data['url'], data['key']);
+                        info.show();
+                    }
+                });
+            } else {
+                info.html('');
+                info.hide();
+                progress.set_progress(0);
+                progress.hide();
+                btn.display_select_upload();
+            }
+
+            this.$('input[id="picture"]').click(function () {  // 此处为两次提交重复文件不响应 change 的解决方案
+                $(this).val('');
+            });
+            this.$('input[id="picture"]').change(function () {
+                var news_array = that._get_news_array();
+                that.$('#upload_picture form').ajaxSubmit({
+                    dataType: 'json',
+                    data: {
+                        'official_account': $('#current-official-account').val(),
+                        'type': 1
+                    },
+                    beforeSend: function (xhr) {
+                        var origin_key = news_array[news_id].picture;
+                        if (origin_key.length > 0) {  // 当原先存在封面图片时先删除原先的
+                            that.delete_media_file(origin_key).success(function () {
+                                news_array[news_id].picture = '';
+                                that._set_news_array(news_array);
+                            });
+                        }
+
+                        xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
+                        btn.display_uploading();
+                        progress.set_progress(0);
+                        progress.show();
+                        info.hide();
+                    },
+                    uploadProgress: function (event, position, total, percentComplete) {
+                        progress.set_progress(percentComplete);
+                    },
+                    success: function (data) {
+                        news_array[news_id].picture = data['key'];
+                        that._set_news_array(news_array);
+
+                        btn.display_restart_upload();
+                        progress.hide();
+                        info.set_content(data['url'], data['key']);
+                        info.show();
+                    },
+                    statusCode: {
+                        400: function(xhr) {
+                            var data = $.parseJSON(xhr.responseText);
+                            for (var key in data) {
+                                btn.display_select_upload();
+                                progress.hide();
+                                info.set_error_content(data[key][0]);
+                                info.show();
+                                break;  // 直接针对第一条错误给出提示, 其他忽略
+                            }
+                        },
+                        500: function(xhr) {
+                            btn.display_select_upload();
+                            progress.hide();
+                            info.hide();
+                            noty({
+                                type: "error",
+                                text: "服务器内部出错, 请重试"
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status != 400 && xhr.status != 500) {
+                            btn.display_select_upload();
+                            progress.hide();
+                            if (xhr.status == 413) {
+                                info.set_error_content('错误' + xhr.status + ' - 请求数据过长，请尝试增大服务器最大上传限制');
+                            } else {
+                                info.set_error_content('错误' + xhr.status);
+                            }
+                            info.show();
+                        }
+                    }
+                });
+            });
+        },
         /**
          * 设置表单的验证
          */

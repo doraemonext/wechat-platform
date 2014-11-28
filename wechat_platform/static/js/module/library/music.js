@@ -305,7 +305,7 @@ define(function(require, exports, module) {
                         }
                     },
                     error: function(xhr) {
-                        if (xhr.status != 400 && xhr.status != 400) {
+                        if (xhr.status != 400 && xhr.status != 500) {
                             btn.display_select_upload();
                             progress.hide();
                             if (xhr.status == 413) {
@@ -580,7 +580,7 @@ define(function(require, exports, module) {
                         }
                     },
                     error: function(xhr) {
-                        if (xhr.status != 400 && xhr.status != 400) {
+                        if (xhr.status != 400 && xhr.status != 500) {
                             btn.display_restart_upload();
                             progress.hide();
                             if (xhr.status == 413) {
