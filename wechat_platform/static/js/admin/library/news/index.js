@@ -44,10 +44,20 @@ define(function (require, exports, module) {
             this.set_header(new ContentHeaderView({
                 html: require('text!templates/library/news/app_content_header_add.html')
             }));
-            this.set_content(new LibraryNewsItemAddView);
+
+            var view = new LibraryNewsItemAddView;
+
+            // 如果已经存在CKEDITOR实例，先删除
+            if (CKEDITOR.instances.hasOwnProperty('news_content')) {
+                CKEDITOR.remove(CKEDITOR.instances.news_content);
+            }
+            this.set_content(view);
+            // 在HTML已经渲染好后初始化CKEDITOR
             CKEDITOR.replace('news_content', {
                 language: 'zh-cn'
             });
+            // Hack: 修正首图文无法在渲染时获得事件绑定问题
+            view.fix_ckeditor();
         },
 //        edit_interface: function (id) {
 //            this.set_breadcrumb(new BreadcrumbView({

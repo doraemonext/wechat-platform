@@ -2,6 +2,7 @@ define(function(require, exports, module) {
     var $ = require('jquery');
     var Backbone = require('backbone');
     var ConfirmModal = require('helper.confirm-modal');
+    var CKEDITOR = require('ckeditor');
     require('spin');
     require('jquery-validate');
     require('jquery-cookie');
@@ -236,6 +237,7 @@ define(function(require, exports, module) {
          */
         render: function () {
             this.$el.html(this.template());
+            this.$('input:radio[name="pattern"]').on('change', this, this._trigger_pattern);
 
             var news_current = this._get_news_current();
             var news_array = this._get_news_array();
@@ -310,6 +312,9 @@ define(function(require, exports, module) {
             this._set_news_current(news_current);
             this._set_news_array(news_array);
         },
+        fix_ckeditor: function () {
+            this._update_editor(this._get_news_current());
+        },
         /**
          * 更新所有左侧预览图文中的序号 (用于对左侧预览图文顺序变动后)
          * @private
@@ -326,16 +331,83 @@ define(function(require, exports, module) {
          * @private
          */
         _update_editor: function (news_id) {
+            var that = this;
             var news_array = this._get_news_array();
-            this.$('input[name=title]').val(news_array[news_id].title);
-            this.$('input[name=author]').val(news_array[news_id].author);
-            this.$('textarea[name=description]').val(news_array[news_id].description);
+            this.$('input[name="title"]').val(news_array[news_id].title);
+            this.$('input[name="author"]').val(news_array[news_id].author);
+            this.$('textarea[name="description"]').val(news_array[news_id].description);
+            this.$('textarea[name="news_content"]').val(news_array[news_id].content);
+            if (CKEDITOR.instances.hasOwnProperty('news_content')) {
+                CKEDITOR.instances.news_content.setData(news_array[news_id].content);
+            }
+            this.$('input[name="url"]').val(news_array[news_id].url);
+            if (news_array[news_id].pattern == 'text') {
+                this.$('input:radio[name="pattern"][value="text"]').prop('checked', true).trigger('change');
+            } else {
+                this.$('input:radio[name="pattern"][value="url"]').prop('checked', true).trigger('change');
+            }
 
+            // 更新编辑框的位置
             if (news_id == 0) {
                 this.$('#editor').css('margin-top', '0');
             } else {
                 this.$('#editor').css('margin-top', 79 + news_id * 119 + 'px');
             }
+
+            // 对标题的事件绑定
+            this.$('input[name="title"]').unbind('input propertychange change');
+            this.$('input[name="title"]').bind('input propertychange', function () {
+                that.$('.appmsg_content .js_appmsg_item:nth-child(' + (news_id+1) + ') .appmsg_title a').html($(this).val());
+            });
+            this.$('input[name="title"]').bind('change', function () {
+                news_array[news_id].title = $(this).val();
+                that._set_news_array(news_array);
+            });
+            // 对作者的事件绑定
+            this.$('input[name="author"]').unbind('change');
+            this.$('input[name="author"]').bind('change', function () {
+                news_array[news_id].author = $(this).val();
+                that._set_news_array(news_array);
+            });
+            // 对摘要的事件绑定
+            this.$('textarea[name="description"]').unbind('change');
+            this.$('textarea[name="description"]').bind('change', function () {
+                news_array[news_id].description = $(this).val();
+                that._set_news_array(news_array);
+            });
+            // 对文本内容的事件绑定
+            if (CKEDITOR.instances.hasOwnProperty('news_content')) {
+                var editor = CKEDITOR.instances.news_content;
+                editor.on('change', function (event) {
+                    news_array[news_id].content = editor.getData();
+                    that._set_news_array(news_array);
+                });
+            }
+            // 对跳转链接的事件绑定
+            this.$('input[name="url"]').unbind('change');
+            this.$('input[name="url"]').bind('change', function () {
+                news_array[news_id].url = $(this).val();
+                that._set_news_array(news_array);
+            });
+        },
+        /**
+         * 触发内容展现方式 radio 时触发此函数
+         * @param event
+         * @private
+         */
+        _trigger_pattern: function (event) {
+            var news_array = event.data._get_news_array();
+            var news_current = event.data._get_news_current();
+            if (event.data.$el.find('input[name="pattern"]:checked').val() === 'text') {
+                event.data.$('#text_content').css('display', 'block');
+                event.data.$('#url_content').css('display', 'none');
+                news_array[news_current].pattern = 'text';
+            } else {
+                event.data.$('#text_content').css('display', 'none');
+                event.data.$('#url_content').css('display', 'block');
+                news_array[news_current].pattern = 'url';
+            }
+            news_array = event.data._set_news_array(news_array);
         },
         /**
          * 返回 localStorage 中存储的当前正在编辑的图文序号
