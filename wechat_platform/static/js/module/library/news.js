@@ -311,24 +311,6 @@ define(function(require, exports, module) {
          * @private
          */
         _update_editor: function (news_id) {
-            var that = this;
-            var news_array = this._get_news_array();
-            this.$('input[name="title"]').val(news_array[news_id].title);
-            this.$('input[name="author"]').val(news_array[news_id].author);
-            this._update_editor_picture(news_id);
-            this.$('textarea[name="description"]').val(news_array[news_id].description);
-            this.$('textarea[name="news_content"]').val(news_array[news_id].content);
-            if (CKEDITOR.instances.hasOwnProperty('news_content')) {
-                CKEDITOR.instances.news_content.setData(news_array[news_id].content);
-            }
-            this.$('input[name="url"]').val(news_array[news_id].url);
-            if (news_array[news_id].pattern == 'text') {
-                this.$('input:radio[name="pattern"][value="text"]').prop('checked', true).trigger('change');
-            } else {
-                this.$('input:radio[name="pattern"][value="url"]').prop('checked', true).trigger('change');
-            }
-            this.$('input[name="from_url"]').val(news_array[news_id].from_url);
-
             // 更新编辑框的位置
             if (news_id == 0) {
                 this.$('#editor').css('margin-top', '0');
@@ -336,50 +318,100 @@ define(function(require, exports, module) {
                 this.$('#editor').css('margin-top', 79 + news_id * 119 + 'px');
             }
 
-            // 对标题的事件绑定
+            this._update_editor_title(news_id);
+            this._update_editor_author(news_id);
+            this._update_editor_picture(news_id);
+            this._update_editor_description(news_id);
+            this._update_editor_content(news_id);
+            this._update_editor_url(news_id);
+            this._update_editor_pattern(news_id);
+            this._update_editor_from_url(news_id);
+        },
+        _update_editor_title: function (news_id) {
+            var that = this;
+            var news_array = this._get_news_array();
+            this.$('input[name="title"]').val(news_array[news_id].title);
             this.$('input[name="title"]').unbind('input propertychange change');
             this.$('input[name="title"]').bind('input propertychange', function () {
                 that.$('.appmsg_content .js_appmsg_item:nth-child(' + (news_id+1) + ') .appmsg_title a').html($(this).val());
             });
             this.$('input[name="title"]').bind('change', function () {
+                news_array = that._get_news_array();
                 news_array[news_id].title = $(this).val();
                 that._set_news_array(news_array);
             });
-            // 对作者的事件绑定
+        },
+        _update_editor_author: function (news_id) {
+            var that = this;
+            var news_array = this._get_news_array();
+            this.$('input[name="author"]').val(news_array[news_id].author);
             this.$('input[name="author"]').unbind('change');
             this.$('input[name="author"]').bind('change', function () {
+                news_array = that._get_news_array();
                 news_array[news_id].author = $(this).val();
-                that._set_news_array(news_array);
-            });
-            // 对摘要的事件绑定
-            this.$('textarea[name="description"]').unbind('change');
-            this.$('textarea[name="description"]').bind('change', function () {
-                news_array[news_id].description = $(this).val();
-                that._set_news_array(news_array);
-            });
-            // 对文本内容的事件绑定
-            if (CKEDITOR.instances.hasOwnProperty('news_content')) {
-                var editor = CKEDITOR.instances.news_content;
-                editor.on('change', function (event) {
-                    news_array[news_id].content = editor.getData();
-                    that._set_news_array(news_array);
-                });
-            }
-            // 对跳转链接的事件绑定
-            this.$('input[name="url"]').unbind('change');
-            this.$('input[name="url"]').bind('change', function () {
-                news_array[news_id].url = $(this).val();
-                that._set_news_array(news_array);
-            });
-            // 对来源链接的事件绑定
-            this.$('input[name="from_url"]').unbind('change');
-            this.$('input[name="from_url"]').bind('change', function () {
-                news_array[news_id].from_url = $(this).val();
                 that._set_news_array(news_array);
             });
         },
         _update_editor_picture: function (news_id) {
             this.set_file_upload(news_id);
+        },
+        _update_editor_description: function (news_id) {
+            var that = this;
+            var news_array = this._get_news_array();
+            this.$('textarea[name="description"]').val(news_array[news_id].description);
+            this.$('textarea[name="description"]').unbind('change');
+            this.$('textarea[name="description"]').bind('change', function () {
+                news_array = that._get_news_array();
+                news_array[news_id].description = $(this).val();
+                that._set_news_array(news_array);
+            });
+        },
+        _update_editor_content: function (news_id) {
+            var that = this;
+            var news_array = this._get_news_array();
+            this.$('textarea[name="news_content"]').val(news_array[news_id].content);
+            if (CKEDITOR.instances.hasOwnProperty('news_content')) {
+                CKEDITOR.instances.news_content.setData(news_array[news_id].content);
+            }
+            if (CKEDITOR.instances.hasOwnProperty('news_content')) {
+                var editor = CKEDITOR.instances.news_content;
+                editor.on('change', function (event) {
+                    news_array = that._get_news_array();
+                    news_array[news_id].content = editor.getData();
+                    that._set_news_array(news_array);
+                });
+            }
+        },
+        _update_editor_url: function (news_id) {
+            var that = this;
+            var news_array = this._get_news_array();
+            this.$('input[name="url"]').val(news_array[news_id].url);
+            this.$('input[name="url"]').unbind('change');
+            this.$('input[name="url"]').bind('change', function () {
+                news_array = that._get_news_array();
+                news_array[news_id].url = $(this).val();
+                that._set_news_array(news_array);
+            });
+        },
+        _update_editor_pattern: function (news_id) {
+            var that = this;
+            var news_array = this._get_news_array();
+            if (news_array[news_id].pattern == 'text') {
+                this.$('input:radio[name="pattern"][value="text"]').prop('checked', true).trigger('change');
+            } else {
+                this.$('input:radio[name="pattern"][value="url"]').prop('checked', true).trigger('change');
+            }
+        },
+        _update_editor_from_url: function (news_id) {
+            var that = this;
+            var news_array = this._get_news_array();
+            this.$('input[name="from_url"]').val(news_array[news_id].from_url);
+            this.$('input[name="from_url"]').unbind('change');
+            this.$('input[name="from_url"]').bind('change', function () {
+                news_array = that._get_news_array();
+                news_array[news_id].from_url = $(this).val();
+                that._set_news_array(news_array);
+            });
         },
         /**
          * 触发内容展现方式 radio 时触发此函数
@@ -516,7 +548,7 @@ define(function(require, exports, module) {
             };
 
             this.$('input[id="picture"]').unbind('click change');
-            if (news_array[news_id].picture.length > 0) {
+            if (news_array[news_id].picture.length > 0) {  // 当该子图文已经上传过封面图片时，直接请求并显示，否则重建上传框
                 btn.display_restart_upload();
                 progress.hide();
                 $.ajax({
