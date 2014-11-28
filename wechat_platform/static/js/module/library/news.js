@@ -312,6 +312,9 @@ define(function(require, exports, module) {
             this._set_news_current(news_current);
             this._set_news_array(news_array);
         },
+        /**
+         * Hack: 修正首图文无法在渲染时获得事件绑定问题，由上层在HTML渲染好后负责调用
+         */
         fix_ckeditor: function () {
             this._update_editor(this._get_news_current());
         },
@@ -346,6 +349,7 @@ define(function(require, exports, module) {
             } else {
                 this.$('input:radio[name="pattern"][value="url"]').prop('checked', true).trigger('change');
             }
+            this.$('input[name="from_url"]').val(news_array[news_id].from_url);
 
             // 更新编辑框的位置
             if (news_id == 0) {
@@ -387,6 +391,12 @@ define(function(require, exports, module) {
             this.$('input[name="url"]').unbind('change');
             this.$('input[name="url"]').bind('change', function () {
                 news_array[news_id].url = $(this).val();
+                that._set_news_array(news_array);
+            });
+            // 对来源链接的事件绑定
+            this.$('input[name="from_url"]').unbind('change');
+            this.$('input[name="from_url"]').bind('change', function () {
+                news_array[news_id].from_url = $(this).val();
                 that._set_news_array(news_array);
             });
         },
