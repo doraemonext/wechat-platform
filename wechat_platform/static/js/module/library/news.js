@@ -384,8 +384,9 @@ define(function(require, exports, module) {
             if (CKEDITOR.instances.hasOwnProperty('news_content')) {
                 var editor = CKEDITOR.instances.news_content;
                 editor.on('change', function (event) {
-                    news_array = that._get_news_array();
-                    news_array[news_id].content = editor.getData();
+                    var news_array = that._get_news_array();
+                    var news_current = that._get_news_current();
+                    news_array[news_current].content = editor.getData();
                     that._set_news_array(news_array);
                 });
             }
@@ -701,26 +702,26 @@ define(function(require, exports, module) {
 
                 for (var i = 0; i < news_array.length; i++) {
                     error.current_position = i;
-                    if (news_array[i].title.length == 0) {
-                        error.title = ['图文标题不能为空'];
-                        error_flag = true;
-                    } else if (news_array[i].title.length > 100) {
-                        error.title = ['图文标题最长为 100 字符'];
-                        error_flag = true;
-                    }
-
-                    if (news_array[i].author.length > 100) {
-                        error.author = ['作者最长为 100 字符'];
-                        error_flag = true;
-                    }
-
-                    if (news_array[i].pattern == 'text' && news_array[i].content == 0) {
-                        error.content = ['图文内容不能为空'];
-                        error_flag = true;
-                    } else if (news_array[i].pattern == 'url' && news_array[i].url == 0) {
-                        error.url = ['跳转链接不能为空'];
-                        error_flag = true;
-                    }
+//                    if (news_array[i].title.length == 0) {
+//                        error.title = ['图文标题不能为空'];
+//                        error_flag = true;
+//                    } else if (news_array[i].title.length > 100) {
+//                        error.title = ['图文标题最长为 100 字符'];
+//                        error_flag = true;
+//                    }
+//
+//                    if (news_array[i].author.length > 100) {
+//                        error.author = ['作者最长为 100 字符'];
+//                        error_flag = true;
+//                    }
+//
+//                    if (news_array[i].pattern == 'text' && news_array[i].content == 0) {
+//                        error.content = ['图文内容不能为空'];
+//                        error_flag = true;
+//                    } else if (news_array[i].pattern == 'url' && news_array[i].url == 0) {
+//                        error.url = ['跳转链接不能为空'];
+//                        error_flag = true;
+//                    }
 
                     if (error_flag) {
                         break;
@@ -742,6 +743,7 @@ define(function(require, exports, module) {
                         url: '/api/library/news/',
                         cache: false,
                         data: {
+                            official_account: $('#current-official-account').val(),
                             news_array: JSON.stringify(news_array)
                         },
                         beforeSend: function (xhr, settings) {
@@ -750,12 +752,31 @@ define(function(require, exports, module) {
                             that.$('#submit_news').text('提交中…');
                         },
                         success: function (data) {
-                            console.log('success');
+                            noty({
+                                type: "success",
+                                text: "成功添加 <strong>" + data["title"] + "</strong> 图文素材"
+                            });
+                            window.location.href = "#";
                         },
                         statusCode: {
                             400: function (xhr) {
-                                console.log('error');
+                                var data = $.parseJSON(xhr.responseText);
+                                var errors = {};
+                                if (data.hasOwnProperty('news_array')) {
+                                    for (var i = 0; i < data.news_array.length; i++) {
+                                        if (!$.isEmptyObject(data.news_array[i])) {
+                                            that._set_news_current(i);
+                                            that._update_editor(i);
+                                            that._set_editor_error_info(data.news_array[i]);
+                                            break;
+                                        }
+                                    }
+                                }
                             }
+                        },
+                        complete: function() {
+                            that.$("#submit_news").removeAttr("disabled");
+                            that.$("#submit_news").text("提交");
                         }
                     });
                 }

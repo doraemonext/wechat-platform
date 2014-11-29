@@ -463,7 +463,7 @@ class PluginProcessor(object):
                 'author': item.author,
                 'summary': item.description,
                 'content': item.content,
-                'picid': item.picture_id,
+                'picid': item.picid,
                 'from_url': item.from_url,
             })
             for x in news_dealt[-1]:  # 将所有非 picid 的空字段转换为空字符串
