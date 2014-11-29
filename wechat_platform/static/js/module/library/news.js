@@ -255,6 +255,13 @@ define(function(require, exports, module) {
             var news_array = this._get_news_array();
             var news_sum = news_array.length;
 
+            if (news_sum >= 10) {
+                noty({
+                    type: "error",
+                    text: "您最多只能添加十条图文"
+                });
+                return;
+            }
             this.$('.appmsg_content').append(_.template(add_sub_news_template)({'id': news_sum}));
             news_array.push(this._get_empty_news());
             this._set_news_array(news_array);
