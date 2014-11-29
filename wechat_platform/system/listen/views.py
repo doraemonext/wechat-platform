@@ -79,7 +79,8 @@ class ListenView(View):
             wechat_instance.parse_data(data=xml)
             response = ControlCenter(
                 official_account=official_account,
-                wechat_instance=wechat_instance
+                wechat_instance=wechat_instance,
+                request=request,
             ).response
 
             logger_listen.info('[RESPONSE] %s' % response.content.replace('\n', ''))

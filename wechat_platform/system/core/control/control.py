@@ -29,16 +29,18 @@ class ControlCenter(object):
     """
     微信控制中心类
     """
-    def __init__(self, official_account, wechat_instance):
+    def __init__(self, official_account, wechat_instance, request):
         """
         控制中心初始化
         :param official_account: 公众号实例 (OfficialAccount)
         :param wechat_instance: 微信请求实例 (WechatBasic)
+        :param request: HTTP请求实例
         """
         self.official_account = official_account  # 公众号实例
         self.wechat = wechat_instance  # 微信请求
         self.message = self.wechat.get_message()  # 微信消息
         self.context = DatabaseContextStore(openid=self.message.source)  # 微信上下文对话
+        self.request = request
 
         self.match_plugin_list = []
 
@@ -140,6 +142,7 @@ class ControlCenter(object):
             official_account=self.official_account,
             wechat=self.wechat,
             context=self.context,
+            request=self.request,
             message=self.message,
             is_exclusive=is_exclusive,
             plugin=plugin,

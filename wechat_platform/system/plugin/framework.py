@@ -8,6 +8,7 @@ from imp import find_module, load_module, acquire_lock, release_lock
 from tempfile import mkstemp
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from wechat_sdk import WechatExt
 
@@ -30,12 +31,13 @@ class PluginProcessor(object):
     """
     插件响应过程基类, 每个插件响应过程都要在此基础上进行扩展
     """
-    def __init__(self, official_account, wechat, context, message=None, in_context=False, is_exclusive=False, plugin=None, is_system=False, **kwargs):
+    def __init__(self, official_account, wechat, context, request, message=None, in_context=False, is_exclusive=False, plugin=None, is_system=False, **kwargs):
         """
         初始化插件, 将状态信息存储
         :param official_account: 公众号实例 (OfficialAccount)
         :param wechat: 微信请求实例 (WechatBasic)
         :param context: 微信上下文对话实例 (DatabaseContextStore)
+        :param request: HTTP请求实例
         :param message: 微信请求信息实例 (WechatMessage)
         :param in_context: 当前是否在上下文对话过程中
         :param is_exclusive: 插件是否可以独享响应内容
@@ -45,6 +47,7 @@ class PluginProcessor(object):
         self.official_account = official_account
         self.wechat = wechat
         self.context = context
+        self.request = request
         if not message:
             self.message = self.wechat.get_message()
         else:
@@ -352,8 +355,8 @@ class PluginProcessor(object):
                 news_dealt.append({
                     'title': item.title,
                     'description': item.description,
-                    'picurl': item.picurl,
-                    'url': item.url,
+                    'picurl': self.request.build_absolute_uri(item.picurl),
+                    'url': self.request.build_absolute_uri(item.url),
                 })
             return self.wechat.response_news(articles=news_dealt)
         elif pattern == 'service':  # 当多客服发送模式时
@@ -463,11 +466,11 @@ class PluginProcessor(object):
                 'author': item.author,
                 'summary': item.description,
                 'content': item.content,
-                'picid': item.picid,
+                'picture_id': item.picid,
                 'from_url': item.from_url,
             })
             for x in news_dealt[-1]:  # 将所有非 picid 的空字段转换为空字符串
-                if x != 'picid' and not news_dealt[-1][x]:
+                if x != 'picture_id' and not news_dealt[-1][x]:
                     news_dealt[-1][x] = ''
         try:
             simulation.add_news(news=news_dealt)
@@ -478,7 +481,7 @@ class PluginProcessor(object):
                 for item in news['multi_item']:
                     index = item['seq']
                     if item['title'] != news_dealt[index]['title'] or item['author'] != news_dealt[index]['author'] or \
-                        item['digest'] != news_dealt[index]['summary'] or item['file_id'] != news_dealt[index]['picid'] or \
+                        item['digest'] != news_dealt[index]['summary'] or item['file_id'] != news_dealt[index]['picture_id'] or \
                         item['source_url'] != news_dealt[index]['from_url']:
                         is_match = False
                         break
@@ -531,13 +534,14 @@ class PluginProcessorSystem(PluginProcessor):
         self.reply_id = kwargs.get('reply_id')
 
 
-def load_plugin(official_account, wechat, context, plugin,  message=None, in_context=False, is_exclusive=False, is_system=False, **kwargs):
+def load_plugin(official_account, wechat, context, plugin, request, message=None, in_context=False, is_exclusive=False, is_system=False, **kwargs):
     """
     加载插件并做初始化工作，返回插件实例 (PluginProcess)
     :param official_account: 公众号实例 (OfficialAccount)
     :param wechat: 微信请求实例 (WechatBasic)
     :param context: 微信上下文对话实例 (DatabaseContextStore)
     :param plugin: 插件信息实例 (Plugin)
+    :param request: HTTP请求实例
     :param message: 微信请求信息实例 (WechatMessage)
     :param in_context: 当前是否在上下文对话过程中
     :param is_exclusive: 插件是否可以独享响应内容
@@ -591,6 +595,7 @@ def load_plugin(official_account, wechat, context, plugin,  message=None, in_con
                         official_account=official_account,
                         wechat=wechat,
                         context=context,
+                        request=request,
                         message=message,
                         in_context=in_context,
                         is_exclusive=is_exclusive,
@@ -606,6 +611,7 @@ def load_plugin(official_account, wechat, context, plugin,  message=None, in_con
                         official_account=official_account,
                         wechat=wechat,
                         context=context,
+                        request=request,
                         message=message,
                         in_context=in_context,
                         is_exclusive=is_exclusive,
