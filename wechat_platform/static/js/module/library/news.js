@@ -702,26 +702,26 @@ define(function(require, exports, module) {
 
                 for (var i = 0; i < news_array.length; i++) {
                     error.current_position = i;
-//                    if (news_array[i].title.length == 0) {
-//                        error.title = ['图文标题不能为空'];
-//                        error_flag = true;
-//                    } else if (news_array[i].title.length > 100) {
-//                        error.title = ['图文标题最长为 100 字符'];
-//                        error_flag = true;
-//                    }
-//
-//                    if (news_array[i].author.length > 100) {
-//                        error.author = ['作者最长为 100 字符'];
-//                        error_flag = true;
-//                    }
-//
-//                    if (news_array[i].pattern == 'text' && news_array[i].content == 0) {
-//                        error.content = ['图文内容不能为空'];
-//                        error_flag = true;
-//                    } else if (news_array[i].pattern == 'url' && news_array[i].url == 0) {
-//                        error.url = ['跳转链接不能为空'];
-//                        error_flag = true;
-//                    }
+                    if (news_array[i].title.length == 0) {
+                        error.title = ['图文标题不能为空'];
+                        error_flag = true;
+                    } else if (news_array[i].title.length > 100) {
+                        error.title = ['图文标题最长为 100 字符'];
+                        error_flag = true;
+                    }
+
+                    if (news_array[i].author.length > 100) {
+                        error.author = ['作者最长为 100 字符'];
+                        error_flag = true;
+                    }
+
+                    if (news_array[i].pattern == 'text' && news_array[i].content == 0) {
+                        error.content = ['图文内容不能为空'];
+                        error_flag = true;
+                    } else if (news_array[i].pattern == 'url' && news_array[i].url == 0) {
+                        error.url = ['跳转链接不能为空'];
+                        error_flag = true;
+                    }
 
                     if (error_flag) {
                         break;
@@ -754,7 +754,7 @@ define(function(require, exports, module) {
                         success: function (data) {
                             noty({
                                 type: "success",
-                                text: "成功添加 <strong>" + data["title"] + "</strong> 图文素材"
+                                text: "成功添加 <strong>" + data.news_array[0]['title'] + "</strong> 图文素材"
                             });
                             window.location.href = "#";
                         },
@@ -781,77 +781,6 @@ define(function(require, exports, module) {
                     });
                 }
             });
-//            this.$('#form').validate({
-//                errorClass: 'control-label text-red',
-//                errorPlacement: function(error, element) {
-//                    if ($(element).prop('name') == 'music') {
-//                        that.$('#upload_music .upload-info').html('<span class="text-red">' + error.html() + '</span>');
-//                        that.$('#upload_music .upload-info').show();
-//                    } else if ($(element).prop('name') == 'hq_music') {
-//                        that.$('#upload_hq_music .upload-info').html('<span class="text-red">' + error.html() + '</span>');
-//                        that.$('#upload_hq_music .upload-info').show();
-//                    } else if ($(element).prop('name') == 'thumb') {
-//                        that.$('#upload_thumb .upload-info').html('<span class="text-red">' + error.html() + '</span>');
-//                        that.$('#upload_thumb .upload-info').show();
-//                    } else {
-//                        error.insertAfter(element);
-//                    }
-//                },
-//                highlight: function(element) {},
-//                unhighlight: function(element) {},
-//                submitHandler: function(form) {
-//                    var validator = this;
-//
-//                    $.ajax({
-//                        type: 'POST',
-//                        dataType: 'json',
-//                        url: '/api/library/music/',
-//                        cache: false,
-//                        data: {
-//                            official_account: $('#current-official-account').val(),
-//                            plugin_iden: 'music',
-//                            title: that.$('input[name=title]').val(),
-//                            description: that.$('textarea[name=description]').val(),
-//                            music: that.$('input[name=music]').val(),
-//                            music_url: that.$('input[name=music_url]').val(),
-//                            hq_music: that.$('input[name=hq_music]').val(),
-//                            hq_music_url: that.$('input[name=hq_music_url]').val(),
-//                            thumb: that.$('input[name=thumb]').val()
-//                        },
-//                        beforeSend: function(xhr, settings) {
-//                            xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
-//                            that.$("button[type=submit]").attr("disabled", "disabled");
-//                            that.$("button[type=submit]").text("提交中…");
-//                        },
-//                        success: function(data) {
-//                            noty({
-//                                type: "success",
-//                                text: "成功添加 <strong>" + data["title"] + "</strong> 音乐素材"
-//                            });
-//                            window.location.href = "#";
-//                        },
-//                        statusCode: {
-//                            400: function(xhr) {
-//                                var data = $.parseJSON(xhr.responseText);
-//                                var errors = {};
-//                                for (var key in data) {
-//                                    if (key == "non_field_errors") {
-//                                        errors["title"] = data[key][0];
-//                                    } else {
-//                                        errors[key] = data[key][0];
-//                                    }
-//                                }
-//                                validator.showErrors(errors);
-//                            }
-//                        },
-//                        complete: function() {
-//                            that.$("button[type=submit]").removeAttr("disabled");
-//                            that.$("button[type=submit]").text("提交");
-//                        }
-//                    });
-//                    return false;
-//                }
-//            });
         }
     });
 //

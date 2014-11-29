@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import time
-from StringIO import StringIO
 
 from django.core.urlresolvers import reverse
+from wechat_sdk import WechatBasic, WechatExt
 from rest_framework import serializers
-from rest_framework.parsers import JSONParser
 
 from system.official_account.models import OfficialAccount
 from system.media.models import Media
 from system.library.news.models import LibraryNews
+from system.simulation import Simulation
 
 
 class LibraryNewsListSeriailzer(serializers.ModelSerializer):
@@ -114,6 +114,34 @@ class LibraryNewsCreate(object):
         self.news_array = kwargs.get('news_array')
 
     def save(self, **kwargs):
+        # 初始化当前公众号实例
+        official_account = OfficialAccount.objects.get(pk=self.official_account)
+        # 如果可用模拟登陆, 则初始化模拟登陆类
+        simulation = None
+        if official_account.simulation_available:
+            wechat_basic = WechatBasic()
+            wechat_basic.parse_data(data="""<xml><ToUserName><![CDATA[toUser]]></ToUserName><FromUserName><![CDATA[fromUser]]></FromUserName><CreateTime>1348831860</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[this is a test]]></Content><MsgId>1234567890123456</MsgId></xml>""")
+            if official_account.has_token_cookies:  # 当已经存在缓存的 token 和 cookies 时直接利用它们初始化
+                token_cookies_dict = official_account.get_cache_token_cookies()
+                wechat_ext = WechatExt(
+                    username=official_account.username,
+                    password=official_account.password,
+                    token=token_cookies_dict['token'],
+                    cookies=token_cookies_dict['cookies'],
+                )
+                simulation = Simulation(
+                    official_account=official_account,
+                    wechat_basic=wechat_basic,
+                    wechat_ext=wechat_ext
+                )
+            else:  # 当不存在缓存的 token 和 cookies 时利用用户名密码初始化
+                simulation = Simulation(
+                    official_account=official_account,
+                    wechat_basic=wechat_basic,
+                    username=official_account.username,
+                    password=official_account.password,
+                )
+
         news = []
         for item in self.news_array:
             if item.pattern == 'text':
@@ -135,11 +163,17 @@ class LibraryNewsCreate(object):
                     'from_url': item.from_url,
                 })
 
-        return LibraryNews.manager.add_mix(
-            official_account=OfficialAccount.objects.get(pk=self.official_account),
+        root = LibraryNews.manager.add_mix(
+            official_account=official_account,
             plugin_iden='news',
             news=news
         )
+        news_list = LibraryNews.manager.get(official_account=official_account, plugin_iden='news', root=root)
+        for item in news_list:
+            item.update_picurl()  # 更新图片访问地址
+            if official_account.simulation_available:
+                item.update_picture_id(simulation=simulation)  # 更新图片在远程素材库中的ID
+        return news_list
 
 
 class LibraryNewsSingleCreateSerializer(serializers.Serializer):
