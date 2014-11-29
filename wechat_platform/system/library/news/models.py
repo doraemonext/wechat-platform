@@ -62,7 +62,40 @@ class LibraryNewsManager(models.Manager):
                 picture=item.get('picture'),
                 author=item.get('author'),
                 content=item.get('content'),
-                picture_id=item.get('picid', 0),
+                picid=item.get('picid', 0),
+                from_url=item.get('from_url'),
+            )
+            if not first_instance:
+                first_instance = tmp
+            parent = tmp
+        return first_instance
+
+    def add_mix(self, official_account, plugin_iden, news):
+        """
+        新建一个完整的混合图文信息 (包括文本显示和链接跳转)
+        :param official_account: 所属公众号 (OfficialAccount)
+        :param plugin_iden: 所属插件标识符
+        :param news: 一个 list 对象, 每个元素为一个 dict 对象, key 包括 'msgid', 'title', 'description', 'picture', 'picurl',
+                     'url', 'author', 'content', 'picid', 'from_url', 对应 value 解释见 LibraryNews Model, 除 'title' 外
+                     所有 key 值均为可选
+        :return: 第一条图文的实例 (LibraryNews)
+        """
+        parent = None
+        first_instance = None
+        for item in news:
+            tmp = super(LibraryNewsManager, self).create(
+                official_account=official_account,
+                plugin_iden=plugin_iden,
+                parent=parent,
+                msgid=item.get('msgid', 0),
+                title=item.get('title'),
+                description=item.get('description'),
+                picture=item.get('picture'),
+                picurl=item.get('picurl'),
+                url=item.get('url'),
+                author=item.get('author'),
+                content=item.get('content'),
+                picid=item.get('picid', 0),
                 from_url=item.get('from_url'),
             )
             if not first_instance:

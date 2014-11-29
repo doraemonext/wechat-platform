@@ -28,10 +28,12 @@
                     <div class="form-group">
                         <label for="title">标题</label>
                         <input type="text" class="form-control" name="title" id="title">
+                        <span class="help-block text-red" id="title_error"></span>
                     </div>
                     <div class="form-group">
                         <label for="author">作者<span class="help-inline">（选填）</span></label>
                         <input type="text" class="form-control" name="author" id="author">
+                        <span class="help-block text-red" id="author_error"></span>
                     </div>
                     <div class="form-group">
                         <label for="picture">封面图片<span class="help-inline">（可选，大图片建议尺寸：900像素 * 500像素）</span></label>
@@ -54,6 +56,7 @@
                     <div class="form-group">
                         <label for="description">摘要<span class="help-inline">（可选）</span></label>
                         <textarea class="form-control" name="description" id="description" rows="5"></textarea>
+                        <span class="help-block text-red" id="description_error"></span>
                     </div>
                     <div class="form-group">
                         <label for="news_content">正文显示方式</label>
@@ -65,6 +68,7 @@
                                 <input type="radio" name="pattern" value="url"> 跳转链接
                             </label>
                         </div>
+                        <span class="help-block text-red" id="content_error"></span>
                         <div id="text_content">
                             <textarea class="form-control" name="news_content" id="news_content" rows="15" cols="80"></textarea>
                         </div>
@@ -75,6 +79,7 @@
                     <div class="form-group">
                         <label for="from_url">来源链接<span class="help-inline">（可选）</span></label>
                         <input type="text" class="form-control" name="from_url" id="from_url">
+                        <span class="help-block text-red" id="from_url_error"></span>
                     </div>
                 </div>
             </div>
@@ -86,7 +91,7 @@
         <div class="tool_bar border tc">
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-2">
-                    <button type="submit" class="btn btn-primary btn-block">提交</button>
+                    <button type="submit" class="btn btn-primary btn-block" id="submit_news">提交</button>
                 </div>
             </div>
         </div>

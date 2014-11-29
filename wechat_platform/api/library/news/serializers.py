@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import time
+from StringIO import StringIO
 
 from django.core.urlresolvers import reverse
 from rest_framework import serializers
+from rest_framework.parsers import JSONParser
 
+from system.official_account.models import OfficialAccount
+from system.media.models import Media
 from system.library.news.models import LibraryNews
 
 
@@ -84,3 +88,130 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
             'from_url', 'storage_location', 'multi_item', 'datetime'
         )
         read_only_fields = ('id', 'msgid', 'title', 'description', 'author', 'from_url')
+
+
+class LibraryNewsSingleCreate(object):
+    def __init__(self, *args, **kwargs):
+        self.title = self._transform(kwargs.get('title'))
+        self.author = self._transform(kwargs.get('author'))
+        self.picture = self._transform(kwargs.get('picture'))
+        self.description = self._transform(kwargs.get('description'))
+        self.pattern = kwargs.get('pattern')
+        self.content = self._transform(kwargs.get('content'))
+        self.url = self._transform(kwargs.get('url'))
+        self.from_url = self._transform(kwargs.get('from_url'))
+
+    def _transform(self, value):
+        if not value:
+            return None
+        else:
+            return value
+
+
+class LibraryNewsCreate(object):
+    def __init__(self, *args, **kwargs):
+        self.official_account = kwargs.get('official_account')
+        self.news_array = kwargs.get('news_array')
+
+    def save(self, **kwargs):
+        news = []
+        for item in self.news_array:
+            if item.pattern == 'text':
+                news.append({
+                    'title': item.title,
+                    'author': item.author,
+                    'picture': None if not item.picture else Media.manager.get(item.picture),
+                    'description': item.description,
+                    'content': item.content,
+                    'from_url': item.from_url,
+                })
+            else:
+                news.append({
+                    'title': item.title,
+                    'author': item.author,
+                    'picture': None if not item.picture else Media.manager.get(item.picture),
+                    'description': item.description,
+                    'url': item.url,
+                    'from_url': item.from_url,
+                })
+
+        return LibraryNews.manager.add_mix(
+            official_account=OfficialAccount.objects.get(pk=self.official_account),
+            plugin_iden='news',
+            news=news
+        )
+
+
+class LibraryNewsSingleCreateSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=100, error_messages={
+        'required': u'图文标题不能为空',
+        'invalid': u'输入数据不合法',
+    })
+    author = serializers.CharField(max_length=100, required=False, error_messages={
+        'invalid': u'输入数据不合法',
+    })
+    picture = serializers.CharField(max_length=40, required=False, error_messages={
+        'invalid': u'输入数据不合法',
+    })
+    description = serializers.CharField(required=False, error_messages={
+        'invalid': u'输入数据不合法',
+    })
+    pattern = serializers.CharField(error_messages={
+        'required': u'必须提供图文显示方式',
+        'invalid': u'输入数据不合法',
+    })
+    content = serializers.CharField(required=False, error_messages={
+        'invalid': u'输入数据不合法',
+    })
+    url = serializers.CharField(max_length=1024, required=False, error_messages={
+        'invalid': u'输入数据不合法',
+    })
+    from_url = serializers.CharField(max_length=1024, required=False, error_messages={
+        'invalid': u'输入数据不合法',
+    })
+
+    def validate_pattern(self, attrs, source):
+        pattern = attrs.get(source)
+        if pattern not in ['text', 'url']:
+            raise serializers.ValidationError(u'参数值非法')
+        return attrs
+
+    def validate_content(self, attrs, source):
+        content = attrs.get(source)
+        if attrs.get('pattern') == 'text' and not content:
+            raise serializers.ValidationError(u'图文内容不能为空')
+        return attrs
+
+    def validate_url(self, attrs, source):
+        url = attrs.get(source)
+        if attrs.get('pattern') == 'url' and not url:
+            raise serializers.ValidationError(u'跳转地址不能为空')
+        return attrs
+
+    def restore_object(self, attrs, instance=None):
+        if instance is not None:
+            instance.title = attrs.get('title', instance.title)
+            instance.author = attrs.get('author', instance.author)
+            instance.picture = attrs.get('picture', instance.picture)
+            instance.description = attrs.get('description', instance.description)
+            instance.pattern = attrs.get('pattern', instance.pattern)
+            instance.content = attrs.get('content', instance.content)
+            instance.url = attrs.get('url', instance.url)
+            instance.from_url = attrs.get('from_url', instance.from_url)
+            return instance
+        return LibraryNewsSingleCreate(**attrs)
+
+
+class LibraryNewsCreateSerializer(serializers.Serializer):
+    official_account = serializers.IntegerField(error_messages={
+        'required': u'必须提供公众号',
+        'invalid': u'输入数据不合法',
+    })
+    news_array = LibraryNewsSingleCreateSerializer(many=True)
+
+    def restore_object(self, attrs, instance=None):
+        if instance is not None:
+            instance.official_account = attrs.get('official_account', instance.official_account)
+            instance.news_array = attrs.get('news_array', instance.news_array)
+            return instance
+        return LibraryNewsCreate(**attrs)
