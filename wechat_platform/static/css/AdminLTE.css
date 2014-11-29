@@ -3627,9 +3627,15 @@ fieldset[disabled] .btn-vk.active {
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
 
+.news-picture {
+
+}
+
+.news-picture-opr {
+
+}
+
 .upload-info {
-    height: 22px;
-    line-height: 22px;
     margin: 10px 0 0 0;
 }
 
@@ -3663,4 +3669,726 @@ fieldset[disabled] .btn-vk.active {
     margin-top: 5px;
     margin-bottom: 10px;
     color: #737373;
+}
+
+.appmsg {
+	position: relative;
+	overflow: hidden;
+	margin-bottom: 20px;
+	border: 1px solid #e7e7eb;
+    border-radius: 4px;
+	background-color: #fff;
+	color: #666;
+}
+
+.appmsg_info {
+	padding-bottom: 10px;
+	font-size: 13px;
+	line-height: 20px;
+}
+
+.appmsg_date {
+	font-weight: 400;
+	font-style: normal;
+}
+
+.appmsg_content {
+	position: relative;
+	padding: 0 14px;
+	*zoom: 1;
+}
+
+.appmsg_title {
+	overflow: hidden;
+	padding-top: 10px;
+	max-height: 56px;
+	word-wrap: break-word;
+	font-weight: 400;
+	font-style: normal;
+	font-size: 16px;
+	line-height: 28px;
+	word-break: break-all;
+}
+
+.appmsg_title a {
+	display: block;
+	color: #666;
+}
+
+.appmsg_title a:hover {
+    text-decoration: underline;
+}
+
+.appmsg_thumb_wrp {
+	overflow: hidden;
+	height: 160px;
+}
+
+.appmsg_thumb {
+	width: 100%;
+}
+
+.appmsg_desc {
+	padding: 5px 0 10px;
+	word-wrap: break-word;
+	word-break: break-all;
+}
+
+.appmsg_opr {
+	border-top: 1px solid #e7e7eb;
+	background-color: #f4f4f4;
+}
+
+.appmsg_opr ul {
+	overflow: hidden;
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 0;
+	*zoom: 1;
+}
+
+.appmsg_opr_item {
+	float: left;
+	height: 44px;
+	line-height: 44px;
+}
+
+.appmsg_opr_item a {
+	display: block;
+	border-right: 1px solid #e7e7eb;
+	text-align: center;
+	text-decoration: none;
+    color: gray;
+}
+
+.appmsg_opr_item a:hover {
+    color: #428bca;
+}
+
+.appmsg_item {
+	position: relative;
+	padding: 20px 14px;
+	border-top: 1px solid #e7e7eb;
+	*zoom: 1;
+}
+
+.appmsg_item:after {
+	clear: both;
+	display: block;
+	height: 0;
+	content: "\200B";
+}
+
+.appmsg_item .appmsg_title {
+	overflow: hidden;
+	margin-top: 14px;
+	max-height: 48px;
+	line-height: 24px;
+	*zoom: 1;
+}
+
+.appmsg_item .appmsg_thumb {
+	float: right;
+	margin-left: 14px;
+	width: 78px;
+	height: 78px;
+}
+
+.multi .appmsg_info {
+	padding-top: 14px;
+	padding-right: 14px;
+	padding-left: 14px;
+}
+
+.multi .appmsg_content {
+	padding: 0;
+}
+
+.multi .appmsg_title {
+	padding-top: 0;
+	font-size: 14px;
+}
+
+.cover_appmsg_item {
+	position: relative;
+	margin: 0 14px 14px;
+}
+
+.cover_appmsg_item .appmsg_title {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background: rgba(0,0,0,0.6)!important;
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#99000000',endcolorstr = '#99000000');
+}
+
+.cover_appmsg_item .appmsg_title a {
+	padding: 0 8px;
+	color: #fff;
+}
+
+.appmsg_mask {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	display: none;
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	opacity: .6;
+	filter: alpha(opacity = 60);
+	-moz-opacity: .6;
+	-khtml-opacity: .6;
+}
+
+.appmsg .icon_card_selected {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	z-index: 1;
+	display: none;
+	overflow: hidden;
+	margin-top: -23px;
+	margin-left: -23px;
+	line-height: 999em;
+}
+
+.dialog_wrp .appmsg:hover {
+	cursor: pointer;
+}
+
+.appmsg:hover .appmsg_mask {
+	display: block;
+}
+
+.appmsg.selected .appmsg_mask {
+	display: block;
+}
+
+.appmsg.selected .icon_card_selected {
+	display: inline-block;
+}
+
+.appmsg_thumb.default {
+	display: block;
+	background-color: #ececec;
+	color: #c0c0c0;
+	text-align: center;
+	font-weight: 400;
+	font-style: normal;
+	font-size: 16px;
+	line-height: 160px;
+}
+
+.appmsg_item .appmsg_thumb.default {
+	font-size: 14px;
+	line-height: 78px;
+}
+
+.appmsg_edit_mask {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: none;
+	width: 100%;
+	height: 100%;
+	background: rgba(229,229,229,0.85)!important;
+	text-align: center;
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#d9e5e5e5',endcolorstr = '#d9e5e5e5');
+}
+
+.appmsg_item .appmsg_edit_mask {
+	line-height: 118px;
+}
+
+.cover_appmsg_item .appmsg_edit_mask {
+	line-height: 160px;
+}
+
+.appmsg_edit_mask a {
+	margin-right: 8px;
+	margin-left: 8px;
+}
+
+.editing .cover_appmsg_item:hover .appmsg_edit_mask,.editing .appmsg_item:hover .appmsg_edit_mask {
+	display: block;
+}
+
+.editing .appmsg_thumb {
+	display: none;
+}
+
+.editing .appmsg_thumb.default {
+	display: block;
+}
+
+.editing .has_thumb .appmsg_thumb {
+	display: block;
+}
+
+.editing .has_thumb .appmsg_thumb.default {
+	display: none;
+}
+
+.editing .appmsg_content {
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	border-bottom-width: 0;
+}
+
+.editing.multi .appmsg_content {
+	border-bottom-width: 1px;
+}
+
+.appmsg_add {
+	margin: 20px 14px;
+}
+
+.tab_content .appmsg {
+	width: 320px;
+}
+
+.appmsg_list {
+	margin: 25px 10px;
+	text-align: justify;
+	text-justify: distribute-all-lines;
+	letter-spacing: -4px;
+	font-size: 0;
+}
+
+.appmsg_list:after {
+	display: inline-block;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 0;
+	content: ".";
+	font-size: 0;
+}
+
+.appmsg_list .tj_item {
+	text-align: left;
+	text-justify: auto;
+	font-size: 14px;
+}
+
+.appmsg_col {
+	display: inline-block;
+	vertical-align: top;
+	text-align: left;
+	letter-spacing: normal;
+	font-size: 14px;
+	*display: inline;
+	*zoom: 1;
+}
+
+.media_dialog.appmsg_list {
+	position: relative;
+	overflow-y: scroll;
+	margin: 0;
+	padding: 28px 140px;
+	height: 365px;
+}
+
+.media_dialog .appmsg_col {
+	width: 48%;
+}
+
+.vote_meta {
+	margin-top: 20px;
+}
+
+.vote_meta:first-child {
+	margin-top: 0;
+}
+
+.vote_meta.option_setting .vote_meta_title {
+	margin-bottom: 12px;
+}
+
+.vote_meta_title {
+	margin-bottom: 6px;
+	font-weight: 400;
+	font-style: normal;
+	font-size: 16px;
+}
+
+.vote_meta_detail .frm_control_group {
+	padding-bottom: 20px;
+}
+
+.vote_meta_detail.tips_wrp {
+	margin-top: -8px;
+	margin-left: 70px;
+}
+
+.vote_meta_detail .frm_input_box.vote_title {
+	width: 335px;
+}
+
+.vote_remove_link {
+	margin-left: .5em;
+}
+
+.dialog_wrp.vote_edit .dialog_bd {
+	position: relative;
+	overflow-y: scroll;
+	padding-top: 18px;
+	padding-bottom: 15px;
+	height: 450px;
+}
+
+.dialog_wrp.vote_edit .frm_label {
+	width: 4em;
+}
+
+.page_appmsg_edit .tool_area {
+	clear: both;
+	margin: 0;
+	padding: 20px 0;
+}
+
+.page_appmsg_edit .tool_bar {
+	margin-right: 0;
+	margin-left: 0;
+}
+
+.page_appmsg_edit .appmsg {
+	min-height: 180px;
+}
+
+.page_appmsg_edit .upload_preview img {
+	max-width: 100px;
+	max-height: 100px;
+}
+
+.media_preview_area {
+	float: left;
+	margin-right: 14px;
+	width: 320px;
+}
+
+.media_edit_area {
+	float: none;
+	display: table-cell;
+	width: auto;
+	vertical-align: top;
+	*display: block;
+	*zoom: 1;
+}
+
+.media_edit_area:after {
+	clear: both;
+	display: block;
+	visibility: hidden;
+	height: 0!important;
+	content: " . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+	line-height: 0;
+}
+
+.edui_editor_wrp {
+	position: relative;
+	z-index: 0;
+}
+
+.appmsg_edit_item {
+	padding-bottom: 1em;
+}
+
+.editor_extra_info {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin-top: -30px;
+	line-height: 30px;
+}
+
+.create_access {
+	display: block;
+	margin-bottom: 20px;
+	border: 2px dotted #d9dadc;
+	text-align: center;
+	line-height: 80px;
+}
+
+.create_access i {
+	cursor: pointer;
+}
+
+.create_access a {
+	display: none;
+	margin-right: 10px;
+	margin-left: 10px;
+	color: #d9d9d9;
+	vertical-align: middle;
+	font-size: 14px;
+	line-height: normal;
+}
+
+.create_access a strong {
+	display: block;
+	padding-top: 3px;
+	font-weight: 400;
+	font-style: normal;
+}
+
+.create_access:hover {
+	border-color: #b3b3b3;
+}
+
+.create_access:hover .add_gray {
+	display: none;
+}
+
+.create_access:hover a {
+	display: inline-block;
+}
+
+.create_access:hover a:hover {
+	color: #b3b3b3;
+}
+
+.create_access_square_wrp {
+	display: inline-block;
+	width: 100px;
+	height: 100px;
+}
+
+.create_access_square_wrp .create_access_primary {
+	line-height: 96px;
+}
+
+.create_access_primary {
+	display: block;
+	margin-bottom: 20px;
+	border: 2px dotted #d9dadc;
+	text-align: center;
+	line-height: 60px;
+}
+
+.create_access_primary i {
+    vertical-align: middle;
+}
+
+.create_access_primary:hover {
+	border-color: #b3b3b3;
+}
+
+.appmsg_editor {
+	position: relative;
+	padding-left: 12px;
+}
+
+.appmsg_editor .inner {
+	padding: 20px;
+	min-height: 350px;
+	border: 1px solid #e7e7eb;
+}
+
+.appmsg_editor .arrow {
+	position: absolute;
+}
+
+.appmsg_editor .arrow_out {
+	top: 44px;
+	left: 0;
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-color: transparent;
+	border-style: dashed;
+	border-width: 12px;
+	border-left-width: 0;
+	border-right-color: #e7e7eb;
+	border-right-style: solid;
+}
+
+.appmsg_editor .arrow_in {
+	top: 44px;
+	left: 1px;
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-color: transparent;
+	border-style: dashed;
+	border-width: 12px;
+	border-left-width: 0;
+	border-right-style: solid;
+}
+
+.appmsg_editor .mask {
+	z-index: 800;
+}
+
+.appmsg_edit_item .frm_label {
+	float: none;
+	display: block;
+	margin-right: 0;
+	margin-bottom: 4px;
+	width: auto;
+	*zoom: 1;
+}
+
+.appmsg_edit_item .frm_label:after {
+	clear: both;
+	display: block;
+	height: 0;
+	content: "\200B";
+}
+
+.appmsg_edit_item .frm_input_box {
+	display: block;
+	width: auto;
+	height: auto;
+	min-height: 30px;
+	border-color: #e7e7eb;
+}
+
+.appmsg_edit_item .frm_textarea_box {
+	display: block;
+	width: auto;
+	border-color: #e7e7eb;
+}
+
+.appmsg_edit_item .title {
+	float: left;
+	font-weight: 400;
+	font-style: normal;
+}
+
+.appmsg_edit_item .tips {
+	color: #8d8d8d;
+}
+
+.appmsg_edit_item .tips em {
+	font-weight: 400;
+	font-style: normal;
+}
+
+.appmsg_edit_item .zoom_edit_access.zoomin {
+	display: none;
+}
+
+.appmsg_edit_item.content_edit .pop_closed {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	display: none;
+}
+
+.appmsg_edit_item.content_edit .tool_bar {
+	display: none;
+	margin: 0;
+	padding-bottom: 28px;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	border-top-width: 0;
+}
+
+.appmsg_edit_item.content_edit .zoom_in_switch {
+	display: none;
+}
+
+.appmsg_edit_item.content_edit.zoom_edit {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	z-index: 801;
+	padding: 5px 20px 25px;
+	width: 960px;
+	background-color: #fff;
+}
+
+.appmsg_edit_item.content_edit.zoom_edit .frm_label {
+	padding: 5px 0;
+}
+
+.appmsg_edit_item.content_edit.zoom_edit .zoom_edit_tips {
+	margin-right: 8px;
+}
+
+.appmsg_edit_item.content_edit.zoom_edit .pop_closed {
+	display: inline-block;
+}
+
+.appmsg_edit_item.content_edit.zoom_edit .tool_bar {
+	display: block;
+}
+
+.appmsg_edit_item.content_edit.zoom_edit .zoom_out_switch {
+	display: none;
+}
+
+.appmsg_edit_item.content_edit.zoom_edit .zoom_in_switch {
+	display: inline-block;
+}
+
+.appmsg_edit_item.content_edit.zoom_edit .edui-default .edui-editor-iframeholder {
+	height: 500px!important;
+}
+
+.appmsg_edit_item.content_edit.zoom_edit .zoom_edit_access.zoomout {
+	display: none;
+}
+
+.appmsg_edit_item.content_edit.zoom_edit .zoom_edit_access.zoomin {
+	display: inline-block;
+}
+
+.tool_area {
+    clear: both;
+    margin: 0;
+    padding: 20px 0;
+}
+
+.tool_bar {
+    padding-top: 18px;
+}
+
+.tool_bar.border {
+    border-top: 1px solid #e7e7eb;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+}
+
+.tc {
+    text-align: center;
+}
+
+span.help-inline {
+    margin-left: 0;
+}
+
+.size1of2 {
+    width: 50%;
+}
+.size1of3 {
+    width: 33.33%;
+}
+
+.grid_item {
+    float: left;
+}
+
+.grid_item.no_extra {
+    float: none;
+    width: auto;
+    overflow: hidden;
+}
+
+.tooltip-inner {
+    border: 2px solid #e7e7eb;
+    background: #f9f9f9;
+    color: #000;
+    text-align: left;
+}
+
+.tooltip.top .tooltip-arrow {
+  border-top-color: #f9f9f9;
 }

@@ -25,7 +25,7 @@ class LibraryNewsListAPI(mixins.ListModelMixin, GenericAPIView):
     serializer_class = LibraryNewsListSeriailzer
     filter_fields = ('official_account', 'plugin_iden', 'title', 'description', 'author')
     search_fields = ('title', 'description', 'author')
-    ordering = ('id', )
+    ordering = ('-datetime', )
 
     def get_queryset(self):
         return LibraryNews.manager.get_list(official_account=self.request.GET.get('official_account'))

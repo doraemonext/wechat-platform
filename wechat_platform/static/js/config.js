@@ -9,6 +9,7 @@ require.config({
         'jquery-validate': { 'deps': ['jquery'] },
         'jquery-form': { 'deps': ['jquery'] },
         'spin': { 'exports': 'Spinner' },
+        'ckeditor': { 'exports': 'CKEDITOR' },
         'theme-app': { 'deps': ['jquery', 'bootstrap'] }
     },
     paths: {
@@ -23,6 +24,7 @@ require.config({
         'jquery-form': 'plugins/jqueryform/jquery.form',
         'noty': 'plugins/noty/jquery.noty.packaged.min',
         'spin': 'plugins/spin/spin.min',
+        'ckeditor': 'plugins/ckeditor/ckeditor',
         'theme-app': 'AdminLTE/app',
         'common': 'common',
 
@@ -31,6 +33,7 @@ require.config({
         'module.common.app-content-header-view': 'module/common/app_content_header_view',
         'module.official-account': 'module/official_account',
         'module.library.music': 'module/library/music',
+        'module.library.news': 'module/library/news',
 
         'helper.confirm-modal': 'helper/confirm_modal/confirm_modal'
     }

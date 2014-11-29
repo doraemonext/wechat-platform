@@ -14,13 +14,11 @@
         <!--[if lt IE 9]>
             <link rel="stylesheet" type="text/css" href="{% static 'news/wechat_default_ie9' %}"/>
         <![endif]-->
-        <style></style>
     </head>
     <body id="activity-detail" class="zh_CN">
         <div class="rich_media">
             <div class="rich_media_inner"><h2 class="rich_media_title" id="activity-name"> {{ object.title }} </h2>
-
-                <div class="rich_media_meta_list"><em id="post-date" class="rich_media_meta text">图文发布时间</em>
+                <div class="rich_media_meta_list"><em id="post-date" class="rich_media_meta text">{{ object.datetime|date:"Y-m-d H:i" }}</em>
                     <a class="rich_media_meta link nickname" id="post-user">{{ object.official_account.name }}</a>
                 </div>
                 <div id="page-content">
