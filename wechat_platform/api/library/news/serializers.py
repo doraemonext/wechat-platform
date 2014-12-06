@@ -90,6 +90,10 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
         read_only_fields = ('id', 'msgid', 'title', 'description', 'author', 'from_url')
 
 
+class LibraryNewsDetailSerializer(LibraryNewsListSeriailzer):
+    pass
+
+
 class LibraryNewsSingleCreate(object):
     def __init__(self, *args, **kwargs):
         self.title = self._transform(kwargs.get('title'))
