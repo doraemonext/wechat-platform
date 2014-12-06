@@ -5,6 +5,7 @@ from StringIO import StringIO
 
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
+from django.http import Http404
 
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
@@ -63,7 +64,7 @@ class LibraryNewsListAPI(mixins.ListModelMixin, GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LibraryNewsDetailAPI(mixins.RetrieveModelMixin, GenericAPIView):
+class LibraryNewsDetailAPI(GenericAPIView):
     """
     系统素材库 - 图文素材 (单个对象View, 仅限GET/PUT/DELETE)
     """
@@ -71,18 +72,13 @@ class LibraryNewsDetailAPI(mixins.RetrieveModelMixin, GenericAPIView):
     model = LibraryNews
     serializer_class = LibraryNewsDetailSerializer
 
-    def get_queryset(self):
-        return LibraryNews.manager.get_list(official_account=self.request.GET.get('official_account'))
-
     def get(self, request, *args, **kwargs):
         """
         获取单个图文素材信息
         """
-        # 对 official_account 参数进行检查
-        official_account_id = request.GET.get('official_account')
-        if not official_account_id:
-            return Response({'official_account': [u'缺少 official_account 参数']}, status=status.HTTP_400_BAD_REQUEST)
-        if not OfficialAccount.manager.exists(official_account_id):
-            return Response({'official_account': [u'指定公众号不存在']}, status=status.HTTP_400_BAD_REQUEST)
+        object = self.get_object()
+        if object.parent:  # 仅允许获得多图文的首图文ID
+            raise Http404()
 
-        return super(LibraryNewsDetailAPI, self).retrieve(request, *args, **kwargs)
+        serializer = self.get_serializer(object)
+        return Response(serializer.data)
