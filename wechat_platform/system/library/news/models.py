@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from system.official_account.models import OfficialAccount
 from system.simulation import Simulation, SimulationException
 from system.media.models import Media
+from system.rule_match.models import RuleMatch
 
 
 class LibraryNewsManager(models.Manager):
@@ -126,6 +127,39 @@ class LibraryNewsManager(models.Manager):
         :return: QuerySet 对象, 为所有根图文回复节点的集合
         """
         return super(LibraryNewsManager, self).get_queryset().filter(official_account=official_account).filter(parent=None)
+
+    def modify(self, pk, news):
+        """
+        修改一个完整的多图文信息
+        :param pk: 需要修改的多图文根 ID
+        :param news: 一个 list 对象, 每个元素为一个 dict 对象, key 包括 'msgid', 'title', 'description', 'picture', 'picurl',
+                     'url', 'author', 'content', 'picid', 'from_url', 对应 value 解释见 LibraryNews Model, 除 'title' 外
+                     所有 key 值均为可选
+        :return: 修改好的第一条图文的实例 (LibraryNews)
+        """
+        origin_root = super(LibraryNewsManager, self).get_queryset().get(pk=pk)
+        origin_id = origin_root.pk
+
+        # 在原图文素材库中新建新的修改后的图文
+        now_root = self.add_mix(
+            official_account=origin_root.official_account,
+            plugin_iden=origin_root.plugin_iden,
+            news=news
+        )
+        now_id = now_root.pk
+        # 在微信回复匹配表中找到原来的reply_id并全部更新为新的ID
+        rule_matches = RuleMatch.manager.get_news(news_id=origin_id)
+        if rule_matches.exists():
+            rule_matches.update(reply_id=now_id)
+        # 完成历史使命，将原图文全部删除
+        origin_root.delete()  # 删除根时会自动删除相关联的子图文
+
+    def delete(self, pk):
+        """
+        删除主键以 pk 为根的多图文
+        :param pk: 多图文根 ID
+        """
+        super(LibraryNewsManager, self).get_queryset().get(pk=pk).delete()
 
     def _get_without_root(self, official_account, plugin_iden, root):
         """
