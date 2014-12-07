@@ -86,6 +86,7 @@ class PluginTest(WechatTestCase):
                 in_context=False,
                 is_exclusive=False,
                 plugin=plugin,
+                request=self.make_request(),
                 is_system=True
             )
 
@@ -106,6 +107,7 @@ class PluginTest(WechatTestCase):
                 in_context=False,
                 is_exclusive=False,
                 plugin=plugin,
+                request=self.make_request(),
                 is_system=False
             )
 
@@ -125,6 +127,7 @@ class PluginTest(WechatTestCase):
             in_context=False,
             is_exclusive=False,
             plugin=plugin,
+            request=self.make_request(),
             is_system=True
         )
 

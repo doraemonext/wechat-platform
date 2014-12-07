@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from django.test.client import RequestFactory
+
 from wechat_sdk import WechatBasic
 from wechat_sdk.context.framework.django import DatabaseContextStore, DatabaseContext
 
@@ -32,7 +34,7 @@ class ControlCenterTest(WechatTestCase):
         wechat.parse_data(data=self.make_raw_text_message(source=source, content=u'乐者为王, that\'s all'))
 
         # 初始化控制中心并检查初始化是否完全
-        control = ControlCenter(official_account=official_account, wechat_instance=wechat)
+        control = ControlCenter(official_account=official_account, wechat_instance=wechat, request=self.make_request())
         self.assertEqual(control.official_account, official_account)
         self.assertEqual(control.wechat, wechat)
         self.assertEqual(control.message, wechat.get_message())

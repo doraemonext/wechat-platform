@@ -4,7 +4,7 @@ import time
 from hashlib import sha1
 
 from django.test import TestCase
-from django.test.client import Client
+from django.test.client import Client, RequestFactory
 
 from lib.tools.rand import make_random_string, make_unique_random_string
 from system.official_account.models import OfficialAccount
@@ -13,6 +13,13 @@ from system.official_account.models import OfficialAccount
 class WechatTestCase(TestCase):
     def setUp(self):
         self.client = Client()
+
+    def make_request(self):
+        """
+        生成一个虚拟的 Request 对象
+        :return: request 实例
+        """
+        return RequestFactory().get('/')
 
     def make_verify_parameter(self, token):
         """

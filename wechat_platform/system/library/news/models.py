@@ -154,6 +154,8 @@ class LibraryNewsManager(models.Manager):
         # 完成历史使命，将原图文全部删除
         origin_root.delete()  # 删除根时会自动删除相关联的子图文
 
+        return now_root
+
     def delete(self, pk):
         """
         删除主键以 pk 为根的多图文
