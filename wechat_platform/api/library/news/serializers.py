@@ -114,6 +114,7 @@ class LibraryNewsSingleCreate(object):
 
 class LibraryNewsCreate(object):
     def __init__(self, *args, **kwargs):
+        self.news_id = kwargs.get('news_id')  # 如果传入 news_id，则说明需要将原图文 news_id 替换为新图文
         self.official_account = kwargs.get('official_account')
         self.news_array = kwargs.get('news_array')
 
@@ -167,11 +168,14 @@ class LibraryNewsCreate(object):
                     'from_url': item.from_url,
                 })
 
-        root = LibraryNews.manager.add_mix(
-            official_account=official_account,
-            plugin_iden='news',
-            news=news
-        )
+        if self.news_id:  # 如果是修改图文，执行修改操作
+            root = LibraryNews.manager.modify(pk=self.news_id, news=news)
+        else:  # 否则直接插入新图文
+            root = LibraryNews.manager.add_mix(
+                official_account=official_account,
+                plugin_iden='news',
+                news=news
+            )
         news_list = LibraryNews.manager.get(official_account=official_account, plugin_iden='news', root=root)
         for item in news_list:
             item.update_picurl()  # 更新图片访问地址
@@ -243,6 +247,9 @@ class LibraryNewsSingleCreateSerializer(serializers.Serializer):
 
 
 class LibraryNewsCreateSerializer(serializers.Serializer):
+    news_id = serializers.IntegerField(error_messages={
+        'invalid': u'输入数据不合法',
+    }, required=False)
     official_account = serializers.IntegerField(error_messages={
         'required': u'必须提供公众号',
         'invalid': u'输入数据不合法',
@@ -251,6 +258,7 @@ class LibraryNewsCreateSerializer(serializers.Serializer):
 
     def restore_object(self, attrs, instance=None):
         if instance is not None:
+            instance.news_id = attrs.get('news_id', instance.news_id)
             instance.official_account = attrs.get('official_account', instance.official_account)
             instance.news_array = attrs.get('news_array', instance.news_array)
             return instance

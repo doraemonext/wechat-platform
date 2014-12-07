@@ -61,7 +61,7 @@ class LibraryNewsListAPI(mixins.ListModelMixin, GenericAPIView):
             return Response({'news_array': [u'内容非法']}, status=status.HTTP_400_BAD_REQUEST)
 
         if serializer.is_valid():
-            serializer.save(force_insert=True)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -76,39 +76,32 @@ class LibraryNewsDetailAPI(mixins.UpdateModelMixin, mixins.DestroyModelMixin, Ge
     serializer_class = LibraryNewsDetailSerializer
 
     def get(self, request, *args, **kwargs):
-        object = self.get_object_or_none()
-        if not object or object.parent:  # 仅允许获得多图文的首图文ID
+        obj = self.get_object_or_none()
+        if not obj or obj.parent:  # 仅允许获得多图文的首图文ID
             raise Http404()
 
-        serializer = self.get_serializer(object)
+        serializer = self.get_serializer(obj)
         return Response(serializer.data)
 
     def put(self, request, *args, **kwargs):
-        object = self.get_object_or_none()
-        if not object or object.parent:  # 仅允许更新, 对于新建或非首图文ID直接禁止
+        obj = self.get_object_or_none()
+        if not obj or obj.parent:  # 仅允许更新, 对于新建或非首图文ID直接禁止
             raise Http404()
 
         try:
             serializer = LibraryNewsCreateSerializer(data={
+                'news_id': obj.pk,
                 'official_account': request.DATA.get('official_account'),
                 'news_array': json.loads(request.DATA.get('news_array')),
             })
         except ValueError:
             return Response({'news_array': [u'内容非法']}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not serializer.is_valid():
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        # try:
-        #     self.pre_save(serializer.object)
-        # except ValidationError as err:
-        #     # full_clean on model instance may be called in pre_save,
-        #     # so we have to handle eventual errors.
-        #     return Response(err.message_dict, status=status.HTTP_400_BAD_REQUEST)
-        #
-        # self.object = serializer.save(force_update=True)
-        # self.post_save(self.object, created=False)
-        # return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, *args, **kwargs):
         return super(LibraryNewsDetailAPI, self).destroy(request, *args, **kwargs)
