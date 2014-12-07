@@ -52,10 +52,13 @@ class LibraryNewsListAPI(mixins.ListModelMixin, GenericAPIView):
         """
         新建图文素材
         """
-        serializer = LibraryNewsCreateSerializer(data={
-            'official_account': request.DATA.get('official_account'),
-            'news_array': json.loads(request.DATA.get('news_array')),
-        })
+        try:
+            serializer = LibraryNewsCreateSerializer(data={
+                'official_account': request.DATA.get('official_account'),
+                'news_array': json.loads(request.DATA.get('news_array')),
+            })
+        except ValueError:
+            return Response({'news_array': [u'内容非法']}, status=status.HTTP_400_BAD_REQUEST)
 
         if serializer.is_valid():
             serializer.save(force_insert=True)
@@ -64,7 +67,7 @@ class LibraryNewsListAPI(mixins.ListModelMixin, GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LibraryNewsDetailAPI(GenericAPIView):
+class LibraryNewsDetailAPI(mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericAPIView):
     """
     系统素材库 - 图文素材 (单个对象View, 仅限GET/PUT/DELETE)
     """
@@ -73,12 +76,39 @@ class LibraryNewsDetailAPI(GenericAPIView):
     serializer_class = LibraryNewsDetailSerializer
 
     def get(self, request, *args, **kwargs):
-        """
-        获取单个图文素材信息
-        """
-        object = self.get_object()
-        if object.parent:  # 仅允许获得多图文的首图文ID
+        object = self.get_object_or_none()
+        if not object or object.parent:  # 仅允许获得多图文的首图文ID
             raise Http404()
 
         serializer = self.get_serializer(object)
         return Response(serializer.data)
+
+    def put(self, request, *args, **kwargs):
+        object = self.get_object_or_none()
+        if not object or object.parent:  # 仅允许更新, 对于新建或非首图文ID直接禁止
+            raise Http404()
+
+        try:
+            serializer = LibraryNewsCreateSerializer(data={
+                'official_account': request.DATA.get('official_account'),
+                'news_array': json.loads(request.DATA.get('news_array')),
+            })
+        except ValueError:
+            return Response({'news_array': [u'内容非法']}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # try:
+        #     self.pre_save(serializer.object)
+        # except ValidationError as err:
+        #     # full_clean on model instance may be called in pre_save,
+        #     # so we have to handle eventual errors.
+        #     return Response(err.message_dict, status=status.HTTP_400_BAD_REQUEST)
+        #
+        # self.object = serializer.save(force_update=True)
+        # self.post_save(self.object, created=False)
+        # return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, *args, **kwargs):
+        return super(LibraryNewsDetailAPI, self).destroy(request, *args, **kwargs)

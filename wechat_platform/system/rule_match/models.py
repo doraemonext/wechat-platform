@@ -45,6 +45,18 @@ class RuleMatchManager(models.Manager):
             '-order', 'id'
         )
 
+    def get_news(self, news_id):
+        """
+        根据 news_id 返回表中所有对应的图文匹配集合
+
+        :param news_id: 图文响应ID
+        """
+        return super(RuleMatchManager, self).get_queryset().filter(
+            plugin_iden='news'
+        ).filter(
+            reply_id=news_id
+        )
+
 
 class RuleMatch(models.Model):
     """
