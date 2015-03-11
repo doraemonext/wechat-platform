@@ -3703,15 +3703,15 @@ fieldset[disabled] .btn-vk.active {
 }
 
 .appmsg_title {
-	overflow: hidden;
-	padding-top: 10px;
-	max-height: 56px;
-	word-wrap: break-word;
-	font-weight: 400;
-	font-style: normal;
-	font-size: 16px;
-	line-height: 28px;
-	word-break: break-all;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 16px;
+    padding-top: 10px;
+    line-height: 28px;
+    max-height: 62px;
+    overflow: hidden;
+    word-wrap: break-word;
+    word-break: break-all
 }
 
 .appmsg_title a {

@@ -181,8 +181,8 @@ class LibraryNewsCreate(object):
             item.update_picurl()  # 更新图片访问地址
             if item.content:
                 item.update_url()  # 更新URL地址
-            if official_account.simulation_available:
-                item.update_picture_id(simulation=simulation)  # 更新图片在远程素材库中的ID
+            # if official_account.simulation_available:
+            #     item.update_picture_id(simulation=simulation)  # 更新图片在远程素材库中的ID
         return news_list
 
 
