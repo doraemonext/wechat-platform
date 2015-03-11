@@ -557,6 +557,7 @@ define(function(require, exports, module) {
             info.set_content = function (url, key) {
                 var content = '<div class="news-picture"><img class="img-responsive img-rounded" src="' + url + '" ></div>';
                 content += '<div class="news-picture-opr"><strong><a class="delete-media" data-key="' + key + '" href="javascript:void(0)">删除该文件</a></strong></div>';
+                content += '<div class="clearfix"></div>';
                 $(this).html(content);
                 $(this).find('.delete-media').click(function () {
                     var key = $(this).attr('data-key');
