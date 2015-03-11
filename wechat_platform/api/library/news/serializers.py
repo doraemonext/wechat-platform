@@ -30,7 +30,7 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
             return False
 
     def get_picurl(self, obj):
-        if not obj.picurl:
+        if not obj.picurl or not obj.picture:
             return None
         elif obj.picurl == reverse('filetranslator:download', kwargs={'key': obj.picture.key}):
             return self.context['view'].request.build_absolute_uri(obj.picurl)
@@ -91,7 +91,48 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
 
 
 class LibraryNewsDetailSerializer(LibraryNewsListSeriailzer):
-    pass
+    picture = serializers.SerializerMethodField('get_picture')
+    content = serializers.SerializerMethodField('get_content')
+
+    def get_picture(self, obj):
+        if not obj.picture:
+            return None
+        else:
+            return obj.picture.key
+
+    def get_content(self, obj):
+        return obj.content
+
+    def get_multi_item(self, obj):
+        multi_item = LibraryNews.manager.get(
+            official_account=obj.official_account,
+            plugin_iden=obj.plugin_iden,
+            root=obj
+        )
+        multi_item_expander = []
+        for item in multi_item:
+            multi_item_expander.append({
+                'id': item.pk,
+                'title': item.title,
+                'description': item.description,
+                'author': item.author,
+                'show_cover_pic': self.get_show_cover_pic(item),
+                'picurl': self.get_picurl(item),
+                'picture': self.get_picture(item),
+                'content_url': self.get_content_url(item),
+                'content': self.get_content(item),
+                'from_url': item.from_url,
+            })
+        multi_item_expander = sorted(multi_item_expander, key=lambda k: k.get('id'))
+        return multi_item_expander
+
+    class Meta:
+        model = LibraryNews
+        fields = (
+            'id', 'msgid', 'title', 'description', 'author', 'show_cover_pic', 'picurl', 'picture', 'content_url',
+            'content', 'from_url', 'storage_location', 'multi_item', 'datetime'
+        )
+        read_only_fields = ('id', 'msgid', 'title', 'description', 'author', 'from_url')
 
 
 class LibraryNewsSingleCreate(object):

@@ -14,7 +14,7 @@ define(function (require, exports, module) {
     var LibraryNewsItemView = LibraryNewsModule.LibraryNewsItemView;
     var LibraryNewsListView = LibraryNewsModule.LibraryNewsListView;
     var LibraryNewsItemAddView = LibraryNewsModule.LibraryNewsItemAddView;
-//    var LibraryMusicItemEditView = LibraryMusicModule.LibraryMusicItemEditView;
+    var LibraryNewsItemEditView = LibraryNewsModule.LibraryNewsItemEditView;
 
     var AppView = CommonAppView.extend({
         default_interface: function () {
@@ -59,39 +59,49 @@ define(function (require, exports, module) {
             // Hack: 修正首图文无法在渲染时获得事件绑定问题
             view.fix_ckeditor();
         },
-//        edit_interface: function (id) {
-//            this.set_breadcrumb(new BreadcrumbView({
-//                title: '编辑音乐素材',
-//                subtitle: '编辑该音乐素材的详细信息',
-//                breadcrumbs: [
-//                    { title: '素材管理', url: '#' },
-//                    { title: '音乐素材', url: '#' },
-//                    { title: '编辑音乐素材', url: '#/edit/' + id }
-//                ]
-//            }));
-//            this.set_header(new ContentHeaderView({
-//                html: require('text!templates/library/music/app_content_header_edit.html')
-//            }));
-//            this.set_content(new LibraryMusicItemEditView({
-//                id: id
-//            }));
-//        }
+        edit_interface: function (id) {
+            this.set_breadcrumb(new BreadcrumbView({
+                title: '编辑图文素材',
+                subtitle: '编辑该图文素材的详细信息',
+                breadcrumbs: [
+                    { title: '素材管理', url: '#' },
+                    { title: '图文素材', url: '#' },
+                    { title: '编辑图文素材', url: '#/edit/' + id }
+                ]
+            }));
+            this.set_header(new ContentHeaderView({
+                html: require('text!templates/library/news/app_content_header_edit.html')
+            }));
+
+            var view = new LibraryNewsItemEditView({id: id});
+
+            // 如果已经存在CKEDITOR实例，先删除
+            if (CKEDITOR.instances.hasOwnProperty('news_content')) {
+                CKEDITOR.remove(CKEDITOR.instances.news_content);
+            }
+            this.set_content(view);
+            // 在HTML已经渲染好后初始化CKEDITOR
+            CKEDITOR.replace('news_content', {
+                language: 'zh-cn'
+            });
+            // Hack: 修正首图文无法在渲染时获得事件绑定问题
+            view.fix_ckeditor();
+        }
     });
     var app_view = new AppView;
 
     var AppRouter = Backbone.Router.extend({
         routes: {
             'add': 'add',
-//            'edit/:id': 'edit',
-//            'detail/:id': 'detail',
+            'edit/:id': 'edit',
             '*actions': 'default_router'
         },
         add: function () {
             app_view.add_interface();
         },
-//        edit: function (id) {
-//            app_view.edit_interface(id);
-//        },
+        edit: function (id) {
+            app_view.edit_interface(id);
+        },
         default_router: function (actions) {
             app_view.default_interface();
         }
