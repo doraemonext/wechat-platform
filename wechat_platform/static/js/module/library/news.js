@@ -229,7 +229,7 @@ define(function(require, exports, module) {
         events: {
             "click #add_sub_news": "add_sub_news",
             "click .edit": "edit_sub_news",
-            "click .delete": "delete_sub_news",
+            "click .delete": "delete_sub_news"
         },
         /**
          * 渲染添加图文素材页面
@@ -566,8 +566,30 @@ define(function(require, exports, module) {
                         info.hide();
                         news_array[news_id].picture = '';
                         that._set_news_array(news_array);
+
+                        // 当删除首图文图片时的同时恢复左侧预览图为默认图片
+                        if (news_id == 0) {
+                            that.$('.appmsg_content .js_appmsg_item:nth-child(1) .appmsg_thumb_wrp img').attr('src', '');
+                            that.$('.appmsg_content .js_appmsg_item:nth-child(1) .appmsg_thumb').css('display', 'block');
+                            that.$('.appmsg_content .js_appmsg_item:nth-child(1) .appmsg_thumb_wrp img').css('display', 'none');
+                        } else {
+                            that.$('.appmsg_content .js_appmsg_item:nth-child(' + (news_id+1) + ') img').attr('src', '');
+                            that.$('.appmsg_content .js_appmsg_item:nth-child(' + (news_id+1) + ') .appmsg_thumb').css('display', 'block');
+                            that.$('.appmsg_content .js_appmsg_item:nth-child(' + (news_id+1) + ') img').css('display', 'none');
+                        }
                     });
                 });
+
+                // 当上传图片成功时设置左侧预览图为对应图片
+                if (news_id == 0) {
+                    that.$('.appmsg_content .js_appmsg_item:nth-child(1) .appmsg_thumb_wrp img').attr('src', url);
+                    that.$('.appmsg_content .js_appmsg_item:nth-child(1) .appmsg_thumb').css('display', 'none');
+                    that.$('.appmsg_content .js_appmsg_item:nth-child(1) .appmsg_thumb_wrp img').css('display', 'block');
+                } else {
+                    that.$('.appmsg_content .js_appmsg_item:nth-child(' + (news_id+1) + ') img').attr('src', url);
+                    that.$('.appmsg_content .js_appmsg_item:nth-child(' + (news_id+1) + ') .appmsg_thumb').css('display', 'none');
+                    that.$('.appmsg_content .js_appmsg_item:nth-child(' + (news_id+1) + ') img').css('display', 'block');
+                }
             };
             info.set_error_content = function (content) {
                 $(this).html('<span class="text-red">上传失败：' + content + '</span>');
