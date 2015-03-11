@@ -829,7 +829,7 @@ define(function(require, exports, module) {
             this.$el.html(this.template());
 
             this.render_library_news(this.news);
-            this.news.fetch();
+            this.news.fetch({async: false});
             this.set_validate();
 
             return this;
