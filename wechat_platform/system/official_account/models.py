@@ -293,12 +293,15 @@ class OfficialAccount(models.Model):
                 wechat_ext=wechat_ext
             )
         else:  # 当不存在缓存的 token 和 cookies 时利用用户名密码初始化
-            simulation = Simulation(
-                official_account=self,
-                wechat_basic=wechat,
-                username=self.username,
-                password=self.password,
-            )
+            try:
+                simulation = Simulation(
+                    official_account=self,
+                    wechat_basic=wechat,
+                    username=self.username,
+                    password=self.password,
+                )
+            except SimulationException:
+                raise OfficialAccountIncorrect('Incorrect official account settings or network error')
 
         return simulation
 

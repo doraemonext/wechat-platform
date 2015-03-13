@@ -46,7 +46,55 @@ define(function(require, exports, module) {
             this.listenTo(this.model, 'destroy', this.remove);
         },
         events: {
+            "click .sync": "sync_item",
             "click .delete": "delete_item"
+        },
+        sync_item: function() {
+            var that = this;
+            noty({
+                layout: "center",
+                type: "success",
+                text: "正在同步该图文，请耐心等待……",
+                timeout: 3600000,
+                closeWith: []
+            });
+            $.ajax({
+                type: 'PUT',
+                dataType: 'json',
+                url: '/api/library/news/' + this.model.get('id') + '/sync',
+                cache: false,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
+                },
+                success: function (data) {
+                    noty({
+                        layout: "center",
+                        type: "success",
+                        text: "成功同步该图文素材",
+                        killer: true
+                    });
+                    that.model.fetch();
+                },
+                error: function (data) {
+                    noty({
+                        layout: "center",
+                        type: "error",
+                        text: "发生意外错误，请稍后重试",
+                        killer: true
+                    });
+                },
+                statusCode: {
+                    400: function (xhr) {
+                        var data = $.parseJSON(xhr.responseText);
+                        noty({
+                            layout: "center",
+                            type: "error",
+                            text: data['non_field_errors'],
+                            killer: true
+                        })
+                    }
+                }
+            });
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
@@ -85,11 +133,59 @@ define(function(require, exports, module) {
             this.listenTo(this.model, 'destroy', this.remove);
         },
         events: {
+            "click .sync": "sync_item",
             "click .delete": "delete_item"
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
             return this;
+        },
+        sync_item: function() {
+            var that = this;
+            noty({
+                layout: "center",
+                type: "success",
+                text: "正在同步该图文，请耐心等待……",
+                timeout: 3600000,
+                closeWith: []
+            });
+            $.ajax({
+                type: 'PUT',
+                dataType: 'json',
+                url: '/api/library/news/' + this.model.get('id') + '/sync',
+                cache: false,
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
+                },
+                success: function (data) {
+                    noty({
+                        layout: "center",
+                        type: "success",
+                        text: "成功同步该图文素材",
+                        killer: true
+                    });
+                    that.model.fetch();
+                },
+                error: function (data) {
+                    noty({
+                        layout: "center",
+                        type: "error",
+                        text: "发生意外错误，请稍后重试",
+                        killer: true
+                    });
+                },
+                statusCode: {
+                    400: function (xhr) {
+                        var data = $.parseJSON(xhr.responseText);
+                        noty({
+                            layout: "center",
+                            type: "error",
+                            text: data['non_field_errors'],
+                            killer: true
+                        })
+                    }
+                }
+            });
         },
         delete_item: function() {
             var current_model = this.model;

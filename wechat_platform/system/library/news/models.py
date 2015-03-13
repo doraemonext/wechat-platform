@@ -4,6 +4,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 
 from system.official_account.models import OfficialAccount
+from system.official_account.utils import OfficialAccountException, OfficialAccountIncorrect, OfficialAccountIncomplete
 from system.simulation import Simulation, SimulationException
 from system.media.models import Media
 from system.rule_match.models import RuleMatch
@@ -171,7 +172,10 @@ class LibraryNewsManager(models.Manager):
         :param news: 列表, 每个元素为一个 LibraryNews 实例
         :return: 官方管理平台中的 msgid
         """
-        simulation = official_account.get_simulation_instance()
+        try:
+            simulation = official_account.get_simulation_instance()
+        except OfficialAccountException as e:
+            raise LibraryNewsException(e)
 
         for item in news:
             item.update_picurl()  # 更新图片访问地址

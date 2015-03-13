@@ -33,6 +33,7 @@
     </div>
     <div class="appmsg_opr">
         <ul>
+            <% if (storage_location == 'local') { %>
             <li class="appmsg_opr_item grid_item size1of3">
                 <a class="sync" href="javascript:void(0)"><i class="fa fa-fw fa-refresh fa-lg"></i> 手动同步</a>
             </li>
@@ -42,6 +43,14 @@
             <li class="appmsg_opr_item grid_item size1of3 no_extra">
                 <a class="delete" href="javascript:void(0)"><i class="fa fa-fw fa-trash-o fa-lg"></i> 删除</a>
             </li>
+            <% } else { %>
+            <li class="appmsg_opr_item grid_item size1of2">
+                <a class="edit" href="#/edit/<%= id %>"><i class="fa fa-fw fa-edit fa-lg"></i> 编辑</a>
+            </li>
+            <li class="appmsg_opr_item grid_item size1of2 no_extra">
+                <a class="delete" href="javascript:void(0)"><i class="fa fa-fw fa-trash-o fa-lg"></i> 删除</a>
+            </li>
+            <% } %>
         </ul>
     </div>
 </div>
