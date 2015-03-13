@@ -113,7 +113,6 @@ class LibraryNewsSyncAPI(mixins.UpdateModelMixin, GenericAPIView):
     """
     系统素材库 - 图文素材同步 API (仅限 PUT)
     """
-    authentication_classes = (authentication.BasicAuthentication, )
     permission_classes = (permissions.IsAuthenticated, )
     model = LibraryNews
 
