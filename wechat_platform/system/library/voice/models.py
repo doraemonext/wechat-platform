@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
-from django.core.files import File
 
 from system.official_account.models import OfficialAccount
+from system.media.models import Media
 from system.simulation import Simulation, SimulationException
 
 
@@ -27,23 +27,18 @@ class LibraryVoiceManager(models.Manager):
             pk=voice_id
         )
 
-    def add(self, official_account, plugin_iden, file_path):
+    def add(self, official_account, plugin_iden, voice):
         """
         添加一条语音
         :param official_account: 所属公众号 (OfficialAccount)
         :param plugin_iden: 所属插件标识符
-        :param file_path: 语音文件路径
+        :param voice: 语音文件实例 (Media)
         """
-        f = open(file_path, 'rb')
-        voice_file = File(f)
-        voice = super(LibraryVoiceManager, self).create(
+        return super(LibraryVoiceManager, self).create(
             official_account=official_account,
             plugin_iden=plugin_iden,
-            voice=voice_file,
+            voice=voice
         )
-        voice_file.close()
-        f.close()
-        return voice
 
 
 class LibraryVoice(models.Model):
@@ -52,7 +47,7 @@ class LibraryVoice(models.Model):
     """
     official_account = models.ForeignKey(OfficialAccount, verbose_name=u'所属公众号')
     plugin_iden = models.CharField(u'所属插件标识符', max_length=50)
-    voice = models.FileField(u'语音本地存储位置', upload_to='library/voice')
+    voice = models.ForeignKey(Media, verbose_name='+', blank=True, null=True)
     fid = models.BigIntegerField(u'远程素材库中的文件ID', default=0)
     media_id = models.CharField(u'语音的媒体ID', max_length=50, null=True, blank=True)
 
@@ -79,7 +74,7 @@ class LibraryVoice(models.Model):
             return self.fid
 
         try:
-            fid = simulation.upload_file(filepath=self.voice.path)
+            fid = simulation.upload_file(filepath=self.voice.media.path)
             self.fid = int(fid)
         except SimulationException:  # 出现模拟登录错误时放弃上传
             self.fid = 0

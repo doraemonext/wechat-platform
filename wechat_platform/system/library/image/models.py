@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
-from django.core.files import File
 
 from system.official_account.models import OfficialAccount
 from system.media.models import Media
