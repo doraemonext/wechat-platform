@@ -7,6 +7,7 @@ from system.official_account.models import OfficialAccount
 from system.simulation import Simulation, SimulationException
 from system.media.models import Media
 from system.rule_match.models import RuleMatch
+from system.library.news.exceptions import LibraryNewsException
 
 
 class LibraryNewsManager(models.Manager):
@@ -162,6 +163,61 @@ class LibraryNewsManager(models.Manager):
         :param pk: 多图文根 ID
         """
         super(LibraryNewsManager, self).get_queryset().get(pk=pk).delete()
+
+    def sync(self, official_account, news):
+        """
+        与官方管理平台图文素材库同步
+        :param official_account: OfficialAccount 实例
+        :param news: 列表, 每个元素为一个 LibraryNews 实例
+        :return: 官方管理平台中的 msgid
+        """
+        simulation = official_account.get_simulation_instance()
+
+        for item in news:
+            item.update_picurl()  # 更新图片访问地址
+            if item.content:
+                item.update_url()  # 更新URL地址
+            if official_account.simulation_available:
+                item.update_picture_id(simulation=simulation)  # 更新图片在远程素材库中的ID
+
+        msgid = None
+        # 向微信公众平台素材库中添加该图文信息
+        news_dealt = []
+        for item in news:
+            news_dealt.append({
+                'title': item.title,
+                'author': item.author,
+                'summary': item.description,
+                'content': item.content,
+                'picture_id': item.picid,
+                'from_url': item.from_url,
+            })
+            for x in news_dealt[-1]:  # 将所有非 picid 的空字段转换为空字符串
+                if x != 'picture_id' and not news_dealt[-1][x]:
+                    news_dealt[-1][x] = ''
+        try:
+            simulation.add_news(news=news_dealt)
+            # 获取素材库中的图文列表并得到刚才添加的图文的 msgid
+            news_list = simulation.get_news_list(page=0)
+            for news_single in news_list:
+                is_match = True
+                for item in news_single['multi_item']:
+                    index = item['seq']
+                    if item['title'] != news_dealt[index]['title'] or item['author'] != news_dealt[index]['author'] or \
+                        item['digest'] != news_dealt[index]['summary'] or item['file_id'] != news_dealt[index]['picture_id'] or \
+                        item['source_url'] != news_dealt[index]['from_url']:
+                        is_match = False
+                        break
+                if is_match:
+                    msgid = news_single['app_id']
+                    break
+        except SimulationException, e:
+            raise LibraryNewsException(e)
+
+        first_news = news[0]
+        first_news.msgid = msgid
+        first_news.save()
+        return msgid
 
     def _get_without_root(self, official_account, plugin_iden, root):
         """

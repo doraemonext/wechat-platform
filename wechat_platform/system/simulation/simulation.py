@@ -392,7 +392,7 @@ class Simulation(object):
         for i in range(0, 2):
             try:
                 try:
-                    return self.wechat_ext.upload_file(filepath=filepath)
+                    return self.wechat_ext.upload_file(filepath=str(filepath))
                 except NeedLoginError:
                     self.login()
             except LoginError, e:

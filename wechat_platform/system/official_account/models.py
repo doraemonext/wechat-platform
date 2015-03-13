@@ -7,7 +7,8 @@ from wechat_sdk import WechatBasic, WechatExt
 from wechat_sdk.exceptions import OfficialAPIError, UnOfficialAPIError
 
 from lib.tools.rand import make_unique_random_string
-from system.official_account import OfficialAccountIncomplete, OfficialAccountIncorrect
+from system.official_account import OfficialAccountIncomplete, OfficialAccountIncorrect, OfficialAccountException
+from system.simulation import Simulation, SimulationException
 
 logger_official_account = logging.getLogger(__name__)
 
@@ -97,6 +98,12 @@ class OfficialAccountManager(models.Manager):
         判断 id 为 pk 的公众号是否存在
         """
         return super(OfficialAccountManager, self).get_queryset().filter(pk=pk).exists()
+
+    def get(self, pk):
+        """
+        返回 id 为 pk 的公众号实例
+        """
+        return super(OfficialAccountManager, self).get_queryset().get(pk=pk)
 
 
 class OfficialAccount(models.Model):
@@ -260,6 +267,40 @@ class OfficialAccount(models.Model):
             raise AttributeError('must provide one of the keyword argument groups')
         self.save()
         logger_official_account.debug('The model has been updated [Model] %s' % self.__dict__)
+
+    def get_simulation_instance(self):
+        """
+        获取该公众号的模拟登陆实例
+        """
+        wechat = WechatBasic()
+        wechat.parse_data(data="""<xml><ToUserName><![CDATA[toUser]]></ToUserName><FromUserName><![CDATA[fromUser]]></FromUserName><CreateTime>1348831860</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[this is a test]]></Content><MsgId>1234567890123456</MsgId></xml>""")
+
+        if not self.simulation_available:
+            logger_official_account.debug('Simulation is not available in current settings [OfficialAccount] %s' % self.__dict__)
+            raise OfficialAccountException('Simulation is not available in current settings')
+
+        if self.has_token_cookies:  # 当已经存在缓存的 token 和 cookies 时直接利用它们初始化
+            token_cookies_dict = self.get_cache_token_cookies()
+            wechat_ext = WechatExt(
+                username=self.username,
+                password=self.password,
+                token=token_cookies_dict['token'],
+                cookies=token_cookies_dict['cookies'],
+            )
+            simulation = Simulation(
+                official_account=self,
+                wechat_basic=wechat,
+                wechat_ext=wechat_ext
+            )
+        else:  # 当不存在缓存的 token 和 cookies 时利用用户名密码初始化
+            simulation = Simulation(
+                official_account=self,
+                wechat_basic=wechat,
+                username=self.username,
+                password=self.password,
+            )
+
+        return simulation
 
 
 from system.rule.models import Rule

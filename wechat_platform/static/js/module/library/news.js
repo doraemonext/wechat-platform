@@ -1388,7 +1388,7 @@ define(function(require, exports, module) {
                     $.ajax({
                         type: 'PUT',
                         dataType: 'json',
-                        url: '/api/library/news/' + that.news.get('id') + '/',
+                        url: '/api/library/news/' + that.news.get('id'),
                         cache: false,
                         data: {
                             official_account: $('#current-official-account').val(),

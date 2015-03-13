@@ -12,8 +12,10 @@ from rest_framework.response import Response
 from rest_framework import authentication, permissions, mixins, filters
 from rest_framework import status, parsers
 from rest_framework.parsers import JSONParser
+from rest_framework.views import APIView
 
 from system.library.news.models import LibraryNews
+from system.library.news.exceptions import LibraryNewsException
 from system.official_account.models import OfficialAccount
 from api.library.news.serializers import LibraryNewsSingleCreate, LibraryNewsCreate
 from api.library.news.serializers import LibraryNewsListSeriailzer, LibraryNewsDetailSerializer, LibraryNewsSingleCreateSerializer, LibraryNewsCreateSerializer
@@ -105,3 +107,32 @@ class LibraryNewsDetailAPI(mixins.UpdateModelMixin, mixins.DestroyModelMixin, Ge
 
     def delete(self, request, *args, **kwargs):
         return super(LibraryNewsDetailAPI, self).destroy(request, *args, **kwargs)
+
+
+class LibraryNewsSyncAPI(mixins.UpdateModelMixin, GenericAPIView):
+    """
+    系统素材库 - 图文素材同步 API (仅限 PUT)
+    """
+    authentication_classes = (authentication.BasicAuthentication, )
+    permission_classes = (permissions.IsAuthenticated, )
+    model = LibraryNews
+
+    def put(self, request, *args, **kwargs):
+        obj = self.get_object_or_none()
+        if not obj or obj.parent:  # 仅允许更新, 对于新建或非首图文ID直接禁止
+            raise Http404()
+        try:
+            news = LibraryNews.manager.get(
+                official_account=obj.official_account,
+                plugin_iden=obj.plugin_iden,
+                root=obj
+            )
+        except LibraryNews.DoesNotExist, e:
+            raise Http404()
+
+        try:
+            msgid = LibraryNews.manager.sync(official_account=obj.official_account, news=news)
+        except LibraryNewsException:
+            return Response({'non_field_errors': [u'同步到微信官方服务器时发生错误']}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'msgid': msgid}, status=status.HTTP_200_OK)
