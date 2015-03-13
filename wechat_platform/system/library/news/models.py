@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import HTMLParser
+
 from django.db import models
 from django.core.urlresolvers import reverse
 
@@ -172,6 +174,8 @@ class LibraryNewsManager(models.Manager):
         :param news: 列表, 每个元素为一个 LibraryNews 实例
         :return: 官方管理平台中的 msgid
         """
+        html_parser = HTMLParser.HTMLParser()
+
         try:
             simulation = official_account.get_simulation_instance()
         except OfficialAccountException as e:
@@ -207,6 +211,10 @@ class LibraryNewsManager(models.Manager):
                 is_match = True
                 for item in news_single['multi_item']:
                     index = item['seq']
+                    item['title'] = html_parser.unescape(item['title'])
+                    item['author'] = html_parser.unescape(item['author'])
+                    item['digest'] = html_parser.unescape(item['digest'])
+                    item['source_url'] = html_parser.unescape(item['source_url'])
                     if item['title'] != news_dealt[index]['title'] or item['author'] != news_dealt[index]['author'] or \
                         item['digest'] != news_dealt[index]['summary'] or item['file_id'] != news_dealt[index]['picture_id'] or \
                         item['source_url'] != news_dealt[index]['from_url']:
