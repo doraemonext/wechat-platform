@@ -56,7 +56,8 @@ define(function(require, exports, module) {
                 type: "success",
                 text: "正在同步该图文，请耐心等待……",
                 timeout: 3600000,
-                closeWith: []
+                closeWith: [],
+                killer: true
             });
             $.ajax({
                 type: 'PUT',
