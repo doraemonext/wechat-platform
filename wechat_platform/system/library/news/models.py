@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import binascii
+import os
 import HTMLParser
 
 from django.db import models
@@ -263,6 +265,7 @@ class LibraryNews(models.Model):
     official_account = models.ForeignKey(OfficialAccount, verbose_name=u'所属公众号')
     plugin_iden = models.CharField(u'所属插件标识符', max_length=50)
 
+    token = models.CharField(u'唯一标识符', max_length=40)
     parent = models.ForeignKey('self', verbose_name=u'本地/远程-父ID', blank=True, null=True)
     title = models.CharField(u'本地/远程-图文标题', max_length=100)
     description = models.TextField(u'本地/远程-图文描述', blank=True, null=True)
@@ -290,6 +293,14 @@ class LibraryNews(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.key = self.generate_key()
+        return super(LibraryNews, self).save(*args, **kwargs)
+
+    def generate_key(self):
+        return binascii.hexlify(os.urandom(20)).decode()
 
     def is_simulated(self):
         """
