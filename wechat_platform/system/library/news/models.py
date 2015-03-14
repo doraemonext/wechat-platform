@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import uuid
+import HTMLParser
+
 from django.db import models
 from django.core.urlresolvers import reverse
 
@@ -31,6 +34,7 @@ class LibraryNewsManager(models.Manager):
                 official_account=official_account,
                 plugin_iden=plugin_iden,
                 parent=parent,
+                token=item.get('token'),
                 title=item.get('title'),
                 description=item.get('description'),
                 picurl=item.get('picurl'),
@@ -60,6 +64,7 @@ class LibraryNewsManager(models.Manager):
                 plugin_iden=plugin_iden,
                 parent=parent,
                 msgid=item.get('msgid', 0),
+                token=item.get('token'),
                 title=item.get('title'),
                 description=item.get('description'),
                 picture=item.get('picture'),
@@ -91,6 +96,7 @@ class LibraryNewsManager(models.Manager):
                 plugin_iden=plugin_iden,
                 parent=parent,
                 msgid=item.get('msgid', 0),
+                token=item.get('token'),
                 title=item.get('title'),
                 description=item.get('description'),
                 picture=item.get('picture'),
@@ -172,6 +178,8 @@ class LibraryNewsManager(models.Manager):
         :param news: 列表, 每个元素为一个 LibraryNews 实例
         :return: 官方管理平台中的 msgid
         """
+        html_parser = HTMLParser.HTMLParser()
+
         try:
             simulation = official_account.get_simulation_instance()
         except OfficialAccountException as e:
@@ -207,6 +215,10 @@ class LibraryNewsManager(models.Manager):
                 is_match = True
                 for item in news_single['multi_item']:
                     index = item['seq']
+                    item['title'] = html_parser.unescape(item['title'])
+                    item['author'] = html_parser.unescape(item['author'])
+                    item['digest'] = html_parser.unescape(item['digest'])
+                    item['source_url'] = html_parser.unescape(item['source_url'])
                     if item['title'] != news_dealt[index]['title'] or item['author'] != news_dealt[index]['author'] or \
                         item['digest'] != news_dealt[index]['summary'] or item['file_id'] != news_dealt[index]['picture_id'] or \
                         item['source_url'] != news_dealt[index]['from_url']:
@@ -255,6 +267,7 @@ class LibraryNews(models.Model):
     official_account = models.ForeignKey(OfficialAccount, verbose_name=u'所属公众号')
     plugin_iden = models.CharField(u'所属插件标识符', max_length=50)
 
+    token = models.CharField(u'唯一标识符', max_length=40)
     parent = models.ForeignKey('self', verbose_name=u'本地/远程-父ID', blank=True, null=True)
     title = models.CharField(u'本地/远程-图文标题', max_length=100)
     description = models.TextField(u'本地/远程-图文描述', blank=True, null=True)
@@ -282,6 +295,14 @@ class LibraryNews(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = self.generate_token()
+        return super(LibraryNews, self).save(*args, **kwargs)
+
+    def generate_token(self):
+        return uuid.uuid1().hex
 
     def is_simulated(self):
         """
@@ -358,6 +379,6 @@ class LibraryNews(models.Model):
         if not self.content:
             self.url = url
         else:
-            self.url = reverse('news:detail', kwargs={'pk': self.pk})
+            self.url = reverse('news:detail', kwargs={'token': self.token})
         self.save()
         return self.url

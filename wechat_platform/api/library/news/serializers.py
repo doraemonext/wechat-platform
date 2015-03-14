@@ -16,12 +16,16 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
     """
     系统素材库 - 图文库 序列化类 (仅限获取列表信息[GET])
     """
+    token = serializers.SerializerMethodField('get_token')
     show_cover_pic = serializers.SerializerMethodField('get_show_cover_pic')
     picurl = serializers.SerializerMethodField('get_picurl')
     content_url = serializers.SerializerMethodField('get_content_url')
     storage_location = serializers.SerializerMethodField('get_storage_location')
     multi_item = serializers.SerializerMethodField('get_multi_item')
     datetime = serializers.SerializerMethodField('get_datetime')
+
+    def get_token(self, obj):
+        return obj.token
 
     def get_show_cover_pic(self, obj):
         if obj.picture:
@@ -42,7 +46,7 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
         获取文章访问的绝对路径
         """
         if obj.is_simulated():
-            return self.context['view'].request.build_absolute_uri(reverse('news:detail', kwargs={'pk': obj.pk}))
+            return self.context['view'].request.build_absolute_uri(reverse('news:detail', kwargs={'token': obj.token}))
         else:
             return obj.url
 
@@ -67,6 +71,7 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
         for item in multi_item:
             multi_item_expander.append({
                 'id': item.pk,
+                'token': item.token,
                 'title': item.title,
                 'description': item.description,
                 'author': item.author,
@@ -84,15 +89,19 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
     class Meta:
         model = LibraryNews
         fields = (
-            'id', 'msgid', 'title', 'description', 'author', 'show_cover_pic', 'picurl', 'content_url',
+            'id', 'msgid', 'token', 'title', 'description', 'author', 'show_cover_pic', 'picurl', 'content_url',
             'from_url', 'storage_location', 'multi_item', 'datetime'
         )
         read_only_fields = ('id', 'msgid', 'title', 'description', 'author', 'from_url')
 
 
 class LibraryNewsDetailSerializer(LibraryNewsListSeriailzer):
+    token = serializers.SerializerMethodField('get_token')
     picture = serializers.SerializerMethodField('get_picture')
     content = serializers.SerializerMethodField('get_content')
+
+    def get_token(self, obj):
+        return obj.token
 
     def get_picture(self, obj):
         if not obj.picture:
@@ -113,6 +122,7 @@ class LibraryNewsDetailSerializer(LibraryNewsListSeriailzer):
         for item in multi_item:
             multi_item_expander.append({
                 'id': item.pk,
+                'token': item.token,
                 'title': item.title,
                 'description': item.description,
                 'author': item.author,
@@ -129,7 +139,7 @@ class LibraryNewsDetailSerializer(LibraryNewsListSeriailzer):
     class Meta:
         model = LibraryNews
         fields = (
-            'id', 'msgid', 'title', 'description', 'author', 'show_cover_pic', 'picurl', 'picture', 'content_url',
+            'id', 'msgid', 'token', 'title', 'description', 'author', 'show_cover_pic', 'picurl', 'picture', 'content_url',
             'content', 'from_url', 'storage_location', 'multi_item', 'datetime'
         )
         read_only_fields = ('id', 'msgid', 'title', 'description', 'author', 'from_url')
@@ -137,6 +147,7 @@ class LibraryNewsDetailSerializer(LibraryNewsListSeriailzer):
 
 class LibraryNewsSingleCreate(object):
     def __init__(self, *args, **kwargs):
+        self.token = self._transform(kwargs.get('token'))
         self.title = self._transform(kwargs.get('title'))
         self.author = self._transform(kwargs.get('author'))
         self.picture = self._transform(kwargs.get('picture'))
@@ -192,6 +203,7 @@ class LibraryNewsCreate(object):
         for item in self.news_array:
             if item.pattern == 'text':
                 news.append({
+                    'token': item.token,
                     'title': item.title,
                     'author': item.author,
                     'picture': None if not item.picture else Media.manager.get(item.picture),
@@ -201,6 +213,7 @@ class LibraryNewsCreate(object):
                 })
             else:
                 news.append({
+                    'token': item.token,
                     'title': item.title,
                     'author': item.author,
                     'picture': None if not item.picture else Media.manager.get(item.picture),
@@ -228,6 +241,9 @@ class LibraryNewsCreate(object):
 
 
 class LibraryNewsSingleCreateSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=40, error_messages={
+        'invalid': u'Token不合法',
+    }, required=False)
     title = serializers.CharField(max_length=100, error_messages={
         'required': u'图文标题不能为空',
         'invalid': u'输入数据不合法',
@@ -275,6 +291,7 @@ class LibraryNewsSingleCreateSerializer(serializers.Serializer):
 
     def restore_object(self, attrs, instance=None):
         if instance is not None:
+            instance.token = attrs.get('token', instance.token)
             instance.title = attrs.get('title', instance.title)
             instance.author = attrs.get('author', instance.author)
             instance.picture = attrs.get('picture', instance.picture)

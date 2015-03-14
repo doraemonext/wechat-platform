@@ -56,7 +56,8 @@ define(function(require, exports, module) {
                 type: "success",
                 text: "正在同步该图文，请耐心等待……",
                 timeout: 3600000,
-                closeWith: []
+                closeWith: [],
+                killer: true
             });
             $.ajax({
                 type: 'PUT',
@@ -612,6 +613,7 @@ define(function(require, exports, module) {
          */
         _get_empty_news: function () {
             return {
+                token: '',
                 title: '',
                 description: '',
                 picture: '',
@@ -944,6 +946,7 @@ define(function(require, exports, module) {
                 var news_current = 0;
                 for (i = 0; i < multi_item.length; i++) {
                     news_array.push(this._get_empty_news());
+                    news_array[i].token = multi_item[i].token || "";
                     news_array[i].title = multi_item[i].title || "";
                     news_array[i].description = multi_item[i].description || "";
                     news_array[i].picture = multi_item[i].picture || "";
@@ -1237,6 +1240,7 @@ define(function(require, exports, module) {
          */
         _get_empty_news: function () {
             return {
+                token: '',
                 title: '',
                 description: '',
                 picture: '',
