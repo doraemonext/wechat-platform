@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import binascii
-import os
+import uuid
 import HTMLParser
 
 from django.db import models
@@ -296,11 +295,11 @@ class LibraryNews(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.token:
-            self.key = self.generate_key()
+            self.key = self.generate_token()
         return super(LibraryNews, self).save(*args, **kwargs)
 
-    def generate_key(self):
-        return binascii.hexlify(os.urandom(20)).decode()
+    def generate_token(self):
+        return uuid.uuid1().hex
 
     def is_simulated(self):
         """
