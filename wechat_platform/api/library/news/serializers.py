@@ -16,12 +16,16 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
     """
     系统素材库 - 图文库 序列化类 (仅限获取列表信息[GET])
     """
+    token = serializers.SerializerMethodField('get_token')
     show_cover_pic = serializers.SerializerMethodField('get_show_cover_pic')
     picurl = serializers.SerializerMethodField('get_picurl')
     content_url = serializers.SerializerMethodField('get_content_url')
     storage_location = serializers.SerializerMethodField('get_storage_location')
     multi_item = serializers.SerializerMethodField('get_multi_item')
     datetime = serializers.SerializerMethodField('get_datetime')
+
+    def get_token(self, obj):
+        return obj.token
 
     def get_show_cover_pic(self, obj):
         if obj.picture:
@@ -84,7 +88,7 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
     class Meta:
         model = LibraryNews
         fields = (
-            'id', 'msgid', 'title', 'description', 'author', 'show_cover_pic', 'picurl', 'content_url',
+            'id', 'msgid', 'token', 'title', 'description', 'author', 'show_cover_pic', 'picurl', 'content_url',
             'from_url', 'storage_location', 'multi_item', 'datetime'
         )
         read_only_fields = ('id', 'msgid', 'title', 'description', 'author', 'from_url')
