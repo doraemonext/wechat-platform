@@ -42,7 +42,7 @@ class LibraryNewsListSeriailzer(serializers.ModelSerializer):
         获取文章访问的绝对路径
         """
         if obj.is_simulated():
-            return self.context['view'].request.build_absolute_uri(reverse('news:detail', kwargs={'pk': obj.pk}))
+            return self.context['view'].request.build_absolute_uri(reverse('news:detail', kwargs={'token': obj.token}))
         else:
             return obj.url
 

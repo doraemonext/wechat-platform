@@ -376,6 +376,6 @@ class LibraryNews(models.Model):
         if not self.content:
             self.url = url
         else:
-            self.url = reverse('news:detail', kwargs={'pk': self.pk})
+            self.url = reverse('news:detail', kwargs={'token': self.token})
         self.save()
         return self.url

@@ -7,5 +7,5 @@ from system.library.news.views import NewsDetailView
 
 
 urlpatterns = patterns('',
-    url(r'^(?P<pk>[0-9]+)/', NewsDetailView.as_view(), name='detail'),
+    url(r'^(?P<token>.*)/$', NewsDetailView.as_view(), name='detail'),
 )
