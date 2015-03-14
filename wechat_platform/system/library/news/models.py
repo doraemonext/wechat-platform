@@ -295,7 +295,7 @@ class LibraryNews(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.token:
-            self.key = self.generate_token()
+            self.token = self.generate_token()
         return super(LibraryNews, self).save(*args, **kwargs)
 
     def generate_token(self):
