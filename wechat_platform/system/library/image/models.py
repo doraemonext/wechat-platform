@@ -11,6 +11,16 @@ class LibraryImageManager(models.Manager):
     """
     素材库 - 图片库 Manager
     """
+    def get_list(self, official_account):
+        """
+        获取单个公众号的所有图片列表
+        :param official_account: 所属公众号
+        :return: 列表, 每个元素为一个 LibraryImage 实例
+        """
+        return super(LibraryImageManager, self).get_queryset().filter(
+            official_account=official_account
+        )
+
     def get(self, official_account, plugin_iden, image_id):
         """
         获取一张图片
